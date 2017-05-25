@@ -1,0 +1,14 @@
+name = Quiz - markup
+package = Quiz core
+description = Provides support for markup question.
+core = 7.x
+dependencies[] = quiz
+dependencies[] = quiz_question
+files[] = quiz_markup.classes.inc
+
+; Information added by thuypx.pro@gmail.com
+version = "7.x-1.0"
+core = "7.x"
+project = "quiz"
+datestamp = "1495718686"
+

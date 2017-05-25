@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Quiz_markup question type for the Quiz module.
+ *
+ * Pages are implemented as a question type. However, they do not affect the score.
+ */
+
+/**
+ * Implements hook_help().
+ */
+function quiz_markup_help($path, $args) {
+  if ($path == 'admin/help#quiz_markups') {
+    return t('Provides markup html in a quiz.');
+  }
+}
+
+/**
+ * Implements hook_quiz_question_info().
+ */
+function quiz_markup_quiz_question_info() {
+  return array(
+    'quiz_markup' => array(
+      'name' => t('@quiz markup', array('@quiz' => QUIZ_NAME)),
+      'description' => t('Quiz markup allow you display html makup in quiz page.'),
+      'question provider' => 'QuizPagesQuestion',
+      'response provider' => 'QuizPagesResponse',
+      // All wrapper functions are in the quiz_question module.
+      'module' => 'quiz_question',
+    ),
+  );
+}
+
+/**
+ * Implements hook_quiz_question_config().
+ */
+function quiz_markup_quiz_question_config() {
+  return FALSE;
+}
