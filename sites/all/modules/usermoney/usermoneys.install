@@ -6,21 +6,21 @@
  *
  * Install a default content type, set some defaults.
  */
-function course_install() {
+function usermoneys_install() {
 
 }
 
 /**
  * Implements hook_uninstall().
  */
-function course_uninstall() {
+function usermoneys_uninstall() {
 
 }
 
 /**
  * Implements hook_schema().
  */
-function course_schema() {
+function usermoneys_schema() {
   $schema = array();
   $schema['usermoneys'] = array(
     'description' => 'Holds the user moneys',
