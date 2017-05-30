@@ -1,0 +1,11 @@
+name = User money
+core = 7.x
+description = Payment for e-learning courses.
+package = Users
+configure = admin/user-money
+; Information added by Drupal.org packaging script on 2017-02-17
+version = "7.x-1.11"
+core = "7.x"
+project = "user_money"
+datestamp = "1487351587"
+
