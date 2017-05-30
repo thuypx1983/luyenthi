@@ -1,0 +1,178 @@
+<?php
+
+
+/**
+ * Implements hook_install().
+ *
+ * Install a default content type, set some defaults.
+ */
+function course_install() {
+
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function course_uninstall() {
+
+}
+
+/**
+ * Implements hook_schema().
+ */
+function course_schema() {
+  $schema = array();
+  $schema['usermoneys'] = array(
+    'description' => 'Holds the user moneys',
+    'fields' => array(
+      'mid' => array(
+        'description' => 'Moints ID',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'description' => 'User ID',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'moneys' => array(
+        'description' => 'Current Moneys',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'last_update' => array(
+        'description' => 'Timestamp',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      )
+    ),
+    'primary key' => array('mid'),
+    'indexes' => array(
+      'last_update' => array('last_update'),
+      'moneys' => array('moneys'),
+    ),
+    'unique keys' => array(
+      'uid' => array('uid'),
+    ),
+  );
+
+  $schema['usermoneys_total'] = array(
+    'description' => 'Holds the total user moneys',
+    'fields' => array(
+      'uid' => array(
+        'description' => 'User ID',
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'Moneys' => array(
+        'description' => 'Current Moneys',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'last_update' => array(
+        'description' => 'Timestamp',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('uid'),
+    'indexes' => array(
+      'last_update' => array('last_update'),
+      'moneys' => array('moneys'),
+    ),
+  );
+
+  $schema['usermoneys_txn'] = array(
+    'description' => 'Usermoneys Transactions',
+    'fields' => array(
+      'txn_id' => array(
+        'description' => 'Transaction ID',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'description' => 'User ID',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'approver_uid' => array(
+        'description' => 'Moderator User ID',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'moneys' => array(
+        'description' => 'Moneyss',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'time_stamp' => array(
+        'description' => 'Timestamp',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'Effective timestamp of last action on this transaction, for tracking purposes.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'status' => array(
+        'description' => 'Status',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'description' => array(
+        'description' => 'Description',
+        'type' => 'text',
+      ),
+      'reference' => array(
+        'description' => 'Reserved for module specific use',
+        'type' => 'varchar',
+        'length' => 128,
+      ),
+      'expirydate' => array(
+        'description' => 'Expirydate',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'expired' => array(
+        'description' => 'Expiration status',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'entity_id' => array(
+        'description' => 'ID of an entity in the Database',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'entity_type' => array(
+        'description' => 'Type of entity',
+        'type' => 'varchar',
+        'length' => 128,
+      ),
+      'operation' => array(
+        'description' => 'Operation being carried out',
+        'type' => 'varchar',
+        'length' => 48,
+      ),
+
+    ),
+    'primary key' => array('txn_id'),
+  );
+  return $schema;
+}
