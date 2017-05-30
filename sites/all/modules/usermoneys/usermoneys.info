@@ -1,4 +1,4 @@
-name = User money
+name = User moneys
 core = 7.x
 description = Payment for e-learning courses.
 package = Users

@@ -1,0 +1,6 @@
+<?php
+    require_once ('F:\websites\luyenthi.localhost\sites\all\modules\usermoney\usermoneys.views.inc');
+    function usermoneys_init(){
+        $x=1;
+    }
+?>
