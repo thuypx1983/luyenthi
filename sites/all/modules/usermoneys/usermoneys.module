@@ -1,6 +1,325 @@
 <?php
-    require_once ('F:\websites\luyenthi.localhost\sites\all\modules\usermoney\usermoneys.views.inc');
-    function usermoneys_init(){
-        $x=1;
-    }
-?>
+/**
+ * Hook_init
+ */
+function usermoneys_init(){
+
+}
+
+/**
+ * @return mixed
+ * Hook_views_data
+ */
+function usermoneys_views_data() {
+    // ----------------------------------------------------------------
+    // userMoneys table
+    // Describe the userMoneys table.
+    // Define the base group of this table. Fields that don't
+    // have a group defined will go into this field by default.
+    $data['usermoneys']['table']['group'] = t('User moneys');
+
+    $data['usermoneys']['table']['base'] = array(
+        'field' => 'uid',
+        'title' => t('usermoneys'),
+        'help' => t('Moneys by category accumulated by users on your site.'),
+    );
+
+    $data['usermoneys']['table']['join'] = array(
+        'users' => array(
+            'left_field' => 'uid',
+            'field' => 'uid',
+        ),
+        'node' => array(
+            'left_field' => 'uid',
+            'field' => 'uid',
+        )
+    );
+
+    // Describe the Moneys column of the userMoneys table.
+    $data['usermoneys']['moneys'] = array(
+        'title' => t('Current !Moneys in category'),
+        'help' => t("A User's current !Moneys in a single category."), // The help that appears on the UI,
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_numeric',
+            'numeric' => TRUE,
+            'name field' => 'moneys', // display this field in the summary
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+    );
+
+    // Describe the last_update column of the userMoneys table.
+    $data['usermoneys']['last_update'] = array(
+        'title' => t('Last update in category'),
+        'help' => t("The last update timestamp for a User's current !Moneys in a single category."),
+        'field' => array(
+            'handler' => 'views_handler_field_date',
+            'click sortable' => TRUE,
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort_date',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_date',
+        ),
+    );
+
+    // Add relationship to user table.
+    $data['usermoneys']['uid'] = array(
+        'title' => t('User'),
+        'help' => t('Relate the userMoneys table to the user table.'),
+        'relationship' => array(
+            'base' => 'users',
+            'field' => 'uid',
+            'label' => t('Users'),
+            'handler' => 'views_handler_relationship',
+        ),
+    );
+
+
+    // ----------------------------------------------------------------
+    // usermoneys_txn table
+    // Describe the usermoneys_txn table.
+    // Define the base group of this table. Fields that don't
+    // have a group defined will go into this field by default.
+    $data['usermoneys_txn']['table']['group'] = t('Usermoneys Transactions');
+
+    $data['usermoneys_txn']['table']['base'] = array(
+        'field' => 'txn_id',
+        'title' => t('Usermoneys Transactions'),
+        'help' => t('Moneys transactions accumulated by users on your site.'),
+    );
+
+    $data['usermoneys_txn']['table']['join'] = array(
+        'users' => array(
+            'left_field' => 'uid',
+            'field' => 'uid',
+        ),
+        'taxonomy_term_data' => array(
+            'left_field' => 'tid',
+            'field' => 'tid',
+        ),
+        // This goes to the node so that we have consistent authorship.
+        'node_revisions' => array(
+            'left_table' => 'node',
+            'left_field' => 'uid',
+            'field' => 'uid',
+        ),
+    );
+
+    // Describe the Moneys column of the Usermoneys table.
+    $data['usermoneys_txn']['moneys'] = array(
+        'title' => t('moneys'),
+        'help' => t("A User's !Moneys for this transaction."), // The help that appears on the UI,
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_numeric',
+            'numeric' => TRUE,
+            'name field' => 'moneys', // display this field in the summary
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+    );
+
+
+
+    // Add relationship to user table.
+    $data['usermoneys_txn']['uid'] = array(
+        'title' => t('User'),
+        'help' => t('Relate the Usermoneys table to the user table.'),
+        'argument' => array(
+            'handler' => 'views_handler_argument_numeric',
+            'numeric' => TRUE,
+        ),
+        'relationship' => array(
+            'base' => 'users',
+            'field' => 'uid',
+            'label' => t('Users'),
+            'handler' => 'views_handler_relationship',
+        ),
+    );
+
+    $data['usermoneys_txn']['time_stamp'] = array(
+        'title' => t('Timestamp'),
+        'help' => t('The created timestamp for the transaction.'),
+        'field' => array(
+            'handler' => 'views_handler_field_date',
+            'click sortable' => TRUE,
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort_date',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_date',
+        ),
+    );
+
+    $data['usermoneys_txn']['changed'] = array(
+        'title' => t('Changed'),
+        'help' => t('The changed timestamp for the transaction, for when the transaction is updated.'),
+        'field' => array(
+            'handler' => 'views_handler_field_date',
+            'click sortable' => TRUE,
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort_date',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_date',
+        ),
+    );
+
+    $data['usermoneys_txn']['status'] = array(
+        'title' => t('Status'),
+        'help' => t('The status of the transaction.'),
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+    );
+
+    $data['usermoneys_txn']['description'] = array(
+        'title' => t('Description'),
+        'help' => t('The description for the transaction.'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+        ),
+    );
+
+    $data['usermoneys_txn']['reference'] = array(
+        'title' => t('Reference'),
+        'help' => t('The reference for the transaction.'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_string',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+    );
+
+    $data['usermoneys_txn']['expirydate'] = array(
+        'title' => t('Expiry date'),
+        'help' => t('The expiration date for the transaction.'),
+        'field' => array(
+            'handler' => 'views_handler_field_date',
+            'click sortable' => TRUE,
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort_date',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_date',
+        ),
+    );
+
+    $data['usermoneys_txn']['expired'] = array(
+        'title' => t('Expired'),
+        'help' => t('The expiry status for the transaction.'),
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+    );
+
+    $data['usermoneys_txn']['entity_id'] = array(
+        'title' => t('Entity ID'),
+        'help' => t('The referenced entity ID.'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+        ),
+        'argument' => array(
+            'handler' => 'views_handler_argument_numeric',
+            'numeric' => TRUE,
+        ),
+    );
+
+    $data['usermoneys_txn']['node'] = array(
+        'title' => t('Node'),
+        'help' => t('Used to relate to the node table.'),
+        'real field' => 'entity_id',
+        'relationship' => array(
+            'base' => 'node',
+            'base field' => 'nid',
+            'label' => t('Node'),
+            'handler' => 'views_handler_relationship',
+            'extra' => array(
+                array(
+                    'field' => 'entity_type',
+                    'value' => 'node',
+                    'table' => 'usermoneys_txn',
+                ),
+            ),
+        ),
+    );
+
+    $data['usermoneys_txn']['entity_type'] = array(
+        'title' => t('Entity type'),
+        'help' => t('The entity type for the transaction.'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_string',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+    );
+
+    $data['usermoneys_txn']['operation'] = array(
+        'title' => t('Operation'),
+        'help' => t('The operation for the transaction.'),
+        'field' => array(
+            'handler' => 'views_handler_field',
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_string',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+        $data['usermoneys_txn']['txn_id'] = array(
+            'title' => t('Transaction ID'),
+            'help' => t('Usermoneys Transaction ID'),
+            'field' => array(
+                'handler' => 'views_handler_field',
+            ),
+            'filter' => array(
+                'handler' => 'views_handler_filter_numeric',
+            ),
+            'sort' => array(
+                'handler' => 'views_handler_sort',
+            ),
+        ),
+    );
+
+    return $data;
+}

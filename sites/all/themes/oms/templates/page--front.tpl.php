@@ -108,23 +108,24 @@
         <div id="home-quote"> <?php print render($page['homequotes']); ?></div>
     <?php endif; ?>
 
-    <?php if ($page['home_high1'] || $page['home_high2'] || $page['home_high3']): ?>
+    <?php if ($page['home_highlight_left'] || $page['home_highlight_right']): ?>
         <div id="home-highlights" class="clearfix">
-            <?php if ($page['home_high1']): ?>
-                <div class="home-highlight-box"><?php print render($page['home_high1']); ?></div>
-            <?php endif; ?>
-            <?php if ($page['home_high2']): ?>
-                <div class="home-highlight-box"><?php print render($page['home_high2']); ?></div>
-            <?php endif; ?>
-            <?php if ($page['home_high3']): ?>
-                <div class="home-highlight-box remove-margin"><?php print render($page['home_high3']); ?></div>
-            <?php endif; ?>
+            <div class="container">
+                <div class="row">
+                    <?php if ($page['home_highlight_left']): ?>
+                        <div class="home-highlight-left col-md-9"><?php print render($page['home_highlight_left']); ?></div>
+                    <?php endif; ?>
+                    <?php if ($page['home_highlight_right']): ?>
+                        <div class="home-highlight-right col-md-3"><?php print render($page['home_highlight_right']); ?></div>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
     <?php endif; ?>
 
     <?php if (theme_get_setting('show_front_content') == 1): ?>
-        <div id="main" class="clearfix">
-            <section id="post-content" role="main">
+        <div id="main" class="container">
+            <section class="row" id="post-content" role="main">
                 <?php if ($page['content_top']): ?><div id="content_top"><?php print render($page['content_top']); ?></div><?php endif; ?>
 
                 <?php if (!empty($tabs['#primary'])): ?><div class="tabs-wrapper clearfix"><?php print render($tabs); ?></div><?php endif; ?>
