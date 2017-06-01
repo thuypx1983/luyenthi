@@ -1,0 +1,47 @@
+#edit-image-pic {
+  position: relative;
+  padding: 0;
+}
+#seats_throbber {
+  background: url("throbber.gif") repeat scroll 0 20px transparent;
+  height: 14px;
+  width: 14px;
+  display: none;
+}
+#seat-dialog input {
+  border: 1px solid black;
+}
+#edit-image-pic .ui-resizable-handle {
+  background: none;
+}
+#edit-image-pic .seat {
+  position: absolute;
+  border: 1px solid black;
+  padding: 0;
+  margin: 0;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  background: #ccccff;
+  color: #000000;
+  text-indent: 2px;
+  font-size: 8px;
+  line-height: 1.5em;
+}
+
+#edit-image-pic .seat_name {
+  overflow: hidden;
+}
+
+#edit-image-pic .ui-selected {
+  border: 1px solid red;
+}
+
+#edit-image-pic .draggable {
+  cursor: move;
+}
+
+#edit-image-pic #seat-dialog {
+  display: none;
+}

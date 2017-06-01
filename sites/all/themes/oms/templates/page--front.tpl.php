@@ -144,37 +144,33 @@
     <?php endif; ?>
 
     <?php if ($page['footer_first'] || $page['footer_second'] || $page['footer_third'] || $page['footer_fourth']): ?>
-        <div id="footer-saran" class="clearfix">
-            <div id="footer-wrap">
-                <?php if ($page['footer_first']): ?>
-                    <div class="footer-box"><?php print render($page['footer_first']); ?></div>
-                <?php endif; ?>
-                <?php if ($page['footer_second']): ?>
-                    <div class="footer-box"><?php print render($page['footer_second']); ?></div>
-                <?php endif; ?>
-                <?php if ($page['footer_third']): ?>
-                    <div class="footer-box"><?php print render($page['footer_third']); ?></div>
-                <?php endif; ?>
-                <?php if ($page['footer_fourth']): ?>
-                    <div class="footer-box remove-margin"><?php print render($page['footer_fourth']); ?></div>
-                <?php endif; ?>
+        <div id="footer-saran" class=" clearfix">
+            <div id="footer-wrap" class="container">
+                <div class="row">
+                  <?php if ($page['footer_first']): ?>
+                    <div class="footer-box col-md-3"><?php print render($page['footer_first']); ?></div>
+                  <?php endif; ?>
+                  <?php if ($page['footer_second']): ?>
+                    <div class="footer-box col-md-3"><?php print render($page['footer_second']); ?></div>
+                  <?php endif; ?>
+                  <?php if ($page['footer_third']): ?>
+                    <div class="footer-box col-md-3"><?php print render($page['footer_third']); ?></div>
+                  <?php endif; ?>
+                  <?php if ($page['footer_fourth']): ?>
+                    <div class="footer-box remove-margin col-md-3"><?php print render($page['footer_fourth']); ?></div>
+                  <?php endif; ?>
+                </div>
             </div>
         </div>
         <div class="clear"></div>
     <?php endif; ?>
 
     <!--END footer -->
-    <?php print render($page['footer']) ?>
-
-    <?php if (theme_get_setting('footer_copyright') || theme_get_setting('footer_credits')): ?>
-        <div class="clear"></div>
-        <div id="copyright">
-            <?php if ($footer_copyright): ?>
-                <?php print $footer_copyright; ?>
-            <?php endif; ?>
-            <?php if (theme_get_setting('footer_credits')): ?>
-                <span class="credits"><?php print t('Designed by'); ?>  <a href="http://www.devsaran.com">Devsaran</a>.</span>
-            <?php endif; ?>
+    <div id="footer-bottom">
+      <div class="container">
+        <div class="row">
+          <?php print render($page['footer']) ?>
         </div>
-    <?php endif; ?>
+      </div>
+    </div>
 </div>

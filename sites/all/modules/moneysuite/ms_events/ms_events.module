@@ -1,0 +1,1209 @@
+<?php
+
+/**
+ * @file
+ * MoneySuite Events Ticketing Suite.
+ *
+ * // @todo - Create a page that shows all events, and drills down to show all tickets for that event
+ *
+ * Original author: Leighton Whiting - Released under GENERAL PUBLIC LICENSE
+ * Current maintenance by multiple MoneySuite users.
+ * Re: new initiative: https://www.drupal.org/node/2315653 
+ */
+
+/**
+ * Implements hook_cron().
+ */
+function ms_events_cron() {
+  // Remove the old tickets
+  ms_events_clear_old_cart_tickets();
+}
+
+/**
+ * Implements hook_menu().
+ */
+function ms_events_menu() {
+  $items = array();
+  $items['user/%user/events_tickets'] = array(
+    'title' => 'My Tickets',
+    'page callback' => 'ms_events_user_purchased_tickets_page',
+    'page arguments' => array(1),
+    'access callback' => 'ms_events_view_purchased_tickets_access_test',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['user/%user/events_tickets/%ms_events_ticket'] = array(
+    'title' => 'View Ticket',
+    'page callback' => 'ms_events_user_view_ticket_page',
+    'page arguments' => array(1, 3),
+    'access callback' => 'ms_events_view_purchased_tickets_access_test',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/moneysuite/ms_events'] = array(
+    'title' => 'Events Ticketing Suite Settings',
+    'description' => 'Set the Events Ticketing Suite Settings here',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ms_events_admin'),
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/moneysuite/ms_events/settings'] = array(
+    'title' => 'Events Ticketing Suite Settings',
+    'description' => 'Set the Events Ticketing Suite Settings here',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ms_events_admin'),
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/moneysuite/ms_events/ticket_types'] = array(
+    'title' => 'Ticket Types',
+    'description' => 'Manage Ticket Types',
+    'page callback' => 'ms_events_view_ticket_types',
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/moneysuite/ms_events/ticket_types/list'] = array(
+    'title' => 'Ticket Types',
+    'description' => 'Manage Ticket Types',
+    'page callback' => 'ms_events_view_ticket_types',
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/moneysuite/ms_events/ticket_types/add'] = array(
+    'title' => 'Add Ticket Type',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ms_events_edit_ticket_type_form'),
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_LOCAL_ACTION,
+  );
+  $items['admin/moneysuite/ms_events/ticket_types/edit/%'] = array(
+    'title' => 'Edit Ticket Type',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ms_events_edit_ticket_type_form', 5),
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  );
+  $items['admin/moneysuite/ms_events/ticket_types/delete/%'] = array(
+    'title' => 'Delete Ticket Type',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ms_events_delete_ticket_type_confirm', 5),
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  );
+  $items['admin/ms_events_tickets/add'] = array(
+    'title' => 'Add Event Ticket',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ms_events_edit_ticket_form'),
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/ms_events_tickets/edit/%'] = array(
+    'title' => 'Edit Event Ticket',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ms_events_edit_ticket_form', 3),
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  );
+  $items['admin/ms_events_tickets/delete/%'] = array(
+    'title' => 'Delete Event Ticket',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ms_events_delete_ticket_confirm', 3),
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  );
+  $items['ms_events/autocomplete/event'] = array(
+    'page callback' => 'ms_events_autocomplete_event',
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Make sure that only users who have permission can view the purchased tickets
+ */
+function ms_events_view_purchased_tickets_access_test($account) {
+  global $user;
+  return (user_access('administer users') OR (user_access('view own purchased tickets') && ($account->uid == $user->uid)));
+}
+
+/**
+ * Implements hook_permission().
+ */
+function ms_events_permission() {
+  $perms = array(
+    'administer ms events' => array(
+      'title' => t('Administer Events Ticketing Suite'),
+      'description' => t('Allows the user to administer Events Ticketing Suite.'),
+    ),
+    'view own ms events tickets' => array(
+      'title' => t('View own purchased tickets'),
+      'description' => t('Allows a user to view their own purchased content in their User Account.'),
+    ),
+  );
+
+  return $perms;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function ms_events_theme($existing, $type, $theme, $path) {
+  return array(
+    'ms_event_ticket' => array(
+      'template' => 'ms-event-ticket',
+      'path' => $path . '/templates',
+      'variables' => array(
+        'ticket' => NULL,
+        'account' => NULL,
+        'event_name' => NULL,
+        'event_date' => NULL,
+        'order' => NULL,
+      ),
+    ),
+  );
+}
+
+// ======================================
+// Administration Page:
+// ======================================
+
+/**
+ * Admin Settings Form
+ */
+function ms_events_admin($form, &$form_state) {
+  $form['main'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Main Settings'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+    '#description' => t("MS Events Settings"),
+  );
+
+  $form['main']['ms_events_ticket_cart_hold_time'] = array(
+    '#type' => 'select',
+    '#title' => t('Ticket Hold Time'),
+    '#options' => array(
+      '5 minutes' => t('5 minutes'),
+      '10 minutes' => t('10 minutes'),
+      '15 minutes' => t('15 minutes'),
+      '20 minutes' => t('20 minutes'),
+      '30 minutes' => t('30 minutes'),
+    ),
+    '#default_value' => variable_get('ms_events_ticket_cart_hold_time', '5 minutes'),
+    '#description' => t("Choose how long will the tickets be reserved while they
+      are in someone's cart. Once the time runs out, the tickets will be removed
+      from the cart and available for purchase by someone else."),
+    '#required' => TRUE,
+  );
+  $form['main']['ms_events_max_quantity'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Max ticket quantity per purchase'),
+    '#default_value' => variable_get('ms_events_max_quantity', 50),
+    '#description' => t("Set the max number of tickets that can be purchased at one time. This can
+      help prevent users from adding all tickets to their cart, preventing others
+      from purchasing the tickets."),
+    '#required' => TRUE,
+  );
+
+  return system_settings_form($form);
+}
+
+// ======================================
+// TOKEN
+// ======================================
+
+/**
+ * Implementation of hook_token_info()
+ */
+function ms_events_token_info() {
+  $types = array(
+    'ms_events_ticket' => array(
+      'name' => t('Event Ticket'),
+      'description' => t('Events Ticketing Suite Ticket'),
+      'needs-data' => 'ms_events',
+    ),
+  );
+
+  $tokens = array(
+    'ms_events_ticket' => array(
+      'eventDateTime' => array(
+        'name' => t('Event Date and Time'),
+        'description' => t("The date and time of the event"),
+      ),
+      'ticketId' => array(
+        'name' => t('Ticket ID'),
+        'description' => t("The unique ticket id number"),
+      ),
+      'ticketSeat' => array(
+        'name' => t('Ticket Seat'),
+        'description' => t("The seat associated with this ticket"),
+      ),
+      'ticketType' => array(
+        'name' => t('Ticket Type'),
+        'description' => t("The name of the ticket type"),
+      ),
+      'ticketPrice' => array(
+        'name' => t('Ticket Price'),
+        'description' => t("The price of the ticket"),
+      ),
+      'eventTitle' => array(
+        'name' => t('Event Title'),
+        'description' => t("The title of the event entity"),
+      ),
+    ),
+  );
+
+  return array('types' => $types, 'tokens' => $tokens);
+}
+
+/**
+ * Implementation of hook_tokens()
+ */
+function ms_events_tokens($type, $tokens, $data = array(), $options = array()) {
+  $replacements = array();
+
+  if ($type == 'ms_events_ticket' && !empty($data['ms_events_ticket'])) {
+    $object = $data['ms_events_ticket'];
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'eventDateTime':
+          $entity = _ms_events_entity_load_single($object->entity_type, $object->entity_id);
+          $ticket_info = ms_events_extract_ticket_info($entity, $object->field_name, $object->eid);
+          $replacements[$original] = format_date($ticket_info['event_date'], 'short');
+          break;
+        case 'ticketId':
+          $replacements[$original] = $object->ticket_number;
+          break;
+        case 'ticketSeat':
+          $replacements[$original] = !empty($object->ticket_seat) ? $object->ticket_seat : t('N/A');
+          break;
+        case 'ticketPrice':
+          $replacements[$original] = ms_core_format_money($object->price);
+          break;
+        case 'ticketType':
+          $ticket_types = ms_events_get_ticket_types();
+          $replacements[$original] = $ticket_types[$object->data['ticket_type']];
+          break;
+        case 'eventTitle':
+          $entity = _ms_events_entity_load_single($object->entity_type, $object->entity_id);
+          $replacements[$original] = entity_label($object->entity_type, $entity);
+          break;
+      }
+    }
+  }
+
+  return $replacements;
+}
+
+// ======================================
+// FUNCTIONS
+// ======================================
+
+/**
+ * Extracts the ticket info from a field on an entity, given eid.
+ *
+ * @param object $entity
+ *   The entity object.
+ * @param string $field_name
+ *   The name of the field.
+ * @param string $eid
+ *   The eid.
+ *
+ * @return array|FALSE
+ *   The ticket info array or FALSE if not found.
+ */
+function ms_events_extract_ticket_info($entity, $field_name, $eid) {
+  if (!empty($entity->{$field_name}['und'])) {
+    foreach ($entity->{$field_name}['und'] as $ticket_info) {
+      if (!empty($ticket_info['eid']) && $ticket_info['eid'] == $eid) {
+        return $ticket_info;
+      }
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Implements hook_ms_products().
+ */
+function ms_events_ms_products() {
+  // Expose tickets per node event and per ticket type.
+  $products = array();
+  $field_instances = ms_events_get_field_instances();
+
+  foreach ($field_instances as $field) {
+    foreach ($field['bundles'] as $entity_type => $bundle) {
+      $entities = entity_load($entity_type, FALSE, array('type' => $bundle));
+      foreach ($entities as $entity) {
+        $label = entity_label($entity_type, $entity);
+        list($entity_id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+        // Load all of the ticket types for the field, and add a product for each.
+        if (!empty($entity->{$field['field_name']}['und'][0]['price'])) { // FIXME - Use the delta here (foreach). Currently this won't work if there are multiple delta items in the field instance.
+          foreach ($entity->{$field['field_name']}['und'][0]['price'] as $type_id => $prices) {
+            if (!is_array($prices)) {
+              $prices = array('basic' => $prices);
+            }
+            foreach ($prices as $ticket_type => $price) {
+              $product_id = "node/" . $entity_id . "/" . $field['field_name'] . "/" . $type_id . "/" . $ticket_type;
+              $product_label = $label . ': ' . $ticket_type . ' - ' . $type_id; // FIXME - Get the ticket type name
+              $product = ms_core_new_product($product_label, 'ms_events', $product_id, $price);
+
+              // Add the product variables
+              $product->owner = $entity->uid;
+              $product->module_title = t('Events Ticketing Suite');
+              $product->type = 'cart';
+
+              $product->edit_path = 'node/' . $entity_id . '/edit';
+
+              $products[] = $product;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return $products;
+}
+
+/**
+ * Clears the old cart tickets
+ */
+function ms_events_clear_old_cart_tickets() {
+  $result = db_query("DELETE FROM {ms_cart_products} WHERE module = :module AND changed < :cutoff", array(
+    ':module' => 'ms_events', ':cutoff' => strtotime('-' . check_plain(variable_get('ms_events_ticket_cart_hold_time', '5 minutes')))));
+}
+
+/**
+ * Helper Function to remove a node access record into the database
+ */
+function ms_events_delete_ticket_record($uid, $entity_type, $entity_id, $field_name, $eid) {
+  $result = db_delete('ms_events_tickets')
+    ->condition('uid', $uid)
+    ->condition('entity_type', $entity_type)
+    ->condition('entity_id', $entity_id)
+    ->condition('field_name', $field_name)
+    ->condition('eid', $eid)
+    ->execute();
+
+  return $result;
+}
+
+/**
+ * Loads a ticket by it's unique number
+ */
+function ms_events_load_ticket_by_number($num) {
+  $result = db_query("SELECT * FROM {ms_events_tickets} WHERE ticket_number = :num",
+    array(':num' => $num));
+
+  foreach ($result as $row) {
+    return ms_events_get_ticket_by_id($row->id);
+  }
+
+  return FALSE;
+}
+
+/**
+ * Load a ticket by id for the menu item
+ */
+function ms_events_ticket_load($id) {
+  return ms_events_get_ticket_by_id($id);
+}
+
+/**
+ * Retrieve a single ticket by id
+ */
+function ms_events_get_ticket_by_id($id) {
+  $result = db_query("SELECT * FROM {ms_events_tickets} WHERE id = :id",
+    array(':id' => $id));
+
+  foreach ($result as $row) {
+    $row->data = unserialize($row->data);
+    return $row;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Gets the registered fields for events
+ */
+function ms_events_get_fields() {
+  return module_invoke_all('ms_events_fields');
+}
+
+/**
+ * Gets a ticket type by it's type key
+ */
+function ms_events_get_ticket_type($type) {
+  $result = db_query("SELECT * FROM {ms_events_ticket_types} WHERE type = :type",
+    array(':type' => $type));
+
+  foreach ($result as $row) {
+    return $row;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Gets the ticket types
+ */
+function ms_events_get_ticket_types() {
+  $result = db_query("SELECT * FROM {ms_events_ticket_types}");
+
+  $types = array();
+
+  foreach ($result as $row) {
+    $types[$row->type] = $row->name;
+  }
+
+  return $types;
+}
+
+/**
+ * Gets all the tickets a user has bought for an entity
+ */
+function ms_events_get_tickets($uid, $entity_type, $entity_id) {
+  $result = db_query("SELECT * FROM {ms_events_tickets} WHERE uid = :uid AND entity_type = :entity_type AND entity_id = :entity_id",
+    array(':uid' => $uid, ':entity_type' => $entity_type, ':entity_id' => $entity_id));
+
+  $tickets = array();
+
+  foreach ($result as $row) {
+    $tickets[] = ms_events_get_ticket_by_id($row->id);
+  }
+
+  return $tickets;
+}
+
+/**
+ * Loads a single entity
+ */
+function _ms_events_entity_load_single($entity_type, $entity_id) {
+  $entities = entity_load($entity_type, array($entity_id));
+
+  foreach ($entities as $id => $entity) {
+    return $entity;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Implements hook_user_cancel().
+ */
+function ms_events_user_cancel($edit, $account, $method) {
+  $result = db_delete('ms_events_tickets')
+    ->condition('uid', $account->uid)
+    ->execute();
+  return $result;
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function ms_events_entity_info() {
+  return array(
+    'ms_events_ticket' => array(
+      'label' => t('Event Ticket'),
+      'base table' => 'ms_events_tickets',
+      'entity class' => 'Entity',
+      'controller class' => 'EntityAPIController',
+      'entity keys' => array(
+        'id' => 'id',
+      ),
+      'label callback' => 'ms_events_ticket_label',
+      'fieldable' => FALSE,
+      'module' => 'ms_events',
+    ),
+  );
+}
+
+/**
+ * Implements hook_entity_property_info_alter().
+ */
+function ms_events_entity_property_info_alter(&$info) {
+  $ms_events_ticket = &$info['ms_events_ticket']['properties'];
+  $ms_events_ticket['oid']['type'] = 'ms_order';
+  $ms_events_ticket['uid']['type'] = 'user';
+  $ms_events_ticket['entity_id']['type'] = 'node';
+  $ms_events_ticket['status']['label'] = t('Status');
+  $ms_events_ticket['status']['options list'] = 'ms_events_get_statuses';
+  $ms_events_ticket['created']['label'] = t('Created');
+  $ms_events_ticket['created']['type'] = 'date';
+  $ms_events_ticket['created']['ticket_number'] = t('Ticket number');
+  $ms_events_ticket['created']['ticket_seat'] = t('Ticket seat');
+  $ms_events_ticket['created']['price'] = t('Price');
+
+  $ms_events_ticket['edit_url'] = array(
+    'label' => t("Edit URL"),
+    'description' => t("The URL of the ticket's edit page."),
+    'getter callback' => 'ms_events_metadata_get_properties',
+    'type' => 'uri',
+    'computed' => TRUE,
+    'entity views field' => TRUE,
+  );
+  $ms_events_ticket['delete_url'] = array(
+    'label' => t("Delete URL"),
+    'description' => t("The URL of the ticket's delete page."),
+    'getter callback' => 'ms_events_metadata_get_properties',
+    'type' => 'uri',
+    'computed' => TRUE,
+    'entity views field' => TRUE,
+  );
+}
+
+/**
+ * Callback for getting ticket properties.
+ *
+ * @see ms_events_entity_property_info_alter()
+ */
+function ms_events_metadata_get_properties($entity, array $options, $name, $entity_type) {
+  switch ($name) {
+    case 'edit_url':
+      return url('admin/ms_events_tickets/edit/' . $entity->id, $options);
+
+    case 'delete_url':
+      return url('admin/ms_events_tickets/delete/' . $entity->id, $options);
+  }
+}
+
+/**
+ * Creates the label for a Ticket
+ */
+function ms_events_ticket_label($entity, $entity_type) {
+  $account = user_load($entity->uid);
+  return t('Ticket to @event for @user',
+    array('@event' => entity_label($entity_type, $entity), '@user' => $account->name));
+}
+
+/**
+ * Returns the available event ticket statuses
+ */
+function ms_events_get_statuses() {
+  return array(
+    0 => t('Inactive'),
+    1 => t('Active'),
+  );
+}
+
+/**
+ * Autocomplete an Event
+ */
+function ms_events_autocomplete_event($title = '') {
+  $matches = array();
+  if ($title) {
+    $fields = field_info_fields();
+    $field_options = array();
+    $entity_options = array();
+
+    $field_instances = ms_events_get_field_instances();
+
+    foreach ($field_instances as $field) {
+      foreach ($field['bundles'] as $entity_type => $bundle) {
+        $entities = entity_load($entity_type, FALSE, array('type' => $bundle));
+        foreach ($entities as $entity) {
+          $label = entity_label($entity_type, $entity);
+          if (stristr($label, $title)) {
+            list($entity_id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+            $matches[ms_events_create_autocomplete_key($entity_type, $entity_id)] = $label;
+          }
+        }
+      }
+    }
+  }
+  drupal_json_output($matches);
+}
+
+/**
+ * Creates an autocomplete key for an entity
+ */
+function ms_events_create_autocomplete_key($entity_type, $entity_id) {
+  $entity = _ms_events_entity_load_single($entity_type, $entity_id);
+  $label = entity_label($entity_type, $entity);
+  return '[' . $entity_type . '|' . $entity_id . '] ' . $label;
+}
+
+/**
+ * Extracts an nid from an autocomplete key
+ */
+function ms_events_extract_from_autocomplete_key($key) {
+  if (preg_match('/^\[(.+)\|(\d+)\]/', $key, $matches) > 0) {
+    return array(
+      'entity_type' => $matches[1],
+      'entity_id' => (int) $matches[2],
+    );
+  }
+  return NULL;
+}
+
+/**
+ * Generates a unique ticket number
+ */
+function ms_events_generate_ticket_number() {
+  $random = substr(number_format(time() * rand(), 0, '', ''), 0, 12);
+
+  while (ms_events_load_ticket_by_number($random)) {
+    $random = substr(number_format(time() * rand(), 0, '', ''), 0, 12);
+  }
+
+  return $random;
+}
+
+// ======================================
+// PAGES
+// ======================================
+
+/**
+ * Display a ticket's information
+ */
+function ms_events_user_view_ticket_page($account, $ticket) {
+  $entity = _ms_events_entity_load_single($ticket->entity_type, $ticket->entity_id);
+  $uri = entity_uri($ticket->entity_type, $entity);
+  $label = entity_label($ticket->entity_type, $entity);
+  $ticket_info = ms_events_extract_ticket_info($entity, $ticket->field_name, $ticket->eid);
+  return theme('ms_event_ticket', array(
+    'ticket' => $ticket,
+    'account' => $account,
+    'event_name' => $label,
+    'event_date' => $ticket_info['event_date'],
+    'order' => ms_core_order_load($ticket->oid),
+  ));
+}
+
+/**
+ * Show the purchased tickets in the user account
+ */
+function ms_events_user_purchased_tickets_page($account) {
+  $output = '';
+  $headers = array(t('Title'), t('Seat'), t('Date'), t('Actions'));
+  $result = db_query("SELECT * FROM {ms_events_tickets} WHERE uid = :uid", array(':uid' => $account->uid));
+  $rows = array();
+  $attr = array();
+  foreach ($result as $row) {
+    $actions = array();
+    $actions[] = l(t('View Ticket'), 'user/' . $account->uid . '/events_tickets/' . $row->id);
+    if ($row->oid AND $order = ms_core_order_load($row->oid)) {
+      $actions[] = l(t('View Order'), 'user/' . $account->uid . '/order-history/view/' . $order->order_key);
+    }
+    $entity = _ms_events_entity_load_single($row->entity_type, $row->entity_id);
+    $uri = entity_uri($row->entity_type, $entity);
+    $label = entity_label($row->entity_type, $entity);
+    $ticket_info = ms_events_extract_ticket_info($entity, $row->field_name, $row->eid);
+
+    $rows[] = array(
+      ($uri) ? l($label, $uri['path']) : $label,
+      $row->ticket_seat ? $row->ticket_seat : t('N/A'),
+      format_date($ticket_info['event_date'], 'short'),
+      implode($actions, ' | '),
+    );
+  }
+
+  $output .= theme('table', array('header' => $headers, 'rows' => $rows, 'attributes' => $attr, 'empty' => t('No tickets.')));
+  return $output;
+}
+
+/**
+ * AJAX form callback
+ */
+function ms_events_tickets_form_ajax_callback($form, $form_state) {
+  return $form['ticket_info'];
+}
+
+/**
+ * Builds the Edit Ticket Form
+ */
+function ms_events_edit_ticket_form($form, &$form_state, $id = NULL) {
+  $is_edit = FALSE;
+  if ($id != NULL) {
+    if ($record = ms_events_get_ticket_by_id($id)) {
+      $is_edit = TRUE;
+      $form['id'] = array(
+        '#type' => 'value',
+        '#value' => $record->id,
+      );
+      $form_state['values']['event'] = ms_events_create_autocomplete_key($record->entity_type, $record->entity_id);
+      $account = user_load($record->uid);
+    }
+  }
+  $form['username'] = array(
+    '#type' => 'textfield',
+    '#title' => t('User'),
+    '#description' => t("The User this ticket is for"),
+    '#autocomplete_path' => 'ms_core/autocomplete/user',
+    '#required' => TRUE,
+    '#default_value' => ($is_edit) ? $account->name : '',
+  );
+  $form['event'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Event'),
+    '#description' => t("Enter the name of the event"),
+    '#autocomplete_path' => 'ms_events/autocomplete/event',
+    '#required' => TRUE,
+    '#default_value' => ($is_edit) ? ms_events_create_autocomplete_key($record->entity_type, $record->entity_id) : '',
+    '#ajax' => array(
+      'callback' => 'ms_events_tickets_form_ajax_callback',
+      'wrapper' => 'ticket_info-div',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+  $fields = field_info_fields();
+
+  $field_types = ms_events_get_fields();
+  $field_type_map = array();
+
+  $field_options = array();
+  if (!empty($form_state['values']['event'])) {
+    if ($entity_info = ms_events_extract_from_autocomplete_key($form_state['values']['event'])) {
+      extract($entity_info);
+      $entity = _ms_events_entity_load_single($entity_type, $entity_id);
+      foreach($fields as $field) {
+        if (isset($field_types[$field['type']]) AND isset($entity->{$field['field_name']}['und'])) {
+          foreach ($entity->{$field['field_name']}['und'] as $field_info) {
+            $field_type_map[$field['field_name']] = $field['type'];
+            $field_options[$field['field_name'] . '|' . $field_info['eid']] = $field['field_name'] . ' ' . format_date($field_info['event_date']);
+          }
+        }
+      }
+    }
+  }
+
+  $form['ticket_info'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Ticket Info'),
+    '#prefix' => '<div id="ticket_info-div">',
+    '#suffix' => '</div>',
+  );
+
+  $form['ticket_info']['field_eid'] = array(
+    '#type' => 'select',
+    '#title' => t('Field'),
+    '#options' => $field_options,
+    '#description' => t("Choose the field."),
+    '#required' => FALSE,
+    '#ajax' => array(
+      'callback' => 'ms_events_tickets_form_ajax_callback',
+      'wrapper' => 'ticket_info-div',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+    '#default_value' => ($is_edit) ? $record->field_name . '|' . $record->eid : '',
+  );
+
+  if (empty($form_state['values']['field_eid']) AND !empty($field_options)) {
+    $form_state['values']['field_eid'] = key($field_options);
+  }
+
+  if (!empty($form_state['values']['field_eid'])) {
+    list($field_eid_name, $field_eid_eid) = explode('|', $form_state['values']['field_eid']);
+    $field_eid_type = $field_type_map[$field_eid_name];
+    $seat_options = $field_types[$field_eid_type]['get_seats']($entity_type, $entity_id, $entity, $field_eid_name, $field_eid_eid);
+    if ($is_edit) {
+      $seat_options[$record->data['seat_id']] = $record->ticket_seat;
+    }
+    $form['seat_options'] = array(
+      '#type' => 'value',
+      '#value' => $seat_options,
+    );
+    $form['ticket_info']['ticket_seat'] = array(
+      '#type' => 'select',
+      '#title' => t('Seat'),
+      '#options' => $seat_options,
+      '#default_value' => ($is_edit) ? $record->data['seat_id'] : '',
+    );
+
+    $form['ticket_info']['price'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Price'),
+      '#description' => t("Enter the price of this ticket"),
+      '#default_value' => ($is_edit) ? $record->price : '',
+    );
+  }
+
+  $form['status'] = array(
+    '#type' => 'select',
+    '#title' => t('Status'),
+    '#options' => ms_events_get_statuses(),
+    '#description' => t("What is the Status of this Ticket?"),
+    '#required' => FALSE,
+    '#default_value' => $is_edit ? $record->status : 1,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+  $form_state['redirect'] = 'admin/ms_events_tickets';
+  return $form;
+}
+
+/**
+ * Validate Function for the Edit Ticket Record Form
+ */
+function ms_events_edit_ticket_form_validate($form, &$form_state) {
+  $v = $form_state['values'];
+
+  if (!$account = user_load_by_name($v['username'])) {
+    form_set_error('username', t('Error: Please enter a valid user.'));
+  }
+}
+
+/**
+ * Submit Function for the Edit Ticket Form
+ */
+function ms_events_edit_ticket_form_submit($form, &$form_state) {
+  $v = $form_state['values'];
+  list($field_name, $eid) = explode('|', $v['field_eid']);
+  $entity_info = ms_events_extract_from_autocomplete_key($v['event']);
+  extract($entity_info);
+  $entity = _ms_events_entity_load_single($entity_type, $entity_id);
+
+  if (!isset($v['id']) || !$record = ms_events_get_ticket_by_id($v['id'])) {
+    $record = new stdClass();
+  }
+
+  $account = user_load_by_name($v['username']);
+  $record->entity_id = $entity_id;
+  $record->entity_type = $entity_type;
+  $record->field_name = $field_name;
+  $record->eid = $eid;
+  $record->uid = $account->uid;
+  $record->status = $v['status'];
+  $record->price = $v['price'];
+  $record->ticket_seat = $v['seat_options'][$v['ticket_seat']];
+  $record->data['seat_id'] = $v['ticket_seat'];
+
+  if (!empty($record->id)) {
+    drupal_write_record('ms_events_tickets', $record, 'id');
+  }
+  else {
+    drupal_write_record('ms_events_tickets', $record);
+  }
+
+  $title = entity_label($record->entity_type, $entity);
+  drupal_set_message(t("Ticket to @event for @user has been saved.",
+    array('@user' => $account->name, '@event' => $title)));
+  $form_state['redirect'] = 'admin/ms_events_tickets';
+}
+
+/**
+ * Delete a Ticket
+ */
+function ms_events_delete_ticket_confirm($form, &$form_state, $id) {
+  $record = ms_events_get_ticket_by_id($id);
+  if ($record->id) {
+    $form['#ms_id'] = $record->id;
+    return confirm_form($form, t('Are you sure you want to delete this Ticket?'), 'admin/ms_events_tickets', t('This action cannot be undone.'), t('Delete'));
+  }
+  else {
+    drupal_not_found();
+  }
+}
+
+/**
+ * Delete a Ticket
+ */
+function ms_events_delete_ticket_confirm_submit($form, &$form_state) {
+  $record = ms_events_get_ticket_by_id($form['#ms_id']);
+
+  // Delete the record
+  db_delete('ms_events_tickets')
+    ->condition('id', $record->id)
+    ->execute();
+
+  drupal_set_message(t('Ticket Deleted'));
+  $form_state['redirect'] = 'admin/ms_events_tickets';
+}
+
+// ======================================
+// hook_ms_order_payment
+// ======================================
+
+/**
+ * Implements hook_ms_order_payment().
+ */
+function ms_events_ms_order_payment($type, $product, $order, $payment) {
+  switch ($product->module) {
+    case 'ms_events':
+      switch ($type) {
+        case "cart":
+          $now = time();
+          // Load the user account
+          $account = user_load($order->uid);
+
+          if ($entity = _ms_events_entity_load_single($product->data['entity_type'], $product->data['entity_id'])) {
+            for ($i = $product->qty; $i > 0; $i--) {
+              $record = new stdClass();
+              $record->entity_id = $product->data['entity_id'];
+              $record->entity_type = $product->data['entity_type'];
+              $record->field_name = $product->data['field_name'];
+              $record->eid = $product->data['eid'];
+              $record->uid = $account->uid;
+              $record->status = 1;
+              $record->ticket_seat = $product->data['ticket_seat'];
+              $record->ticket_number = ms_events_generate_ticket_number();
+              $record->price = $product->amount;
+              $record->oid = $order->oid;
+              $record->created = REQUEST_TIME;
+              $record->data = $product->data;
+              drupal_write_record('ms_events_tickets', $record);
+              module_invoke_all('ms_events_ticket_purchased', $payment, $record, $order, $account);
+            }
+          }
+          break;
+      }
+
+      break;
+  }
+}
+
+// ======================================
+// RULES
+// ======================================
+
+/**
+ * Implementation of hook_ms_events_ticket_purchased().
+ */
+function ms_events_ms_events_ticket_purchased($payment, $ticket, $order, $account) {
+  rules_invoke_event('ms_events_event_ticket_purchased', $payment, $ticket, $order, $account);
+}
+
+// ======================================
+// Ticket Types
+// ======================================
+
+/**
+ * Show a list of ticket types
+ */
+function ms_events_view_ticket_types() {
+  global $user;
+  $build = array();
+
+  $headers = array(
+    array('data' => t('Name'), 'class' => array('ticket_type_name_header'), 'field' => 't.name', 'sort' => 'desc'),
+    array('data' => t('Type'), 'class' => array('ticket_type_type_header'), 'field' => 't.type', 'sort' => 'desc'),
+    array('data' => t('Actions'), 'class' => array('ticket type_actions_header')),
+  );
+
+  $query = db_select('ms_events_ticket_types', 't');
+  $query->fields('t');
+  $query = $query->extend('TableSort')->orderByHeader($headers);
+
+  $pager_amount = 20;
+  if (!isset($_GET['pager_amount']) OR $pager_amount = $_GET['pager_amount']) {
+    $query = $query->extend('PagerDefault')->limit($pager_amount);
+  }
+
+  // execute the query
+  $result = $query->execute();
+
+  $rows = array();
+  $attr = array('id' => 'ticket_types-table');
+  foreach ($result as $row) {
+    $actions = array(
+      l(t('Edit'), 'admin/moneysuite/ms_events/ticket_types/edit/' . $row->type),
+      l(t('Delete'), 'admin/moneysuite/ms_events/ticket_types/delete/' . $row->type),
+    );
+
+    $rows[] = array('data' => array(
+      array('data' => $row->name, 'class' => array('ticket_type_name')),
+      array('data' => $row->type, 'class' => array('ticket_type_type')),
+      array('data' => implode(' | ', $actions), 'class' => array('ticket type_actions'))
+    ));
+  }
+
+  // add the content
+  $build['content'] = array(
+    'table' => array(
+      '#type' => 'item',
+      '#markup' => theme('table', array('header' => $headers, 'rows' => $rows, 'attributes' => $attr, 'empty' => t('No ticket types.'))),
+    ),
+  );
+
+  // Add the pager
+  $build['pager'] = array(
+    '#theme' => 'pager',
+    '#weight' => 5,
+  );
+
+  return $build;
+}
+
+/**
+ * Builds the Edit ticket type Form
+ */
+function ms_events_edit_ticket_type_form($form, &$form_state, $type = NULL) {
+  $is_edit = FALSE;
+  if ($type != NULL) {
+    if ($record = ms_events_get_ticket_type($type)) {
+      $is_edit = TRUE;
+
+    }
+  }
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Name'),
+    '#required' => TRUE,
+    '#description' => t("Enter the ticket type name."),
+    '#default_value' => $is_edit ? $record->name : '',
+  );
+  if ($is_edit) {
+    $form['type'] = array(
+      '#type' => 'value',
+      '#value' => $record->type,
+    );
+  }
+  else {
+    $form['type'] = array(
+      '#type' => 'machine_name',
+      '#title' => t('Title'),
+      '#required' => TRUE,
+      '#machine_name' => array(
+        'exists' => 'ms_events_get_ticket_type',
+      ),
+      '#default_value' => $is_edit ? $record->type : '',
+    );
+  }
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+  $form_state['redirect'] = 'admin/moneysuite/ms_events/ticket_types';
+  return $form;
+}
+
+/**
+ * Submit Function for the Edit ticket type Form
+ */
+function ms_events_edit_ticket_type_form_submit($form, &$form_state) {
+  $v = $form_state['values'];
+
+  if ($record = ms_events_get_ticket_type($v['type'])) {
+    // We are editing an existing record
+    $record->name = $v['name'];
+    drupal_write_record('ms_events_ticket_types', $record, 'type');
+  }
+  else {
+    $record = new stdClass();
+    $record->type = $v['type'];
+    $record->name = $v['name'];
+    drupal_write_record('ms_events_ticket_types', $record);
+  }
+
+  drupal_set_message(t("Ticket type @title has been saved.",
+    array('@title' => $v['name'])));
+  $form_state['redirect'] = 'admin/moneysuite/ms_events/ticket_types';
+}
+
+/**
+ * Delete a ticket type
+ */
+function ms_events_delete_ticket_type_confirm($form, &$form_state, $type) {
+  if ($record = ms_events_get_ticket_type($type)) {
+    $form['#ms_id'] = $record->type;
+    return confirm_form($form, t('Are you sure you want to delete this Ticket Type?'), 'admin/moneysuite/ms_events/ticket_types', t('This action cannot be undone.'), t('Delete'));
+  }
+  else {
+    drupal_not_found();
+  }
+}
+
+/**
+ * Delete a ticket type
+ */
+function ms_events_delete_ticket_type_confirm_submit($form, &$form_state) {
+  $record = ms_events_get_ticket_type($form['#ms_id']);
+
+  // Delete the record
+  db_delete('ms_events_ticket_types')
+    ->condition('type', $record->type)
+    ->execute();
+
+  drupal_set_message(t('Ticket type Deleted'));
+  $form_state['redirect'] = 'admin/moneysuite/ms_events/ticket_types';
+}
+
+/**
+ * Throws an Exception if the event is not open.
+ */
+function ms_events_check_event_open($item) {
+  // If the user can't register for this event yet, then show a message instead.
+  if ($item['open_date'] > REQUEST_TIME) {
+    throw new Exception(t("Registration will open on @date.", array('@date' => format_date($item['open_date']))));
+  }
+  // If registration is closed, then show a message.
+  if (!empty($item['close_date']) AND $item['close_date'] < REQUEST_TIME) {
+    throw new Exception(t("Registration is closed."));
+  }
+  // If this event is in the past, then show a message.
+  if (!empty($item['event_date']) AND $item['event_date'] < REQUEST_TIME) {
+    throw new Exception(t("This event has passed."));
+  }
+}
+
+/**
+ * Get all of the field instances for ticket field types.
+ */
+function ms_events_get_field_instances() {
+  $fields = field_info_fields();
+  $field_instances = array();
+  $field_types = ms_events_get_fields();
+
+  foreach ($fields as $field) {
+    if (isset($field_types[$field['type']])) {
+      $field_instances[$field['field_name']] = $field;
+    }
+  }
+
+  return $field_instances;
+}
+
+/**
+ * Loads a node from an event id.
+ */
+function ms_events_load_by_event_id($eid) {
+  $field_instances = ms_events_get_field_instances();
+
+  foreach ($field_instances as $field_name => $field) {
+    $query = new EntityFieldQuery();
+    $query->fieldCondition($field_name, 'eid', $eid, '=');
+    $result = $query->execute();
+
+    if (isset($result['node'])) {
+      return entity_load('node', key($result['node']));
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Generates a unique transaction id.
+ *
+ * @return string
+ *   The unique 10 digit transaction id.
+ */
+function ms_events_generate_event_id($length = 10) {
+  $id = ms_core_get_random_key($length);
+
+  while (ms_events_load_by_event_id($id)) {
+    $id = ms_core_get_random_key($length);
+  }
+
+  return $id;
+}
+
+/**
+* Implementation of hook_views_api().
+*/
+function ms_events_views_api() {
+  return array(
+    'api' => 3.0,
+    'path' => drupal_get_path('module', 'ms_events') .'/views'
+  );
+}

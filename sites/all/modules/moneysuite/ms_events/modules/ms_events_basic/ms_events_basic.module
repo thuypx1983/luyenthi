@@ -1,0 +1,468 @@
+<?php
+
+/**
+ * @file
+ * MoneySuite Events Basic Tickets.
+ *
+ * Original author: Leighton Whiting - Released under GENERAL PUBLIC LICENSE
+ * Current maintenance by multiple MoneySuite users.
+ * Re: new initiative: https://www.drupal.org/node/2315653 
+ */
+
+// ======================================
+// FIELDS API
+// ======================================
+
+/**
+ * Implements hook_ms_events_fields().
+ */
+function ms_events_basic_ms_events_fields() {
+  return array(
+    'ms_events_basic_event' => array(
+      'get_seats' => 'ms_events_basic_get_seats_list',
+    )
+  );
+}
+
+/**
+ * Return a list of seats available
+ */
+function ms_events_basic_get_seats_list($entity_type, $entity_id, $entity, $field_name, $eid) {
+  $ticket_info = ms_events_extract_ticket_info($entity, $field_name, $eid);
+
+  $seats_list = array();
+  if ($tickets_left = ms_events_basic_get_tickets_left($ticket_info['total_tickets'], $entity_type, $entity_id, $entity, $field_name, $eid)) {
+    $seats_list[$tickets_left] = t('N/A');
+  }
+
+  return $seats_list;
+}
+
+/**
+ * Implements hook_field_info().
+ */
+function ms_events_basic_field_info() {
+  return array(
+    'ms_events_basic_event' => array(
+      'label' => t('Ticketed Event'),
+      'description' => t('A ticketed event with support for max attendees.'),
+      'default_widget' => 'ms_events_basic_default',
+      'default_formatter' => 'ms_events_basic_purchase_tickets',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_validate().
+ */
+function ms_events_basic_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+  foreach ($items as $delta => $item) {
+    if (!empty($item['event_date'])) {
+      if (!is_numeric($item['total_tickets']) OR intval($item['total_tickets']) <= 0) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'ms_events_basic_invalid',
+          'message' => t('Total available tickets must be a positive number.'),
+        );
+      }
+    }
+  }
+}
+
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function ms_events_basic_field_is_empty($item, $field) {
+  return empty($item['event_date']);
+}
+
+// ======================================
+// FORMATTERS
+// ======================================
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function ms_events_basic_field_formatter_info() {
+  return array(
+    'ms_events_basic_purchase_tickets' => array(
+      'label' => t('Display a form to purchase tickets'),
+      'field types' => array('ms_events_basic_event'),
+      'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function ms_events_basic_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+
+  switch ($display['type']) {
+    case 'ms_events_basic_purchase_tickets':
+      foreach ($items as $delta => $item) {
+        $field_name = $field['field_name'];
+        list($entity_id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+
+        $tickets_left = ms_events_basic_get_tickets_left($item['total_tickets'], $entity_type, $entity_id, $field_name, $item['eid']);
+        if ($tickets_left) {
+          $vars = array(
+            'entity_type' => $entity_type,
+            'entity_id' => $entity_id,
+            'entity' => $entity,
+            'field_name' => $field_name,
+            'eid' => $item['eid'],
+            'tickets_left' => $tickets_left,
+            'item' => $item,
+          );
+          $elements=drupal_get_form('ms_events_basic_add_to_cart_form', $vars);
+          $element[$delta] = array(
+            '#type' => 'item',
+            '#markup' => drupal_render($elements),
+          );
+        }
+        else {
+          $element[$delta] = array(
+            '#type' => 'item',
+            '#markup' => t("No tickets available. Please try again later in case any tickets become available."),
+          );
+        }
+      }
+      break;
+  }
+
+  return $element;
+}
+
+/**
+ * Builds the add to cart form
+ */
+function ms_events_basic_add_to_cart_form($form, $form_state, $vars) {
+  extract($vars);
+
+  // Make sure the event is open before continuing.
+  try {
+    ms_events_check_event_open($item);
+  }
+  catch (Exception $e) {
+    $form['event_error_message'] = array(
+      '#type' => 'item',
+      '#markup' => $e->getMessage(),
+    );
+    return $form;
+  }
+
+  $options = array();
+  $ticket_types = ms_events_get_ticket_types();
+  foreach ($item['price'] as $ticket_type => $price) {
+    $options[$ticket_type] = $ticket_types[$ticket_type] . ' - ' . ms_core_format_money($price);
+  }
+  $form['vars'] = array(
+    '#type' => 'value',
+    '#value' => $vars,
+  );
+  $form['ticket_type'] = array(
+    '#type' => 'select',
+    '#options' => $options,
+    '#title' => t('Ticket type'),
+    '#required' => TRUE,
+  );
+
+  $form['qty'] = array(
+    '#type' => 'select',
+    '#options' => drupal_map_assoc(range(1, $tickets_left)),
+    '#title' => t('Qty - @num left', array('@num' => $tickets_left)),
+    '#required' => TRUE,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add to cart'),
+  );
+
+  return $form;
+}
+
+/**
+ * Submit handler for the add to cart form
+ */
+function ms_events_basic_add_to_cart_form_submit($form, $form_state) {
+  $v = $form_state['values'];
+  extract($v['vars']);
+  $ticket_types = ms_events_get_ticket_types();
+  $price = empty($item['price'][$v['ticket_type']]) ? 0 : $item['price'][$v['ticket_type']];
+  // Add to cart and redirect to this page
+  $product = ms_core_new_product(t('@ticket_type tickets for @entity_label',
+    array('@ticket_type' => $ticket_types[$v['ticket_type']], '@entity_label' => entity_label($entity_type, $entity))),
+    'ms_events', $entity_type . '/' . $entity_id . '/' . $field_name . '/' . $item['eid'], $price);
+
+  $product->qty = $v['qty'];
+
+  // Store the custom data
+  $product->data = array(
+    'entity_type' => $entity_type,
+    'entity_id' => $entity_id,
+    'field_name' => $field_name,
+    'eid' => $item['eid'],
+    'ticket_seat' => '',
+    'ticket_type' => $v['ticket_type'],
+    'allow_multiple' => TRUE,
+    'qty_validate' => 'ms_events_basic_qty_validate',
+    'qty_available' => min($tickets_left, variable_get('ms_events_max_quantity', 50)),
+    'qty_max' => $item['total_tickets'],
+  );
+
+  ms_core_add_cart_product($product);
+}
+
+/**
+ * Calculates how many tickets are available for an event
+ */
+function ms_events_basic_get_tickets_left($total, $entity_type, $entity_id, $field_name, $eid) {
+  // Calculate how many tickets are left by looking at purchased tickets and tickets in carts
+  ms_events_clear_old_cart_tickets();
+  $in_cart = 0;
+  $purchased = 0;
+  $result = db_query("SELECT * FROM {ms_cart_products} WHERE module = :module AND id = :id", array(
+    ':module' => 'ms_events', ':id' => $entity_type . '/' . $entity_id . '/' . $field_name . '/' . $eid));
+  foreach ($result as $row) {
+    $in_cart += $row->qty;
+  }
+  $result = db_query("SELECT * FROM {ms_order_products} WHERE module = :module AND id = :id", array(
+    ':module' => 'ms_events', ':id' => $entity_type . '/' . $entity_id . '/' . $field_name . '/' . $eid));
+  foreach ($result as $row) {
+    $purchased += $row->qty;
+  }
+  $tickets_left = $total - $in_cart - $purchased;
+
+  return $tickets_left;
+}
+
+/**
+ * Validate the quantity selected
+ */
+function ms_events_basic_qty_validate($element, &$form_state, $form) {
+  $product = $form_state['values']['product'];
+  $tickets_left = ms_events_basic_get_tickets_left($product->data['qty_max'], $product->data['entity_type'], $product->data['entity_id'], $product->data['field_name'], $product->data['eid']);
+  $tickets_left += $product->qty;
+  if (intval($element['#value']) > $tickets_left) {
+    form_error($element, t('You have chosen a quantity that exceeds the amount remaining.'));
+  }
+  if (intval($element['#value']) > variable_get('ms_events_max_quantity', 50)) {
+    form_error($element, t('You cannot purchase more than @num at a time.', array('@num' => variable_get('ms_events_max_quantity', 50))));
+  }
+}
+
+// ======================================
+// WIDGETS
+// ======================================
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function ms_events_basic_field_widget_info() {
+  return array(
+    'ms_events_basic_default' => array(
+      'label' => t('Default widget'),
+      'field types' => array('ms_events_basic_event'),
+      'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+    ),
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function ms_events_basic_theme() {
+  return array(
+    'ms_event_basic' => array(
+      'render element' => 'element',
+    ),
+  );
+}
+
+/**
+ * Implements hook_element_info().
+ */
+function ms_events_basic_element_info() {
+  $elements = array();
+  $elements['ms_events_basic_default'] =  array(
+    '#input' => TRUE,
+    '#process' => array('ms_events_basic_default_field_process'),
+    '#theme' => 'ms_event_basic',
+    '#theme_wrappers' => array('form_element'),
+  );
+  return $elements;
+}
+
+/**
+ * Implements hook_field_load().
+ */
+function ms_events_basic_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
+  foreach ($entities as $id => $entity) {
+    foreach ($items[$id] as $delta => $item) {
+      $items[$id][$delta]['price'] = unserialize($items[$id][$delta]['price']);
+    }
+  }
+}
+
+/**
+ * Implements hook_field_presave().
+ */
+function ms_events_basic_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  foreach ($items as $delta => $value) {
+    $items[$delta]['price'] = serialize($items[$delta]['price']);
+    // Convert the date to a timestamp
+    if (!empty($items[$delta]['event_date']) AND !is_numeric($items[$delta]['event_date'])) {
+      $items[$delta]['event_date'] = strtotime($items[$delta]['event_date']);
+    }
+    else {
+      $items[$delta]['event_date'] = 0;
+    }
+    if (!empty($items[$delta]['open_date']) AND !is_numeric($items[$delta]['open_date'])) {
+      $items[$delta]['open_date'] = strtotime($items[$delta]['open_date']);
+    }
+    else {
+      $items[$delta]['open_date'] = 0;
+    }
+    if (!empty($items[$delta]['close_date']) AND !is_numeric($items[$delta]['close_date'])) {
+      $items[$delta]['close_date'] = strtotime($items[$delta]['close_date']);
+    }
+    else {
+      $items[$delta]['close_date'] = 0;
+    }
+  }
+}
+
+/**
+ * Process the element before displaying the field.
+ */
+function ms_events_basic_default_field_process($element, $form_state, $complete_form) {
+  $instance = field_widget_instance($element, $form_state);
+  $settings = $instance['settings'];
+
+  $date_format = variable_get('date_format_short', 'm/d/Y - H:i');
+
+  if (!empty($element['#value']['event_date']) AND $d = $element['#value']['event_date'] AND is_array($d)) {
+    $element['#value']['event_date'] = strtotime($element['#value']['event_date']['date'] . ' ' . $element['#value']['event_date']['time']);
+  }
+  if (!empty($element['#value']['open_date']) AND $d = $element['#value']['open_date'] AND is_array($d)) {
+    $element['#value']['open_date'] = strtotime($element['#value']['open_date']['date'] . ' ' . $element['#value']['open_date']['time']);
+  }
+  if (!empty($element['#value']['close_date']) AND $d = $element['#value']['close_date'] AND is_array($d)) {
+    $element['#value']['close_date'] = strtotime($element['#value']['close_date']['date'] . ' ' . $element['#value']['close_date']['time']);
+  }
+  $element['event_date'] = array(
+    '#type' => 'date_popup',
+    '#title' => t('Event Date'),
+    '#date_format' => $date_format,
+    '#date_type' => DATE_UNIX,
+    '#default_value' => !empty($element['#value']['event_date']) ?
+      date('Y-m-d H:i:s', $element['#value']['event_date']) :
+      NULL,
+    '#date_year_range' => '-1:+5',
+  );
+  $element['open_date'] = array(
+    '#type' => 'date_popup',
+    '#title' => t('Registration Opens'),
+    '#date_format' => $date_format,
+    '#date_type' => DATE_UNIX,
+    '#default_value' => !empty($element['#value']['open_date']) ?
+      date('Y-m-d H:i:s', $element['#value']['open_date']) :
+      NULL,
+    '#date_year_range' => '-1:+5',
+  );
+  $element['close_date'] = array(
+    '#type' => 'date_popup',
+    '#title' => t('Registration Closes'),
+    '#date_format' => $date_format,
+    '#date_type' => DATE_UNIX,
+    '#default_value' => !empty($element['#value']['close_date']) ?
+      date('Y-m-d H:i:s', $element['#value']['close_date']) :
+      NULL,
+    '#date_year_range' => '-1:+5',
+  );
+  $element['total_tickets'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Total available tickets'),
+    '#default_value' => isset($element['#value']['total_tickets']) ? $element['#value']['total_tickets'] : '',
+    '#description' => t("Enter the total number of tickets available for purchase."),
+  );
+
+  $element['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Name'),
+    '#default_value' => isset($element['#value']['name']) ? $element['#value']['name'] : '',
+    '#description' => t("Enter a name for this event."),
+  );
+
+  if (empty($element['#value']['eid'])) {
+    $element['#value']['eid'] = ms_events_generate_event_id();
+  }
+
+  $element['eid'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array('readonly' => 'readonly', 'style' => 'display:none;'),
+    '#default_value' => isset($element['#value']['eid']) ? $element['#value']['eid'] : ms_events_generate_event_id(),
+  );
+
+  $ticket_types = ms_events_get_ticket_types();
+  $element['price'] = array(
+    '#tree' => TRUE,
+    '#type' => 'fieldset',
+    '#title' => t('Price'),
+  );
+  foreach ($ticket_types as $ticket_type => $ticket_type_name){
+    $element['price'][$ticket_type] = array(
+      '#type' => 'textfield',
+      '#title' => $ticket_type_name,
+      '#default_value' => isset($element['#value']['price']) && isset($element['#value']['price'][$ticket_type]) ? $element['#value']['price'][$ticket_type] : '',
+      '#description' => t("Enter a number without currency symbols. To exclude this
+        ticket type, leave blank."),
+    );
+  }
+
+  return $element;
+}
+
+/**
+ * FAPI theme for an individual text elements.
+ */
+function theme_ms_event_basic($vars) {
+  $element = $vars['element'];
+
+  $output = '';
+  $output .= '<div>'. drupal_render($element['name']) .'</div>';
+  $output .= '<div>'. drupal_render($element['eid']) .'</div>';
+  $output .= '<div>'. drupal_render($element['total_tickets']) .'</div>';
+  $output .= '<div>'. drupal_render($element['price']) .'</div>';
+  $output .= '<div>'. drupal_render($element['event_date']) .'</div>';
+  $output .= '<div>'. drupal_render($element['open_date']) .'</div>';
+  $output .= '<div>'. drupal_render($element['close_date']) .'</div>';
+
+  return $output;
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function ms_events_basic_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $element += array(
+    '#type' => $instance['widget']['type'],
+    '#default_value' => isset($items[$delta]) ? $items[$delta] : '',
+  );
+  return $element;
+}
+
+/**
+ * Implements hook_field_widget_error().
+ */
+function ms_events_basic_field_widget_error($element, $error, $form, &$form_state) {
+  switch ($error['error']) {
+    case 'ms_events_basic_invalid':
+      form_error($element, $error['message']);
+      break;
+  }
+}
+

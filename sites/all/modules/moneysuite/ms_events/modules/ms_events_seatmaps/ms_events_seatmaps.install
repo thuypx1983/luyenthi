@@ -1,0 +1,225 @@
+<?php
+
+/**
+ * @file
+ * MoneySuite Events Seating Maps .install file
+ * FIXME - Add name
+ */
+
+/**
+ * Implements hook_field_schema().
+ */
+function ms_events_seatmaps_field_schema($field) {
+  return array(
+    'columns' => array(
+      'seatmap' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'price' => array(
+        'type' => 'text',
+        'serialize' => TRUE,
+      ),
+      'event_date' => array(
+        'type' => 'int',
+        'disp_width' => '11',
+        'not null' => TRUE,
+        'default' => 0,
+        'property_type' => 'date',
+      ),
+      'open_date' => array(
+        'type' => 'int',
+        'disp_width' => '11',
+        'not null' => TRUE,
+        'default' => 0,
+        'property_type' => 'date',
+      ),
+      'close_date' => array(
+        'type' => 'int',
+        'disp_width' => '11',
+        'not null' => TRUE,
+        'default' => 0,
+        'property_type' => 'date',
+      ),
+      'eid' => array(
+        'type' => 'varchar',
+        'length' => '20',
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The unique event id',
+      ),
+    )
+  );
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function ms_events_seatmaps_uninstall() {
+  // Delete related variables all at once.
+  db_delete('variable')
+  ->condition('name', 'ms_events_seatmaps_%%', 'LIKE')
+  ->execute();
+}
+
+/**
+ * Implements hook_schema().
+ */
+function ms_events_seatmaps_schema() {
+  $schema['ms_events_seatmaps'] = array(
+    'description' => 'Seatmaps',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'ID',
+      ),
+      'fid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The file id',
+      ),
+      'uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'User ID',
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'description' => 'The title of the map',
+      ),
+      'groups' => array(
+        'type' => 'text',
+        'serialize' => TRUE,
+      ),
+      'created' => array(
+        'type' => 'int',
+        'description' => 'Timestamp for Creation',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  $schema['ms_events_seats'] = array(
+    'description' => 'Seats',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'ID',
+      ),
+      'map_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The map id',
+      ),
+      'group_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The group id',
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'description' => 'The name of the seat',
+      ),
+      'x' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'X Coordinate',
+      ),
+      'y' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Y Coordinate',
+      ),
+      'width' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Width',
+      ),
+      'height' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Height',
+      ),
+      'seats' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 1,
+        'description' => 'Number of Seats',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  return $schema;
+}
+
+// ======================================
+// Updates:
+// ======================================
+
+/**
+ * Add file usage references for all files
+ */
+function ms_events_seatmaps_update_7101(&$sandbox) {
+  $result = db_select('ms_events_seatmaps', 's')
+    ->fields('s')
+    ->execute();
+
+  foreach ($result as $record) {
+    if ($file = file_load($record->fid)) {
+      file_usage_delete($file, 'ms_events_seatmaps', 'ms_events_seatmap', $record->id);
+      file_usage_add($file, 'ms_events_seatmaps', 'ms_events_seatmap', $record->id);
+    }
+  }
+  return t('Successfully added references for all seating chart images.');
+}
+
+/**
+ * Add close_date and open_date settings for events
+ */
+function ms_events_seatmaps_update_7102(&$sandbox) {
+  field_cache_clear();
+  $fields = field_info_fields();
+  $count = 0;
+  foreach ($fields as $field_name => $field) {
+    if ($field['type'] == 'ms_events_seatmaps_event' && $field['storage']['type'] == 'field_sql_storage') {
+      $schema = ms_events_seatmaps_field_schema($field);
+      foreach ($field['storage']['details']['sql'] as $type => $table_info) {
+        foreach ($table_info as $table_name => $columns) {
+          $column_name = _field_sql_storage_columnname($field_name, 'open_date');
+          db_add_field($table_name, $column_name, $schema['columns']['open_date']);
+          $column_name = _field_sql_storage_columnname($field_name, 'close_date');
+          db_add_field($table_name, $column_name, $schema['columns']['close_date']);
+          $count += 1;
+        }
+      }
+    }
+  }
+  field_cache_clear();
+  return t('Successfully added open_date and close_date fields for @count tables.', array('@count' => $count));
+}

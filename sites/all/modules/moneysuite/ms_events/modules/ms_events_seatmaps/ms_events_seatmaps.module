@@ -1,0 +1,1200 @@
+<?php
+
+/**
+ * @file
+ * MoneySuite Seating Maps tickets.
+ *
+ * Original author: Leighton Whiting - Released under GENERAL PUBLIC LICENSE
+ * Current maintenance by multiple MoneySuite users.
+ * Re: new initiative: https://www.drupal.org/node/2315653 
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function ms_events_seatmaps_menu() {
+  $items = array();
+  $items['admin/moneysuite/ms_events/seatmaps'] = array(
+    'title' => 'Seating Maps',
+    'description' => 'Manage Seating Maps',
+    'page callback' => 'ms_events_seatmaps_view_seatmaps',
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/moneysuite/ms_events/seatmaps/list'] = array(
+    'title' => 'Seating Maps',
+    'description' => 'Manage Seating Maps',
+    'page callback' => 'ms_events_seatmaps_view_seatmaps',
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/moneysuite/ms_events/seatmaps/add'] = array(
+    'title' => 'Add Seating Map',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ms_events_seatmaps_edit_seatmap_form'),
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_LOCAL_ACTION,
+  );
+  $items['admin/moneysuite/ms_events/seatmaps/settings'] = array(
+    'title' => 'Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ms_events_seatmaps_admin_form'),
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/moneysuite/ms_events/seatmaps/edit/%'] = array(
+    'title' => 'Edit Seating Map',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ms_events_seatmaps_edit_seatmap_form', 5),
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  );
+  $items['admin/moneysuite/ms_events/seatmaps/clone/%'] = array(
+    'page callback' => 'ms_events_seatmaps_clone_seatmap_callback',
+    'page arguments' => array(5),
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  );
+  $items['admin/moneysuite/ms_events/seatmaps/seats/%'] = array(
+    'title' => 'Edit Seats',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ms_events_seatmaps_edit_seats_form', 5),
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  );
+  $items['admin/moneysuite/ms_events/seatmaps/delete/%'] = array(
+    'title' => 'Delete Seating Map',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ms_events_seatmaps_delete_seatmap_confirm', 5),
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  );
+  $items['ms_events_seatmaps/save/%'] = array(
+    'page callback' => 'ms_events_seatmaps_save',
+    'page arguments' => array(2),
+    'access arguments' => array('administer ms events'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Admin Settings Form
+ */
+function ms_events_seatmaps_admin_form($form, &$form_state) {
+  $form['main'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Main Settings'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+    '#description' => t("MS Events Settings"),
+  );
+
+  $form['main']['ms_events_seatmaps_autoadd'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Automatically Add Ticket to Cart'),
+    '#default_value' => variable_get('ms_events_seatmaps_autoadd', FALSE),
+    '#description' => t("If this is checked, then the ticket will be automatically added to the cart when a user clicks it on the seatmap. Otherwise, there will be an area showing the selected tickets with an 'Add to Cart' button."),
+  );
+
+  return system_settings_form($form);
+}
+
+// ======================================
+// FUNCTIONS
+// ======================================
+
+/**
+ * Returns a list of all seatmaps
+ */
+function ms_events_seatmaps_get_seatmaps() {
+  $result = db_query("SELECT * FROM {ms_events_seatmaps}");
+  $seatmaps = array();
+
+  foreach ($result as $row) {
+    $seatmaps[] = ms_events_seatmaps_get_seatmap_by_id($row->id);
+  }
+
+  return $seatmaps;
+}
+
+/**
+ * Returns a list of all seatmaps
+ */
+function ms_events_seatmaps_get_seatmaps_list() {
+  $result = db_query("SELECT * FROM {ms_events_seatmaps}");
+  $seatmaps = array();
+
+  foreach ($result as $row) {
+    $seatmaps[$row->id] = $row->name;
+  }
+
+  return $seatmaps;
+}
+
+/**
+ * Retrieve a single ticket by id
+ */
+function ms_events_seatmaps_get_seatmap_by_id($map_id) {
+  $result = db_query("SELECT * FROM {ms_events_seatmaps} WHERE id = :id",
+    array(':id' => $map_id));
+
+  foreach ($result as $row) {
+    $row->groups = unserialize($row->groups);
+    $row->groups[0] = array(
+      'group_id' => 0,
+      'name' => t('No group'),
+      'color' => '#d9d9d9',
+    );
+    return $row;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Gets all of the seats for a specific seatmap
+ */
+function ms_events_seatmaps_get_seats($map_id) {
+  $record = ms_events_seatmaps_get_seatmap_by_id($map_id);
+  $result = db_query("SELECT * FROM {ms_events_seats} WHERE map_id = :map_id",
+    array(':map_id' => $record->id));
+
+  $seats = array();
+  foreach ($result as $row) {
+    if (!empty($record->groups[$row->group_id])) {
+      $row->color = $record->groups[$row->group_id]['color'];
+    }
+    else {
+      $row->group_id = 0;
+    }
+    $seats[$row->id] = $row;
+  }
+
+  return $seats;
+}
+
+/**
+ * Save the seats passed in
+ */
+function ms_events_seatmaps_save($map_id) {
+  header("Cache-Control: no-cache, must-revalidate");
+  header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+
+  $seats = $_REQUEST['seat_data'];
+
+  foreach ($seats as $seat) {
+    $seat_obj = new stdClass();
+    $seat_obj->map_id = $map_id;
+    $seat_obj->group_id = $seat['group_id'];
+    $seat_obj->width = $seat['width'];
+    $seat_obj->height = $seat['height'];
+    $seat_obj->x = $seat['x'];
+    $seat_obj->y = $seat['y'];
+    $seat_obj->name = $seat['name'];
+    $seat_obj->seats = $seat['seats'];
+
+    if (!empty($seat['remove'])) {
+      if (isset($seat['seat_id'])) {
+        db_query("DELETE FROM {ms_events_seats} WHERE id = :id", array(':id' => $seat['seat_id']));
+      }
+    }
+    else {
+      // Write or update this record in the database
+      if (isset($seat['seat_id'])) {
+        $seat_obj->id = $seat['seat_id'];
+        drupal_write_record('ms_events_seats', $seat_obj, 'id');
+      }
+      else {
+        drupal_write_record('ms_events_seats', $seat_obj);
+      }
+    }
+  }
+
+  $result = array(
+    'success' => TRUE,
+  );
+  print json_encode($result);
+
+  exit;
+}
+
+// ======================================
+// PAGES
+// ======================================
+
+/**
+ * Show a list of seatmaps
+ */
+function ms_events_seatmaps_view_seatmaps() {
+  global $user;
+  $build = array();
+
+  $headers = array(
+    array('data' => t('Name'), 'class' => array('seatmap_name_header'), 'field' => 's.name', 'sort' => 'desc'),
+    array('data' => t('User'), 'class' => array('seatmap_user_header')),
+    array('data' => t('Image'), 'class' => array('seatmap_image_header')),
+    array('data' => t('Actions'), 'class' => array('seatmap_actions_header'), 'sort' => 'desc'),
+  );
+
+  $query = db_select('ms_events_seatmaps', 's');
+  $query->leftjoin('users', 'u', 's.uid = u.uid');
+  $query->fields('s');
+  $query->addField('u', 'name', 'user_name');
+  $query = $query->extend('TableSort')->orderByHeader($headers);
+
+  $pager_amount = 20;
+  if (!isset($_GET['pager_amount']) OR $pager_amount = $_GET['pager_amount']) {
+    $query = $query->extend('PagerDefault')->limit($pager_amount);
+  }
+
+  if (isset($_GET['name'])) {
+    $name = $_GET['name'];
+    $query->condition('u.name', '%' . $name .'%', 'LIKE');
+  }
+
+  // execute the query
+  $result = $query->execute();
+
+  $rows = array();
+  $attr = array('id' => 'seatmaps-table');
+  foreach ($result as $row) {
+    $actions = array(
+      l(t('Seats'), 'admin/moneysuite/ms_events/seatmaps/seats/' . $row->id),
+      l(t('Edit'), 'admin/moneysuite/ms_events/seatmaps/edit/' . $row->id),
+      l(t('Clone'), 'admin/moneysuite/ms_events/seatmaps/clone/' . $row->id),
+      l(t('Delete'), 'admin/moneysuite/ms_events/seatmaps/delete/' . $row->id),
+    );
+    $file = file_load($row->fid);
+
+    $rows[] = array('data' => array(
+      array('data' => $row->name, 'class' => array('seatmap_name')),
+      array('data' => l($row->user_name, 'user/' . $row->uid), array('class' => 'seatmap_user')),
+      array('data' => theme('image', array('path' => $file->uri, 'height' => 100)), array('class' => 'seatmap_image')),
+      array('data' => implode(' | ', $actions), 'class' => array('seatmap_actions'))
+    ));
+  }
+
+  // add the content
+  $build['content'] = array(
+    'table' => array(
+      '#type' => 'item',
+      '#markup' => theme('table', array('header' => $headers, 'rows' => $rows, 'attributes' => $attr, 'empty' => t('No seatmaps yet.'))),
+    ),
+  );
+
+  // Add the pager
+  $build['pager'] = array(
+    '#theme' => 'pager',
+    '#weight' => 5,
+  );
+
+  return $build;
+}
+
+/**
+ * Builds the form where users can add seats to seatmaps
+ */
+function ms_events_seatmaps_edit_seats_form($form, &$form_state, $id) {
+  if ($record = ms_events_seatmaps_get_seatmap_by_id($id)) {
+    drupal_add_library('system', 'ui.draggable');
+    drupal_add_library('system', 'ui.resizable');
+    drupal_add_library('system', 'ui.dialog');
+    drupal_add_library('system', 'ui.selectable');
+    $form['#attached']['js'] = array(
+      drupal_get_path('module', 'ms_events_seatmaps') . '/js/ms_events_seatmaps_manage_seats.js',
+    );
+    drupal_add_css(drupal_get_path('module', 'ms_events_seatmaps') . '/css/ms_events_seatmaps.css');
+    $form['id'] = array(
+      '#type' => 'value',
+      '#value' => $record->id,
+    );
+
+    $file = file_load($record->fid);
+
+    $seats = ms_events_seatmaps_get_seats($record->id);
+
+    drupal_add_js(array('ms_events_seatmaps' => array(
+      'map_id' => $record->id,
+      'seats' => $seats,
+    )), 'setting');
+    foreach ($record->groups as $id => $group) {
+      $form['group_' . $id] = array(
+        '#type' => 'button',
+        '#value' => $group['name'],
+        '#attributes' => array(
+          'color' => $group['color'],
+          'class' => array('group_button'),
+          'group_id' => $id,
+          'style' => 'background: ' . $group['color'] . ';'),
+      );
+    }
+
+    $form['image_pic'] = array(
+      '#type' => 'item',
+      '#prefix' => "<div class='image_container'>",
+      '#suffix' => "</div>",
+      '#markup' => theme('image', array('path' => $file->uri)),
+      '#description' => t("Double-click on the map to add seats. Double-click on
+        seats to change their settings and remove them.
+        <br />You can also move the seats with the arrow keys, and resize the
+        seats by holding SHIFT while pressing the arrow keys.
+        <br />You can also use range(char,start,finish) in the name to
+        create multiple seats at once. For example, range(E,1,12) will create 12
+        seats, E1 through E12."),
+    );
+
+    $form['submit'] = array(
+      '#type' => 'button',
+      '#value' => t('Saved'),
+    );
+    return $form;
+  }
+}
+
+/**
+ * Page callback: Clone a seatmap.
+ */
+function ms_events_seatmaps_clone_seatmap_callback($id) {
+  if ($record = ms_events_seatmaps_get_seatmap_by_id($id)) {
+    unset($record->id);
+    $record->name = t('Clone of @name', array('@name' => $record->name));
+    drupal_write_record('ms_events_seatmaps', $record);
+
+    $file = file_load($record->fid);
+
+    // Update the reference to the file
+    file_usage_delete($file, 'ms_events_seatmaps', 'ms_events_seatmap', $record->id);
+    file_usage_add($file, 'ms_events_seatmaps', 'ms_events_seatmap', $record->id);
+
+    // Clone the seats too.
+    $seats = ms_events_seatmaps_get_seats($id);
+
+    foreach ($seats as $seat) {
+      unset($seat->id);
+      $seat->map_id = $record->id;
+      drupal_write_record('ms_events_seats', $seat);
+    }
+
+    drupal_set_message(t("Seatmap @title has been cloned.",
+      array('@title' => $record->name)));
+  }
+  else {
+    drupal_set_message(t('Error cloning the seatmap. Invalid ID.'), 'error');
+  }
+  drupal_goto('admin/moneysuite/ms_events/seatmaps');
+}
+
+/**
+ * Builds the Edit Seatmap Form
+ */
+function ms_events_seatmaps_edit_seatmap_form($form, &$form_state, $id = NULL) {
+  $form['#tree'] = TRUE;
+  $is_edit = FALSE;
+  if ($id != NULL) {
+    if ($record = ms_events_seatmaps_get_seatmap_by_id($id)) {
+      $is_edit = TRUE;
+      $form['id'] = array(
+        '#type' => 'value',
+        '#value' => $record->id,
+      );
+      $account = user_load($record->uid);
+    }
+  }
+  $form['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title'),
+    '#required' => TRUE,
+    '#default_value' => $is_edit ? $record->name : '',
+  );
+  global $user;
+  $form['username'] = array(
+    '#type' => 'value',
+    '#value' => ($is_edit) ? $account->name : $user->name,
+  );
+  $form['image'] = array(
+    '#type' => 'managed_file',
+    '#title' => t('Seat Map'),
+    '#description' => t("Upload new seating map"),
+    '#upload_location' => 'public://',
+    '#upload_validators' => array(
+      'file_validate_extensions' => array('gif png jpg jpeg'),
+      'file_validate_is_image' => array(),
+    ),
+    '#required' => TRUE,
+    '#default_value' => $is_edit ? $record->fid : '',
+  );
+
+  if (empty($form_state['saved_groups'])) {
+    if ($is_edit) {
+      // We don't need to edit the 'no group' group.
+      unset($record->groups[0]);
+      $form_state['saved_groups'] = $record->groups;
+    }
+    else {
+      $form_state['saved_groups'] = array();
+    }
+  }
+
+  // Build the number of group fieldsets indicated by $form_state['num_groups']
+  foreach ($form_state['saved_groups'] as $i => $group) {
+    $form['groups'][$i] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Group #@num', array('@num' => $i)),
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+    );
+    $form['groups'][$i]['name'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Name'),
+      '#description' => t("Enter the group name. Example: Loft."),
+      '#default_value' => ($is_edit && !empty($group['name'])) ? $group['name'] : '',
+      '#size' => 20,
+      '#required' => TRUE,
+    );
+    $form['groups'][$i]['color'] = array(
+      '#type' => 'select',
+      '#title' => t('Color'),
+      '#options' => array(
+        '#ffa8a8' => t('Red'),
+        '#a8ffab' => t('Green'),
+        '#a8cfff' => t('Blue'),
+        '#fff9a8' => t('Yellow'),
+        '#ff9361' => t('Orange'),
+        '#e6a8ff' => t('Purple'),
+        '#ffa8d6' => t('Pink'),
+        '#d9d9d9' => t('Gray'),
+      ),
+      '#default_value' => ($is_edit && !empty($group['color'])) ? $group['color'] : '#d9d9d9',
+    );
+    $form['groups'][$i]['remove_group_' . $i] = array(
+      '#type' => 'submit',
+      '#value' => t('Remove group #@num', array('@num' => $i)),
+      '#submit' => array('ms_events_seatmaps_remove_group'),
+      '#limit_validation_errors' => array(),
+    );
+  }
+
+  // Adds "Add another group" button
+  $form['add_group'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add group'),
+    '#submit' => array('ms_events_seatmaps_add_group'),
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+  $form_state['redirect'] = 'admin/moneysuite/ms_events/seatmaps';
+  return $form;
+}
+
+/**
+ * Submit handler for "Add another group" button
+ */
+function ms_events_seatmaps_add_group($form, &$form_state) {
+  if (empty($form_state['saved_groups'])) {
+    $form_state['saved_groups'][1] = array(
+      'name' => '',
+      'color' => '#d9d9d9',
+    );
+  }
+  else {
+    $form_state['saved_groups'][] = array(
+      'name' => '',
+      'color' => '#d9d9d9',
+    );
+  }
+  $form_state['rebuild'] = TRUE;
+}
+
+/**
+ * Submit handler for "Remove last group" button
+ */
+function ms_events_seatmaps_remove_group($form, &$form_state) {
+  $matches = array();
+  preg_match('/Remove group #(\d+)/', $form_state['values']['op'], $matches);
+  $id = $matches[1];
+  unset($form_state['saved_groups'][$id]);
+  $form_state['rebuild'] = TRUE;
+}
+
+/**
+ * Validate Function for the Edit Seatmap Form
+ */
+function ms_events_seatmaps_edit_seatmap_form_validate($form, &$form_state) {
+  $v = $form_state['values'];
+
+  if (!$account = user_load_by_name($v['username'])) {
+    form_set_error('username', t('Error: Please enter a valid user.'));
+  }
+}
+
+/**
+ * Submit Function for the Edit Seatmap Form
+ */
+function ms_events_seatmaps_edit_seatmap_form_submit($form, &$form_state) {
+  $v = $form_state['values'];
+  $file = file_load($v['image']);
+  // Change status to permanent and save
+  if ($file->status != FILE_STATUS_PERMANENT) {
+    $file->status = FILE_STATUS_PERMANENT;
+    file_save($file);
+  }
+
+  $account = user_load_by_name($v['username']);
+
+  if (isset($v['id']) AND $record = ms_events_seatmaps_get_seatmap_by_id($v['id'])) {
+    // We are editing an existing record
+    $record->fid = $file->fid;
+    $record->name = $v['title'];
+    $record->groups = isset($v['groups']) ? $v['groups'] : array();
+    $record->uid = $account->uid;
+    drupal_write_record('ms_events_seatmaps', $record, 'id');
+  }
+  else {
+    $record = new stdClass();
+    $record->fid = $file->fid;
+    $record->name = $v['title'];
+    $record->groups = isset($v['groups']) ? $v['groups'] : array();
+    $record->uid = $account->uid;
+    drupal_write_record('ms_events_seatmaps', $record);
+  }
+
+  // Update the reference to the file
+  file_usage_delete($file, 'ms_events_seatmaps', 'ms_events_seatmap', $record->id);
+  file_usage_add($file, 'ms_events_seatmaps', 'ms_events_seatmap', $record->id);
+
+  drupal_set_message(t("Seatmap @title has been saved.",
+    array('@title' => $v['title'])));
+  $form_state['redirect'] = 'admin/moneysuite/ms_events/seatmaps';
+}
+
+/**
+ * Delete a Seatmap
+ */
+function ms_events_seatmaps_delete_seatmap_confirm($form, &$form_state, $id) {
+  if ($record = ms_events_seatmaps_get_seatmap_by_id($id)) {
+    $form['#ms_id'] = $record->id;
+    return confirm_form($form, t('Are you sure you want to delete this Seating Map?'), 'admin/moneysuite/ms_events/seatmaps', t('This action cannot be undone.'), t('Delete'));
+  }
+  else {
+    drupal_not_found();
+  }
+}
+
+/**
+ * Delete a Seatmap
+ */
+function ms_events_seatmaps_delete_seatmap_confirm_submit($form, &$form_state) {
+  $record = ms_events_seatmaps_get_seatmap_by_id($form['#ms_id']);
+
+  if ($file = file_load($record->fid)) {
+    file_usage_delete($file, 'ms_events_seatmaps', 'ms_events_seatmap', $record->id);
+  }
+
+  // Delete the record
+  db_delete('ms_events_seatmaps')
+    ->condition('id', $record->id)
+    ->execute();
+
+  // Delete the seats too
+  db_delete('ms_events_seats')
+    ->condition('map_id', $record->id)
+    ->execute();
+
+  drupal_set_message(t('Seatmap Deleted'));
+  $form_state['redirect'] = 'admin/moneysuite/ms_events/seatmaps';
+}
+
+// ======================================
+// FIELDS API
+// ======================================
+
+/**
+ * Implements hook_ms_events_fields().
+ */
+function ms_events_seatmaps_ms_events_fields() {
+  return array(
+    'ms_events_seatmaps_event' => array(
+      'get_seats' => 'ms_events_seatmaps_get_event_seats_list',
+    )
+  );
+}
+
+/**
+ * Returns a list of seats available, keyed by seat id
+ */
+function ms_events_seatmaps_get_event_seats_list($entity_type, $entity_id, $entity, $field_name, $eid) {
+  $ticket_info = ms_events_extract_ticket_info($entity, $field_name, $eid);
+
+  $seats = ms_events_seatmaps_get_event_seats($ticket_info['seatmap'], array(
+    'entity_type' => $entity_type,
+    'entity_id' => $entity_id,
+    'entity' => $entity,
+    'field_name' => $field_name,
+    'eid' => $eid,
+  ));
+
+  $seats_list = array();
+  foreach ($seats as $seat_id => $seat) {
+    if ($seat->seats > 0) {
+      $seats_list[$seat_id] = $seat->name;
+    }
+  }
+
+  return $seats_list;
+}
+
+/**
+ * Implements hook_field_info().
+ */
+function ms_events_seatmaps_field_info() {
+  return array(
+    'ms_events_seatmaps_event' => array(
+      'label' => t('Ticketed Event with Seating Chart'),
+      'description' => t('A ticketed event with support for seating charts.'),
+      'default_widget' => 'ms_events_seatmaps_default',
+      'default_formatter' => 'ms_events_seatmaps_purchase_tickets',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function ms_events_seatmaps_field_is_empty($item, $field) {
+  return empty($item['event_date']);
+}
+
+// ======================================
+// FORMATTERS
+// ======================================
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function ms_events_seatmaps_field_formatter_info() {
+  return array(
+    'ms_events_seatmaps_purchase_tickets' => array(
+      'label' => t('Display a form to purchase tickets'),
+      'field types' => array('ms_events_seatmaps_event'),
+      'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function ms_events_seatmaps_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+
+  switch ($display['type']) {
+    case 'ms_events_seatmaps_purchase_tickets':
+      foreach ($items as $delta => $item) {
+        $field_name = $field['field_name'];
+        list($entity_id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+
+        $vars = array(
+          'entity_type' => $entity_type,
+          'entity_id' => $entity_id,
+          'entity' => $entity,
+          'field_name' => $field_name,
+          'eid' => $item['eid'],
+          'item' => $item,
+        );
+        $elements=drupal_get_form('ms_events_seatmaps_add_to_cart_form_' . $item['eid'], $vars);
+        $element[$delta] = array(
+          '#type' => 'item',
+          '#prefix' => "<div class='ms_events_seatmap' id='ms_events_seatmap_" . $item['eid'] . "'>",
+          '#suffix' => "</div>",
+          '#markup' => drupal_render($elements),
+        );
+      }
+      break;
+  }
+
+  return $element;
+}
+
+/**
+ * Gets the seats array for a specific field item, adding in some fields like available
+ */
+function ms_events_seatmaps_get_event_seats($map_id, $vars) {
+  extract($vars);
+
+  $seats = ms_events_seatmaps_get_seats($map_id);
+
+  // First get the tickets sold for this event
+  $result = db_select('ms_events_tickets', 't')
+    ->fields('t')
+    ->condition('t.entity_id', $entity_id)
+    ->condition('t.entity_type', $entity_type)
+    ->condition('t.field_name', $field_name)
+    ->condition('t.eid', $eid)
+    ->execute();
+
+  foreach ($result as $row) {
+    $row->data = unserialize($row->data);
+    if (isset($seats[$row->data['seat_id']])) {
+      $seats[$row->data['seat_id']]->seats -= 1;
+
+      drupal_alter('ms_incart_seat', $seats[$row->data['seat_id']], $row);
+    }
+  }
+
+  // Then get all of the seats in the ms_carts_products
+  $result = db_select('ms_cart_products', 'd')
+    ->fields('d')
+    ->condition('d.module', 'ms_events')
+    ->condition('d.id', $entity_type . '/' . $entity_id . '/' . $field_name . '/' . $eid . '/%', 'LIKE')
+    ->execute();
+  foreach ($result as $row) {
+    $row->data = unserialize($row->data);
+    if (isset($seats[$row->data['seat_id']])) {
+      $seats[$row->data['seat_id']]->seats -= $row->qty;
+
+      drupal_alter('ms_incart_seat',$seats[$row->data['seat_id']], $row);
+    }
+  }
+
+  return $seats;
+}
+
+/**
+ * Gets how many seats are left for a seat for an event
+ */
+function ms_events_seatmaps_get_event_seat_seats_left($seat_id, $vars) {
+  extract($vars);
+  $entity = _ms_events_entity_load_single($entity_type, $entity_id);
+  $ticket_info = ms_events_extract_ticket_info($entity, $field_name, $eid);
+  $seats = ms_events_seatmaps_get_event_seats($ticket_info['seatmap'], $vars);
+
+  return (!empty($seats[$seat_id]->seats)) ? $seats[$seat_id]->seats : 0;
+}
+
+/**
+ * Implements hook_forms().
+ */
+function ms_events_seatmaps_forms($form_id) {
+  if (strpos($form_id, 'ms_events_seatmaps_add_to_cart_form') !== FALSE) {
+    $forms = array();
+    $forms[$form_id] = array('callback' => 'ms_events_seatmaps_add_to_cart_form');
+    return $forms;
+  }
+}
+
+/**
+ * Builds the add to cart form
+ */
+function ms_events_seatmaps_add_to_cart_form($form, $form_state, $vars) {
+  extract($vars);
+
+  // Make sure the event is open before continuing.
+  try {
+    ms_events_check_event_open($item);
+  }
+  catch (Exception $e) {
+    $form['event_error_message'] = array(
+      '#type' => 'item',
+      '#markup' => $e->getMessage(),
+    );
+    return $form;
+  }
+
+  $options = array();
+  $ticket_types = ms_events_get_ticket_types();
+  $seatmap = ms_events_seatmaps_get_seatmap_by_id($item['seatmap']);
+  $file = file_load($seatmap->fid);
+
+  // Show the seating chart and the seats that are available
+  $seats = ms_events_seatmaps_get_event_seats($seatmap->id, $vars);
+  drupal_add_js(
+    array(
+      'ms_events_seatmaps' => array(
+        $eid => array(
+          'map_id' => $seatmap->id,
+          'seats' => $seats,
+          'ticket_types' => $ticket_types,
+          'prices' => $item['price'],
+        ),
+      ),
+      'ms_events_seatmaps_autoadd' => variable_get('ms_events_seatmaps_autoadd', FALSE),
+    ), 'setting');
+  drupal_add_library('system', 'ui.dialog');
+  $form['#attached']['js'] = array(
+    drupal_get_path('module', 'ms_events_seatmaps') . '/js/ms_events_seatmaps_buy_seats.js',
+  );
+  $js = "
+(function ($) {
+  $(document).ready(function() {
+    ms_events_seatmaps_attach('$eid');
+  });
+})(jQuery);";
+  $form['#attached']['js'][$js] = array( 'type' => 'inline');
+  drupal_add_css(drupal_get_path('module', 'ms_events_seatmaps') . '/css/ms_events_seatmaps_buy.css');
+
+  $form['groups'] = array(
+    '#type' => 'fieldset',
+    '#prefix' => "<div class='seatmap_groups'>",
+    '#suffix' => "</div>",
+    '#title' => t("Key"),
+  );
+  $form['groups']['group_na'] = array(
+    '#type' => 'item',
+    '#markup' => "<span class='key_color' style='background: #666;'></span>" . t('Not available'),
+    '#attributes' => array(
+      'color' => '#666',
+      'class' => array('group_key'),
+      'group_id' => -1,
+    ),
+  );
+
+  $used_groups = array();
+  foreach ($seats as $seat) {
+    $used_groups[$seat->group_id] = TRUE;
+  }
+
+  foreach ($seatmap->groups as $id => $group) {
+    // If there are no seats in the group, skip it
+    if (!isset($used_groups[$id])) {
+      continue;
+    }
+
+    $form['groups']['group_' . $id] = array(
+      '#type' => 'item',
+      '#markup' => "<span class='key_color' style='background: {$group['color']};'></span>" . $group['name'],
+      '#attributes' => array(
+        'color' => $group['color'],
+        'class' => array('group_key'),
+        'group_id' => $id,
+      ),
+    );
+  }
+
+  $form['image_pic'] = array(
+    '#type' => 'item',
+    '#prefix' => "<div class='seatmap_image'>",
+    '#suffix' => "</div>",
+    '#markup' => theme('image', array('path' => $file->uri)),
+    '#description' => t("Click the seats you would like to purchase."),
+  );
+
+  $form['tickets'] = array(
+    '#prefix' => "<div class='tickets_field'>",
+    '#suffix' => "</div>",
+    '#type' => 'textarea',
+    '#title' => t('Tickets'),
+    '#required' => TRUE,
+  );
+
+  $form['vars'] = array(
+    '#type' => 'value',
+    '#value' => $vars,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add to cart'),
+  );
+
+  return $form;
+}
+
+/**
+ * Submit handler for the add to cart form
+ */
+function ms_events_seatmaps_add_to_cart_form_submit($form, $form_state) {
+  $v = $form_state['values'];
+  extract($v['vars']);
+  $ticket_types = ms_events_get_ticket_types();
+
+  $tickets = (array) json_decode($v['tickets']);
+
+  foreach ($tickets as $seat_id => $ticket) {
+    // Add to cart and redirect to this page
+    $price = empty($item['price'][$ticket->group_id][$ticket->type]) ? 0 : $item['price'][$ticket->group_id][$ticket->type];
+    $product = ms_core_new_product(t('@ticket_name ticket for @entity_label',
+      array('@ticket_name' => $ticket->seat_name . ' (' . $ticket_types[$ticket->type] . ')', '@entity_label' => entity_label($entity_type, $entity))),
+      'ms_events', $entity_type . '/' . $entity_id . '/' . $field_name . '/' . $ticket->eid . '/' . $ticket->seat_id, $price);
+
+    $product->qty = $ticket->qty;
+
+    $seatmap = ms_events_seatmaps_get_seatmap_by_id($item['seatmap']);
+
+    // Store the custom data
+    $product->data = array(
+      'entity_type' => $entity_type,
+      'entity_id' => $entity_id,
+      'field_name' => $field_name,
+      'eid' => $eid,
+      'ticket_seat' => $ticket->seat_name,
+      'seat_id' => $ticket->seat_id,
+      'ticket_type' => $ticket->type,
+      'allow_multiple' => ($ticket->qty > 1),
+      'qty_validate' => 'ms_events_seatmaps_qty_validate',
+      'qty_available' => min(ms_events_seatmaps_get_event_seat_seats_left($ticket->seat_id, $v['vars']), variable_get('ms_events_max_quantity', 50)),
+    );
+
+    ms_core_add_cart_product($product);
+  }
+}
+
+/**
+ * Validate the quantity selected
+ */
+function ms_events_seatmaps_qty_validate($element, &$form_state, $form) {
+  $product = $form_state['values']['product'];
+  $tickets_left = ms_events_seatmaps_get_event_seat_seats_left($product->data['seat_id'], $product->data);
+  $tickets_left += $product->qty;
+  if (intval($element['#value']) > $tickets_left) {
+    form_error($element, t('You have chosen a quantity that exceeds the amount remaining.'));
+  }
+  if (intval($element['#value']) > variable_get('ms_events_max_quantity', 50)) {
+    form_error($element, t('You cannot purchase more than @num at a time.', array('@num' => variable_get('ms_events_max_quantity', 50))));
+  }
+}
+
+// ======================================
+// WIDGETS
+// ======================================
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function ms_events_seatmaps_field_widget_info() {
+  return array(
+    'ms_events_seatmaps_default' => array(
+      'label' => t('Default widget'),
+      'field types' => array('ms_events_seatmaps_event'),
+      'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+    ),
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function ms_events_seatmaps_theme() {
+  return array(
+    'ms_event_seatmap' => array(
+      'render element' => 'element',
+    ),
+  );
+}
+
+/**
+ * Implements hook_element_info().
+ */
+function ms_events_seatmaps_element_info() {
+  $elements = array();
+  $elements['ms_events_seatmaps_default'] =  array(
+    '#input' => TRUE,
+    '#process' => array('ms_events_seatmaps_default_field_process'),
+    '#theme' => 'ms_event_seatmap',
+    '#theme_wrappers' => array('form_element'),
+  );
+  return $elements;
+}
+
+/**
+ * Implements hook_field_load().
+ */
+function ms_events_seatmaps_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
+  foreach ($entities as $id => $entity) {
+    foreach ($items[$id] as $delta => $item) {
+      $items[$id][$delta]['price'] = unserialize($items[$id][$delta]['price']);
+    }
+  }
+}
+
+/**
+ * Implements hook_field_presave().
+ */
+function ms_events_seatmaps_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  foreach ($items as $delta => $value) {
+    $items[$delta]['price'] = serialize($items[$delta]['price']);
+    // Convert the date to a timestamp
+    if (!empty($items[$delta]['event_date']) AND !is_numeric($items[$delta]['event_date'])) {
+      $items[$delta]['event_date'] = strtotime($items[$delta]['event_date']);
+    }
+    else {
+      $items[$delta]['event_date'] = 0;
+    }
+    if (!empty($items[$delta]['open_date']) AND !is_numeric($items[$delta]['open_date'])) {
+      $items[$delta]['open_date'] = strtotime($items[$delta]['open_date']);
+    }
+    else {
+      $items[$delta]['open_date'] = 0;
+    }
+    if (!empty($items[$delta]['close_date']) AND !is_numeric($items[$delta]['close_date'])) {
+      $items[$delta]['close_date'] = strtotime($items[$delta]['close_date']);
+    }
+    else {
+      $items[$delta]['close_date'] = 0;
+    }
+  }
+}
+
+/**
+ * AJAX form callback
+ */
+function ms_events_seatmaps_tickets_form_ajax_callback($form, $form_state) {
+  array_pop($form_state['triggering_element']['#parents']);
+  $element = drupal_array_get_nested_value($form, $form_state['triggering_element']['#parents']);
+  return $element['price'];
+}
+
+/**
+ * Process the element before displaying the field.
+ */
+function ms_events_seatmaps_default_field_process($element, $form_state, $complete_form) {
+  $instance = field_widget_instance($element, $form_state);
+  $settings = $instance['settings'];
+
+  $date_format = variable_get('date_format_short', 'm/d/Y - H:i');
+
+  if (!empty($element['#value']['event_date']) AND $d = $element['#value']['event_date'] AND is_array($d)) {
+    $element['#value']['event_date'] = strtotime($element['#value']['event_date']['date'] . ' ' . $element['#value']['event_date']['time']);
+  }
+  if (!empty($element['#value']['event_date']) AND !is_numeric($element['#value']['event_date'])) {
+    $element['#value']['event_date'] = strtotime($element['#value']['event_date']);
+  }
+  $element['event_date'] = array(
+    '#type' => 'date_popup',
+    '#title' => t('Event Date'),
+    '#date_format' => $date_format,
+    '#date_type' => DATE_UNIX,
+    '#default_value' => !empty($element['#value']['event_date']) ? date('Y-m-d H:i:s', $element['#value']['event_date']) : NULL,
+    '#date_year_range' => '-1:+5',
+  );
+  if (!empty($element['#value']['open_date']) AND $d = $element['#value']['open_date'] AND is_array($d)) {
+    $element['#value']['open_date'] = strtotime($element['#value']['open_date']['date'] . ' ' . $element['#value']['open_date']['time']);
+  }
+  if (!empty($element['#value']['open_date']) AND !is_numeric($element['#value']['open_date'])) {
+    $element['#value']['open_date'] = strtotime($element['#value']['open_date']);
+  }
+  $element['open_date'] = array(
+    '#type' => 'date_popup',
+    '#title' => t('Registration Opens'),
+    '#date_format' => $date_format,
+    '#date_type' => DATE_UNIX,
+    '#default_value' => !empty($element['#value']['open_date']) ? date('Y-m-d H:i:s', $element['#value']['open_date']) : NULL,
+    '#date_year_range' => '-1:+5',
+  );
+  if (!empty($element['#value']['close_date']) AND $d = $element['#value']['close_date'] AND is_array($d)) {
+    $element['#value']['close_date'] = strtotime($element['#value']['close_date']['date'] . ' ' . $element['#value']['close_date']['time']);
+  }
+  if (!empty($element['#value']['close_date']) AND !is_numeric($element['#value']['close_date'])) {
+    $element['#value']['close_date'] = strtotime($element['#value']['close_date']);
+  }
+  $element['close_date'] = array(
+    '#type' => 'date_popup',
+    '#title' => t('Registration Closes'),
+    '#date_format' => $date_format,
+    '#date_type' => DATE_UNIX,
+    '#default_value' => !empty($element['#value']['close_date']) ? date('Y-m-d H:i:s', $element['#value']['close_date']) : NULL,
+    '#date_year_range' => '-1:+5',
+  );
+  $seatmap_options = ms_events_seatmaps_get_seatmaps_list();
+  $element['seatmap'] = array(
+    '#type' => 'select',
+    '#title' => t('Seating Chart'),
+    '#default_value' => isset($element['#value']['seatmap']) ? $element['#value']['seatmap'] : '',
+    '#description' => t("Select the seating chart for this event."),
+    '#options' => $seatmap_options,
+    '#ajax' => array(
+      'callback' => 'ms_events_seatmaps_tickets_form_ajax_callback',
+      'wrapper' => 'price-div',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+    '#required' => TRUE,
+  );
+
+  if (empty($element['#value']['eid'])) {
+    $element['#value']['eid'] = ms_events_generate_event_id();
+  }
+
+  $element['eid'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array('readonly' => 'readonly', 'style' => 'display:none;'),
+    '#default_value' => isset($element['#value']['eid']) ? $element['#value']['eid'] : ms_events_generate_event_id(),
+  );
+
+  if (empty($element['#value']['seatmap'])) {
+    $element['#value']['seatmap'] = key($seatmap_options);
+  }
+
+  if ($seatmap = ms_events_seatmaps_get_seatmap_by_id($element['#value']['seatmap'])) {
+    $ticket_types = ms_events_get_ticket_types();
+    $element['price'] = array(
+      '#tree' => TRUE,
+      '#type' => 'fieldset',
+      '#title' => t('Prices'),
+      '#prefix' => '<div id="price-div">',
+      '#suffix' => '</div>',
+    );
+    foreach ($seatmap->groups as $id => $group) {
+      $element['price'][$id] = array(
+        '#type' => 'fieldset',
+        '#title' => $group['name'],
+      );
+      foreach ($ticket_types as $ticket_type => $ticket_type_name){
+        $element['price'][$id][$ticket_type] = array(
+          '#type' => 'textfield',
+          '#title' => $ticket_type_name,
+          '#default_value' => isset($element['#value']['price'][$id][$ticket_type]) ? $element['#value']['price'][$id][$ticket_type] : '',
+          '#description' => t("Enter a number without currency symbols. To exclude this
+            ticket type, leave blank."),
+        );
+      }
+    }
+  }
+
+  return $element;
+}
+
+/**
+ * FAPI theme for an individual form elements.
+ */
+function theme_ms_event_seatmap($vars) {
+  $element = $vars['element'];
+
+  $output = '';
+  $output .= '<div>'. drupal_render($element['seatmap']) .'</div>';
+  $output .= '<div>'. drupal_render($element['eid']) .'</div>';
+  $output .= '<div>'. drupal_render($element['price']) .'</div>';
+  $output .= '<div>'. drupal_render($element['event_date']) .'</div>';
+  $output .= '<div>'. drupal_render($element['open_date']) .'</div>';
+  $output .= '<div>'. drupal_render($element['close_date']) .'</div>';
+
+  return $output;
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function ms_events_seatmaps_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $element += array(
+    '#type' => $instance['widget']['type'],
+    '#default_value' => isset($items[$delta]) ? $items[$delta] : '',
+  );
+  return $element;
+}
+
+/**
+ * Implements hook_field_widget_error().
+ */
+function ms_events_seatmaps_field_widget_error($element, $error, $form, &$form_state) {
+  switch ($error['error']) {
+    case 'ms_events_seatmaps_invalid':
+      form_error($element, $error['message']);
+      break;
+  }
+}
+
+

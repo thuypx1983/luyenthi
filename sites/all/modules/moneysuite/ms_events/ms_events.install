@@ -1,0 +1,241 @@
+<?php
+
+/**
+ * @file
+ * MoneySuite Events Ticketing Suite .install file
+ */
+
+/**
+ * Implements hook_install().
+ */
+function ms_events_install() {
+  $t = get_t();
+  db_insert('ms_events_ticket_types')
+    ->fields(array(
+      'type' => 'regular',
+      'name' => $t('Regular'),
+    ))
+    ->execute();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function ms_events_uninstall() {
+  // Delete related variables all at once.
+  db_delete('variable')
+  ->condition('name', 'ms_events_%%', 'LIKE')
+  ->execute();
+}
+
+/**
+ * Implements hook_schema().
+ */
+function ms_events_schema() {
+  $schema['ms_events_ticket_types'] = array(
+    'description' => 'Event Ticket Types',
+    'fields' => array(
+      'type' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'description' => 'The ticket type',
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'description' => 'The type name',
+      ),
+    ),
+    'primary key' => array('type'),
+  );
+  $schema['ms_events_tickets'] = array(
+    'description' => 'Event Tickets that have been sold',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'ID',
+      ),
+      'entity_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Entity ID',
+      ),
+      'entity_type' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'description' => 'The entity type',
+      ),
+      'field_name' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'description' => 'The field name',
+      ),
+      'uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'User ID',
+      ),
+      'oid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Order ID',
+      ),
+      'status' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 1,
+        'description' => 'Status',
+      ),
+      'ticket_number' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'description' => 'The unique ticket number',
+      ),
+      'ticket_seat' => array(
+        'type' => 'varchar',
+        'length' => '31',
+        'not null' => TRUE,
+        'description' => 'The ticket seat',
+      ),
+      'price' => array(
+        'type' => 'numeric',
+        'not null' => TRUE,
+        'default' => 0,
+        'precision' => '10',
+        'scale' => '2',
+        'description' => 'The ticket price',
+      ),
+      'created' => array(
+        'type' => 'int',
+        'description' => 'Timestamp for Creation',
+      ),
+      'data' => array(
+        'type' => 'text',
+        'serialize' => TRUE,
+      ),
+      'eid' => array(
+				'type' => 'varchar',
+				'length' => '20',
+				'not null' => TRUE,
+				'default' => '',
+				'description' => 'The unique event id',
+			),
+    ),
+    'primary key' => array('id'),
+  );
+  return $schema;
+}
+
+// ======================================
+// Updates:
+// ======================================
+
+/**
+ * Add eid fields for events
+ */
+function ms_events_update_7100(&$sandbox) {
+  field_cache_clear();
+  $fields = field_info_fields();
+  $count = 0;
+  $eids = array();
+  foreach ($fields as $field_name => $field) {
+    if (in_array($field['type'], array('ms_events_seatmaps_event', 'ms_events_basic_event')) && $field['storage']['type'] == 'field_sql_storage') {
+      foreach ($field['storage']['details']['sql'] as $type => $table_info) {
+        foreach ($table_info as $table_name => $columns) {
+          $column_name = _field_sql_storage_columnname($field_name, 'eid');
+          db_add_field($table_name, $column_name, array(
+            'type' => 'varchar',
+            'length' => '20',
+            'not null' => TRUE,
+            'default' => '',
+            'description' => 'The unique event id',
+          ));
+
+          field_cache_clear();
+
+          // Get all of the current instances of the field and set values for the eid.
+          $result = db_select($table_name, 'f')
+            ->fields('f')
+            ->execute();
+
+          foreach ($result as $row) {
+            $eid = ms_core_get_random_key(10);
+            while (in_array($eid, $eids)) {
+              $eid = ms_core_get_random_key(10);
+            }
+            $eids[] = $eid;
+            db_update($table_name)
+              ->fields(array($column_name => $eid))
+              ->condition('revision_id', $row->revision_id)
+              ->execute();
+          }
+          $count += 1;
+        }
+      }
+    }
+  }
+  field_cache_clear();
+  return t('Successfully added eid fields for @count tables.', array('@count' => $count));
+}
+
+/**
+ * Add the eid field to the tickets table.
+ */
+function ms_events_update_7101(&$sandbox) {
+  db_add_field('ms_events_tickets', 'eid', array(
+    'type' => 'varchar',
+    'length' => '20',
+    'not null' => TRUE,
+    'default' => '',
+    'description' => 'The unique event id',
+  ));
+  return t('Successfully added the eid field to the tickets table.');
+}
+
+/**
+ * Migrate from delta to eid.
+ */
+function ms_events_update_7102(&$sandbox) {
+  $count = 0;
+
+  // Load all of the tickets that are in the tickets table.
+  $result = db_query("SELECT * FROM {ms_events_tickets}");
+
+  foreach ($result as $row) {
+    // Find the eid.
+    $entities = entity_load($row->entity_type, array($row->entity_id));
+    foreach ($entities as $entity) {
+      if (!empty($entity->{$row->field_name}['und'][$row->delta]['eid'])) {
+        $eid = $entity->{$row->field_name}['und'][$row->delta]['eid'];
+        // Update the tickets with the appropriate eid based on the delta.
+        db_update('ms_events_tickets')
+          ->fields(array('eid' => $eid))
+          ->condition('id', $row->id)
+          ->execute();
+        ms_core_product_id_change('ms_events-' . $row->entity_type . '/' . $row->entity_id . '/' . $row->field_name . '/' . $row->delta, 'ms_events-' . $row->entity_type . '/' . $row->entity_id . '/' . $row->field_name . '/' . $eid);
+        $count += 1;
+      }
+      else {
+        drupal_set_message(t("Error updating the eid for a ticket: @row", array('@row' => $row->id)));
+      }
+    }
+  }
+
+  // Remove the delta field from the tickets table.
+  db_drop_field('ms_events_tickets', 'delta');
+  return t('Successfully migrated the keys for @count tickets.', array('@count' => $count));
+}
