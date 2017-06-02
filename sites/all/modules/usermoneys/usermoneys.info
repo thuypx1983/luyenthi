@@ -1,5 +1,5 @@
 name = Usermoneys
-description = Userpoints core: API module for recording points for other modules.
+description = Usermoneys core: API module for recording points for other modules.
 package = Usermoneys
 core = 7.x
 ;configure = admin/config/people/usermoneys/settings

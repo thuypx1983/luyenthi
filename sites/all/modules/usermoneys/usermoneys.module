@@ -1,9 +1,26 @@
 <?php
+
 /**
  * Hook_init
  */
 function usermoneys_init(){
 
+}
+
+/**
+ * Implements hook_menu().
+ */
+function usermoneys_menu() {
+  $items = array();
+    $items['admin/usermoneys_transaction/%usermoneys_transaction/edit'] = array(
+      'title' => 'Edit transaction',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('usermoneys_admin_txn',1,'edit'),
+      'access arguments' => array('access adminstration page'),
+      'file' => 'usermoneys.admin.inc',
+      'type' => MENU_LOCAL_TASK,
+    );
+  return $items;
 }
 
 /**
@@ -322,4 +339,28 @@ function usermoneys_views_data() {
     );
 
     return $data;
+}
+
+
+/**
+ * Load a usermoneys transaction.
+ *
+ * @param $txn_id
+ *   Usermoneys transaction Id.
+ *
+ * @return
+ *   A loaded userpoints transaction object.
+ */
+function usermoneys_transaction_load($txn_id) {
+  if (!empty($txn_id)) {
+    $transaction = db_query('SELECT * from {usermoneys_txn} WHERE txn_id = :txn', array(':txn' => $txn_id))->fetchObject();
+  }
+  if (empty($transaction)) {
+    return FALSE;
+  }
+
+  // Load corresponding user object.
+  $transaction->user = user_load($transaction->uid);
+
+  return $transaction;
 }
