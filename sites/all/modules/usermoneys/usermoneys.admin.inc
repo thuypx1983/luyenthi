@@ -5,7 +5,7 @@
  */
 function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
 
-  //drupal_add_css(drupal_get_path('module', 'userpoints') . '/userpoints.css');
+  //drupal_add_css(drupal_get_path('module', 'usermoneys') . '/usermoneys.css');
 
   $timestamp = format_date(REQUEST_TIME, 'custom', 'Y-m-d H:i O');
   if ($mode == 'edit') {
@@ -19,7 +19,7 @@ function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
     );
   }
   elseif ($mode == 'add') {
-    drupal_set_title(t('Add !points', userpoints_translation()));
+    drupal_set_title(t('Add !Moneys'));
     if ($txn) {
       $txn_user = user_load($txn);
     }
@@ -31,7 +31,7 @@ function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
     '#maxlength' => 60,
     '#default_value' => isset($txn_user) ? $txn_user->name : '',
     '#autocomplete_path' => $mode == 'edit' ? NULL : 'user/autocomplete',
-    '#description' => t('The name of the user who should gain or lose !points.', userpoints_translation()),
+    '#description' => t('The name of the user who should gain or lose !points.'),
     '#required' => TRUE,
     '#weight' => -20,
     '#disabled' => $mode == 'edit',
@@ -43,24 +43,11 @@ function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
     '#size' => 10,
     '#maxlength' => 10,
     '#default_value' => isset($txn->points) ? $txn->points : 0,
-    '#description' => t('The number of !points to add or subtract.  For example, enter %positive to add !points or %negative to deduct !points.', array('%positive' => 25, '%negative' => -25) + userpoints_translation()),
+    '#description' => t('The number of !points to add or subtract.  For example, enter %positive to add !points or %negative to deduct !points.', array('%positive' => 25, '%negative' => -25)),
     '#required' => TRUE,
     '#weight' => -15,
   );
 
-  if (module_exists('taxonomy')) {
-    $options = userpoints_get_categories();
-    $form['tid'] = array(
-      '#type' => 'select',
-      '#title' => t('Category'),
-      '#default_value' => isset($txn->tid) ? $txn->tid : userpoints_get_default_tid(),
-      '#options' => $options,
-      '#description' => t('The !points category that should apply to this transaction.', userpoints_translation()),
-      '#weight' => 0,
-      // Only show the category if there are actually categories to choose from.
-      '#access' => count($options) > 1,
-    );
-  }
 
   $form['additional_settings'] = array(
     '#type' => 'vertical_tabs',
@@ -76,9 +63,9 @@ function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
     $form['status']['moderate'] = array(
       '#title' => t('Moderated'),
       '#type' => 'checkbox',
-      '#description' => t('If checked, this !points transaction must be approved, through the moderation process.', userpoints_translation()),
-      '#default_value' => variable_get(USERPOINTS_POINTS_MODERATION, 0),
-      '#access' => userpoints_admin_access('moderate'),
+      '#description' => t('If checked, this !points transaction must be approved, through the moderation process.'),
+      '#default_value' => variable_get(usermoneys_POINTS_MODERATION, 0),
+      '#access' => usermoneys_admin_access('moderate'),
       '#weight' => -10,
     );
   }
@@ -86,10 +73,10 @@ function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
     $form['status']['status'] = array(
       '#title' => t('Approval status'),
       '#type' => 'radios',
-      '#options' => userpoints_txn_status(),
+      '#options' => usermoneys_txn_status(),
       '#description' => t('Approval status of the transaction.'),
       '#default_value' => $txn->status,
-      '#access' => userpoints_admin_access('moderate'),
+      '#access' => usermoneys_admin_access('moderate'),
       '#weight' => -10,
     );
   }
@@ -103,7 +90,7 @@ function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
     '#description' => t('The date and time recorded for this transaction. Use this format: YYYY-MM-DD HH:MM +ZZZZ.'),
     '#weight' => -5,
     // Do not show this if it is not allowed to change the timestamp anyway.
-    '#access' => !variable_get(USERPOINTS_TRANSACTION_TIMESTAMP, 1),
+    '#access' => !variable_get(usermoneys_TRANSACTION_TIMESTAMP, 1),
   );
 
   $expirydate = 0;
@@ -114,7 +101,7 @@ function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
   }
   else {
     // If we're not editing we use site defaults.
-    $expirydate = userpoints_get_default_expiry_date();
+    $expirydate = usermoneys_get_default_expiry_date();
     if ($expirydate) {
       $expirydate = format_date($expirydate, 'custom', 'Y-m-d H:i:s O');
     }
@@ -125,7 +112,7 @@ function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
     '#default_value' => $expirydate ? $expirydate : '',
     '#size' => 30,
     '#maxlength' => 30,
-    '#description' => t('The date and time that the !points should expire. Use this format: YYYY-MM-DD HH:MM +ZZZZ. Leave this field blank if the !points should never expire.', userpoints_translation()),
+    '#description' => t('The date and time that the !points should expire. Use this format: YYYY-MM-DD HH:MM +ZZZZ. Leave this field blank if the !points should never expire.'),
     '#weight' => 25,
   );
 
@@ -143,7 +130,7 @@ function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
     '#description' => t('The operation type for this transaction (default is %admin). Any value is valid but using a defined operation will cause an auto-generated description (specific to the chosen operation) to be included. This description can be translated into multiple languages.', array('%admin' => t('admin'))),
     '#weight' => 5,
     '#required' => FALSE,
-    '#autocomplete_path' => 'userpoints/operation-autocomplete',
+    '#autocomplete_path' => 'usermoneys/operation-autocomplete',
   );
 
   $form['reason']['description'] = array(
@@ -152,7 +139,7 @@ function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
     '#default_value' => isset($txn->description) ? $txn->description : '',
     '#rows' => 7,
     '#cols' => 40,
-    '#description' => t('Enter an optional description for this transaction, such as the reason !points were added or subtracted.', userpoints_translation()),
+    '#description' => t('Enter an optional description for this transaction, such as the reason !points were added or subtracted.'),
     '#weight' => 10,
   );
 
@@ -191,7 +178,7 @@ function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
     '#default_value' => isset($txn->reference) ? $txn->reference : '',
     '#size' => 30,
     '#maxlength' => 128,
-    '#description' => t('Enter an optional reference code for this transaction. This is for internal tracking and is not shown to the end user.', userpoints_translation()),
+    '#description' => t('Enter an optional reference code for this transaction. This is for internal tracking and is not shown to the end user.'),
     '#weight' => 10,
   );
 
@@ -219,4 +206,92 @@ function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
     '#weight' => 50,
   );
   return $form;
+}
+
+/**
+ * Validate function for usermoneys transaction form.
+ */
+function usermoneys_admin_txn_validate($form, &$form_state) {
+    $txn_user = user_load_by_name($form_state['values']['txn_user']);
+    if (!is_object($txn_user)) {
+        form_set_error('txn_user', t('Specified user does not exist.'));
+    }
+    else {
+        form_set_value($form['txn_user'], $txn_user, $form_state);
+    }
+
+    if ((int)$form_state['values']['points'] == 0) {
+        form_set_error('points', t('Amount of !points must be a positive or negative number.'));
+    }
+
+    if (!strtotime($form_state['values']['time_stamp'])) {
+        form_set_error('time_stamp', t('The provided timestamp is not a valid date.'));
+    }
+
+}
+
+/**
+ * Submit function for usermoneys transaction form.
+ */
+function usermoneys_admin_txn_submit($form, &$form_state) {
+    global $user;
+    if ($form_state['values']['mode'] == 'add') {
+        $params = array(
+            'points' => $form_state['values']['points'],
+            'uid' => $form_state['values']['txn_user']->uid,
+            'operation' => $form_state['values']['operation'],
+            'description' => $form_state['values']['description'],
+            'reference' => $form_state['values']['reference'],
+            'tid' => $form_state['values']['tid'],
+            'time_stamp' => strtotime($form_state['values']['time_stamp']),
+            'moderate' => (bool)$form_state['values']['moderate'],
+            'approver_uid' => $user->uid,
+        );
+        if ($form_state['values']['expirydate']) {
+            // Check for the existence of an expirydate.
+            $params['expirydate'] = strtotime($form_state['values']['expirydate']);
+        }
+        if (!empty($form_state['values']['entity_id']) && !empty($form_state['values']['entity_type'])) {
+            $params['entity_type'] = $form_state['values']['entity_type'];
+            $params['entity_id'] = (int)$form_state['values']['entity_id'];
+        }
+    }
+    else {
+        $expirydate = 0;
+        if (!empty($form_state['values']['expirydate'])) {
+            $expirydate = strtotime($form_state['values']['expirydate']);
+        }
+
+        // If status changed, the current user is the new approver, when not
+        // changed, then the current approver is kept.
+        if ($form_state['values']['txn']->status == $form_state['values']['status']) {
+            $approver_uid = $form_state['values']['txn']->approver_uid;
+        }
+        else {
+            $approver_uid = $user->uid;
+        }
+
+        $params = array(
+            'uid' => $form_state['values']['txn']->uid,
+            'approver_uid' => $approver_uid,
+            'points' => $form_state['values']['points'],
+            'tid' => $form_state['values']['tid'],
+            'time_stamp' => strtotime($form_state['values']['time_stamp']),
+            'operation' => $form_state['values']['operation'],
+            'description' => $form_state['values']['description'],
+            'reference' => $form_state['values']['reference'],
+            'status' => $form_state['values']['status'],
+            'expirydate' => $expirydate,
+            'txn_id' => $form_state['values']['txn']->txn_id,
+            'display' => FALSE,
+        );
+        if (!empty($form_state['values']['entity_id']) && !empty($form_state['values']['entity_type'])) {
+            $params['entity_type'] = $form_state['values']['entity_type'];
+            $params['entity_id'] = (int)$form_state['values']['entity_id'];
+        }
+        drupal_set_message(t('Changes to the !points transaction have been saved.'));
+    }
+    usermoneys_usermoneysapi($params);
+
+    $form_state['redirect'] = 'admin/usermoneys-transaction';
 }

@@ -1,5 +1,9 @@
 <?php
 
+define('USERPOINTS_TXN_STATUS_APPROVED', 0);
+define('USERPOINTS_TXN_STATUS_PENDING', 1);
+define('USERPOINTS_TXN_STATUS_DECLINED', 2);
+
 /**
  * Hook_init
  */
@@ -15,7 +19,7 @@ function usermoneys_menu() {
     $items['admin/usermoneys_transaction/%usermoneys_transaction/edit'] = array(
       'title' => 'Edit transaction',
       'page callback' => 'drupal_get_form',
-      'page arguments' => array('usermoneys_admin_txn',1,'edit'),
+      'page arguments' => array('usermoneys_admin_txn',3,2),
       'access arguments' => array('access adminstration page'),
       'file' => 'usermoneys.admin.inc',
       'type' => MENU_LOCAL_TASK,
@@ -349,7 +353,7 @@ function usermoneys_views_data() {
  *   Usermoneys transaction Id.
  *
  * @return
- *   A loaded userpoints transaction object.
+ *   A loaded usermoneys transaction object.
  */
 function usermoneys_transaction_load($txn_id) {
   if (!empty($txn_id)) {
@@ -363,4 +367,330 @@ function usermoneys_transaction_load($txn_id) {
   $transaction->user = user_load($transaction->uid);
 
   return $transaction;
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function usermoneys_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+    // Add action link to add points on 'usermoneys' administration pages.
+    if (strpos($root_path, 'admin/usermoneys_transaction') !== FALSE) {
+
+        // Don't display the action link on some pages like settings and
+        // approve or decline confirmation forms.
+        $blacklist = array('settings', 'approve', 'decline');
+        foreach ($blacklist as $blacklisted_path) {
+            if (strpos($root_path, $blacklisted_path) !== FALSE) {
+                return;
+            }
+        }
+
+        $item = menu_get_item('admin/config/people/usermoneys/add');
+
+        // For the transaction view pages, we want to directly link to the
+        // user for this transaction.
+        if (arg(4) == 'transaction' && (arg(6) == 'view' || arg(6) == 'edit')) {
+            $transaction = usermoneys_transaction_load(arg(5));
+            $item['href'] .= '/' . $transaction->uid;
+        }
+
+        if ($item['access']) {
+            $data['actions']['output'][] = array(
+                '#theme' => 'menu_local_action',
+                '#link' => $item,
+            );
+        }
+    }
+}
+
+
+function usermoneys_txn_status() {
+    static $stati;
+    if (empty($stati)) {
+        $stati = array(
+            USERMONEYS_TXN_STATUS_APPROVED => t('Approved'),
+            USERMONEYS_TXN_STATUS_PENDING => t('Pending'),
+            USERMONEYS_TXN_STATUS_DECLINED => t('Declined'),
+        );
+    }
+    return $stati;
+}
+
+
+/**
+ * Save usermoneys changes and call hooks.
+ *
+ * @param $params
+ *    if (int) assumed to be points for current user
+ *    Accepts an array of keyed variables and parameters
+ *    'points' => # of points (int) (required)
+ *    'moderate' => TRUE/FALSE
+ *    'uid' => $user->uid
+ *    'time_stamp' => unix time of the points assignment date
+ *    'operation' => 'published' 'moderated' etc.
+ *    'tid' => 'category ID'
+ *    'expirydate' => timestamp or 0, 0 = non-expiring; NULL = site default
+ *    'description' => 'description'
+ *    'reference' => reserved for module specific use
+ *    'display' => whether or not to display "points awarded" message
+ *    'txn_id' => Transaction ID of points, If present an UPDATE is performed
+ *    'entity_id' => ID of an entity in the Database. ex. $node->id or $user->uid
+ *    'entity_type' => string of the entity type. ex. 'node' or 'user' NOT 'node-content-custom'
+ *
+ * @return
+ *   Array with status and reason.
+ *     'status' => FALSE when no action is take, TRUE when points are credited or debited
+ *     'reason' => (string) error message to indicate reason for failure
+ */
+function usermoneys_usermoneysapi($params) {
+    global $user;
+
+    // Test for the existence of parameters and set defaults if necessary.
+    if (!isset($params['txn_id'])) {
+        // If a txn_id is passed in we'll do an UPDATE thus the std checks don't apply.
+        if (is_int($params)) {
+            $params = array('points' => $params);
+        }
+        if (!is_array($params)) {
+            // Has to be an array to continue.
+            return array(
+                'status' => FALSE,
+                'reason' => 'Parameters did not properly form as an array,
+                     this is an internal module error.
+                    ',
+            );
+        }
+        if (!isset($params['uid'])) {
+            $params['uid'] = $user->uid;
+        }
+
+        // Check if parameters are set.
+        $params_null_check = array('operation', 'description', 'reference', 'display', 'entity_id', 'entity_type');
+        foreach ($params_null_check as $param_null_check) {
+            if (!isset($params[$param_null_check])) {
+                $params[$param_null_check] = NULL;
+            }
+        }
+
+        if (!isset($params['moderate'])) {
+            // If not passed then site default is used.
+            $params['status'] = variable_get(usermoneys_POINTS_MODERATION, usermoneys_TXN_STATUS_APPROVED);
+        }
+        else {
+            $params['status'] = $params['moderate'] ? usermoneys_TXN_STATUS_PENDING : usermoneys_TXN_STATUS_APPROVED;
+        }
+        if (!isset($params['tid']) || !is_numeric($params['tid'])) {
+            // If not passed then site default is used.
+            $params['tid'] = usermoneys_get_default_tid();
+        }
+
+        // Anonymous users do not get points, and there have to be points to process.
+        if (empty($params['uid']) || empty($params['points'])) {
+            return array(
+                'status' => FALSE,
+                'reason' => 'uid or points not given. Anonymous users do not get points and there must be points to process.',
+            );
+        }
+    }
+    else {
+        // We have a txn_id so we can look up some user information.
+        $params['uid'] = db_query('SELECT uid from {usermoneys_txn} WHERE txn_id = :txn_id', array(':txn_id' => $params['txn_id']))->fetchField();
+    } // If txn_id.
+    // Load the user object that will be awarded the points.
+    $account = user_load($params['uid']);
+    if (!$account) {
+        return array(
+            'status' => FALSE,
+            'reason' => 'invalid uid or user account could not be loaded',
+        );
+    }
+
+    // Call the _usermoneys hook, and stop if one of them returns FALSE.
+    $rc = usermoneys_invoke_all('points before', $params);
+
+    foreach ($rc as $key => $value) {
+        if ($value == FALSE) {
+            // Do not process the points.
+            return array(
+                'status' => FALSE,
+                'reason' => t('@key returned FALSE from the hook_usermoneys points before call', array('@key' => $key)),
+            );
+        }
+    }
+
+    $ret = _usermoneys_transaction($params);
+
+    // Reset the static cache of usermoneys.
+    drupal_static_reset('usermoneys_get_current_points');
+
+    if ($ret == FALSE) {
+        return array(
+            'status' => FALSE,
+            'reason' => 'transaction failed in _usermoneys_transaction, this is an internal module error',
+        );
+    }
+
+    // Allow modules to define custom messages.
+    if (!empty($params['message'])) {
+        $message = $params['message'];
+    }
+    // Display message if either display property is not set and messages should
+    // be displayed by default or display property is not FALSE.
+    elseif (!empty($params['display']) || (!isset($params['display']) && variable_get(usermoneys_DISPLAY_MESSAGE, 1))) {
+        // Prepare arguments. They are the same for all string combinations.
+        $categories = usermoneys_get_categories();
+        $arguments = array_merge(usermoneys_translation(), array(
+            '!username' => theme('username', array('account' => $account)),
+            '%total' => usermoneys_get_current_points($params['uid'], $params['tid']),
+            '%category' => isset($categories[$params['tid']]) ? $categories[$params['tid']] : $categories[0],
+        ));
+
+        $view_own_points = user_access('view own usermoneys') || user_access('view usermoneys') || user_access('administer usermoneys');
+        $view_all_points = user_access('view usermoneys') || user_access('administer usermoneys');
+
+        if ($params['status'] == usermoneys_TXN_STATUS_DECLINED) {
+            // Points have been declined.
+            if ($account->uid == $user->uid && $view_own_points) {
+                $message = format_plural($params['points'], 'You did not receive approval for @count !point in the %category category.', 'You did not receive approval for @count !points in the %category category.', $arguments);
+            }
+            elseif ($view_all_points) {
+                $message = format_plural($params['points'], '!username did not receive approval for @count !point in the %category category.', '!username did not receive approval for @count !points in the %category category.', $arguments);
+            }
+        }
+        elseif (isset($params['points']) && $params['points'] < 0) {
+            if ($params['status'] == usermoneys_TXN_STATUS_PENDING) {
+                if ($account->uid == $user->uid && $view_own_points) {
+                    // Directly address the user if he is loosing points.
+                    $message = format_plural(abs($params['points']), 'You just had a !point deducted, pending administrator approval.', 'You just had @count !points deducted, pending administrator approval.', $arguments);
+                }
+                elseif ($view_all_points) {
+                    // Only display message about other users if user has permission to view usermoneys.
+                    $message = format_plural(abs($params['points']), '!username just had a !point deducted, pending administrator approval.', '!username just had @count !points deducted, pending administrator approval.', $arguments);
+                }
+            }
+            else {
+                if ($account->uid == $user->uid && $view_own_points) {
+                    $message = format_plural(abs($params['points']), 'You just had a !point deducted and now have %total !points in the %category category.', 'You just had @count !points deducted and now have %total !points in the %category category.', $arguments);
+                }
+                elseif ($view_all_points) {
+                    $message = format_plural(abs($params['points']), '!username just had a !point deducted and now has %total !points in the %category category.', '!username just had @count !points deducted and now has %total !points in the %category category.', $arguments);
+                }
+            }
+        }
+        elseif (!empty($params['points'])) {
+            if ($params['status'] == usermoneys_TXN_STATUS_PENDING) {
+                if ($account->uid == $user->uid && $view_own_points) {
+                    // Directly address the user if he is loosing points.
+                    $message = format_plural(abs($params['points']), 'You just earned a !point, pending administrator approval.', 'You just earned @count !points, pending administrator approval.', $arguments);
+                }
+                elseif ($view_all_points) {
+                    // Only display message about other users if user has permission to view usermoneys.
+                    $message = format_plural(abs($params['points']), '!username just earned a !point, pending administrator approval.', '!username just earned @count !points, pending administrator approval.', $arguments);
+                }
+            }
+            else {
+                if ($account->uid == $user->uid && $view_own_points) {
+                    $message = format_plural(abs($params['points']), 'You just earned a !point and now have %total !points in the %category category.', 'You just earned @count !points and now have %total !points in the %category category.', $arguments);
+                }
+                elseif ($view_all_points) {
+                    $message = format_plural(abs($params['points']), '!username just earned a !point and now has %total !points in the %category category.', '!username just earned @count !points and now has %total !points in the %category category.', $arguments);
+                }
+            }
+        }
+
+        if (isset($message)) {
+            drupal_set_message($message);
+        }
+    }
+    // Call the _usermoneys hook to allow modules to act after points are awarded.
+    usermoneys_invoke_all('points after', $params);
+    return array(
+        'status' => TRUE,
+        'transaction' => $params,
+    );
+}
+
+/**
+ * Adds the points to the txn table.
+ */
+function _usermoneys_transaction(&$params) {
+    // Check, again, for a properly formed array.
+    if (!is_array($params)) {
+        return FALSE;
+    }
+    if (!isset($params['txn_id'])) {
+        // If a txn_id is preset we UPDATE the record instead of adding one
+        // the standard checks don't apply.
+        if (!is_numeric($params['points'])) {
+            return FALSE;
+        }
+        if (!isset($params['uid'])) {
+            global $user;
+            $params['uid'] = $user->uid;
+            // There must be a UID, anonymous does not receive points.
+            if (!$params['uid'] > 0) {
+                return FALSE;
+            }
+        }
+        if (isset($params['expirydate']) && !is_numeric($params['expirydate'])) {
+            return FALSE;
+        }
+
+        // Check if parameters are set.
+        $params_null_check = array('operation', 'description', 'reference', 'expired', 'parent_txn_id', 'entity_id', 'entity_type');
+        foreach ($params_null_check as $param_null_check) {
+            if (!isset($params[$param_null_check])) {
+                $params[$param_null_check] = NULL;
+            }
+        }
+
+        if (!isset($params['tid']) || !is_numeric($params['tid'])) {
+            $params['tid'] = usermoneys_get_default_tid();
+        }
+        elseif ($params['tid'] == 0) {
+            // Tid with 0 are uncategorized and are set to NULL
+            // this is a backwards compatibility issue.
+            $params['tid'] = NULL;
+        }
+        if (!isset($params['expirydate'])) {
+            $params['expirydate'] = usermoneys_get_default_expiry_date();
+        }
+
+        // Use current time for time_stamp if configured to always use the default,
+        // not set, not a positive integer or in the future.
+        if (variable_get(usermoneys_TRANSACTION_TIMESTAMP, 1) || !isset($params['time_stamp']) || $params['time_stamp'] <= 0 || $params['time_stamp'] > REQUEST_TIME) {
+            $params['time_stamp'] = REQUEST_TIME;
+        }
+    }
+    // Always force changed timestamp to current REQUEST_TIME for transaction tracking.
+    $params['changed'] = REQUEST_TIME;
+
+    if (!empty($params['txn_id']) && $params['txn_id'] > 0) {
+        // A transaction ID was passed in so we'll update the transaction.
+        $txn = (array) usermoneys_transaction_load($params['txn_id']);
+        if (!$txn) {
+            return FALSE;
+        }
+
+        // Don't superseed existing keys, just complete missing keys.
+        $params += $txn;
+        // Update existing transaction record for key txn_id.
+        $ret = drupal_write_record('usermoneys_txn', $params, array('txn_id'));
+        // Only update if the record has been successfully updated.
+        if ($ret != FALSE) {
+            _usermoneys_update_cache($params, $txn);
+        }
+    }
+    else {
+        // Create new transaction record.
+        $ret = drupal_write_record('usermoneys_txn', $params);
+        if ($ret != FALSE) {
+            _usermoneys_update_cache($params);
+        }
+    }
+    return TRUE;
+}
+
+function usermoneys_admin_access(){
+    return true;
 }
