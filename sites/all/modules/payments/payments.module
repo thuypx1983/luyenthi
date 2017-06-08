@@ -4,10 +4,26 @@
  */
 function payments_menu() {
   $items = array();
+
+  $items['payments/pay-card'] = array( //this creates a URL that will call this form at "examples/form-example"
+    'title' => 'Pay card', //page title
+    'description' => 'Pay card.',
+    'page callback' => 'drupal_get_form', //this is the function that will be called when the page is accessed.  for a form, use drupal_get_form
+    'page arguments' => array('payments_pay_card_form'), //put the name of the form here
+    'access callback' => TRUE
+  );
+
+
   $items['payments/bank-transfer'] = array(
     'title' => 'Chuyển khoản qua ngân hàng',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('payments_bank_transfer_form'),
+    'page callback' => '_bank_transfer_content',
+    'access arguments' => array('access content'),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['payments'] = array(
+    'title' => 'Thanh toán',
+    'page callback' => '_payments_content',
     'access arguments' => array('access content'),
     'type' => MENU_LOCAL_TASK,
   );
@@ -16,24 +32,80 @@ function payments_menu() {
     'title' => 'payments configuration',
     'description' => 'This is the payments',
     'weight' => -100,
-    'page callback' => 'payments_configure_form',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('payments_configure_form', 1),
     'access arguments' => array('administer site configuration'),
   );
   return $items;
 }
 
-function payments_configure_form(){
-  $form = array();
+function payments_configure_form($form, &$form_state){
+  $payment_bank_transfer_content=variable_get('payment_bank_transfer_content',array('value'=>'','format'=>'text_format'));
+  $form['payment_bank_transfer_content'] = [
+    '#type' => 'text_format',
+    '#title' => t('Bank transfer content'),
+    '#description' => t('Bank transfer deatail'),
+    '#default_value' => $payment_bank_transfer_content['value'],
+    '#cols' => 40,
+    '#rows' => 10,
+    '#format' => $payment_bank_transfer_content['format'],
+  ];
 
-  $form['onthisdate_maxdisp'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Maximum number of links'),
-    '#default_value' => variable_get('onthisdate_maxdisp', 3),
-    '#size' => 2,
-    '#maxlength' => 2,
-    '#description' => t("The maximum number of links to display in the block."),
-    '#required' => TRUE,
-  );
+  // If you want to hide the text format.
+  // $form['#after_build'][] = 'mymodule_admin_settings_form_form_after_build';
 
   return system_settings_form($form);
 }
+
+/**
+ * Implements hook_theme()
+ */
+function payments_theme() {
+  return array(
+    'bank_transfer_content' => array(
+      'render element' => 'elements',
+      'template' => 'templates/bank-transfer-content',
+    ),
+    'payments_content' => array(
+      'render element' => 'elements',
+      'template' => 'templates/payments-content',
+    ),
+    'pay_card_content' => array(
+      'render element' => 'elements',
+      'template' => 'templates/pay-card-content',
+    ),
+  );
+}
+
+function _bank_transfer_content(){
+  return theme('bank_transfer_content');
+}
+
+function _payments_content(){
+  return theme('payments_content');
+}
+
+
+function _pay_card_content(){
+  return theme('pay_card_content');
+}
+
+function payments_pay_card_form($form, &$form_state) {
+
+  $form['submit_button'] = array(
+    '#type' => 'submit',
+    '#value' => t('Click Here!'),
+  );
+
+  return $form;
+}
+
+function payments_pay_card_validate($form, &$form_state) {
+  $x=1;
+}
+
+function payments_pay_card_form_submit($form, &$form_state) {
+  $x=1;
+}
+
+
