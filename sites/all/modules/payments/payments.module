@@ -1,0 +1,39 @@
+<?php
+/**
+ * Implements hook_menu().
+ */
+function payments_menu() {
+  $items = array();
+  $items['payments/bank-transfer'] = array(
+    'title' => 'Chuyển khoản qua ngân hàng',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('payments_bank_transfer_form'),
+    'access arguments' => array('access content'),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['admin/config/payments'] = array(
+    'title' => 'payments configuration',
+    'description' => 'This is the payments',
+    'weight' => -100,
+    'page callback' => 'payments_configure_form',
+    'access arguments' => array('administer site configuration'),
+  );
+  return $items;
+}
+
+function payments_configure_form(){
+  $form = array();
+
+  $form['onthisdate_maxdisp'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Maximum number of links'),
+    '#default_value' => variable_get('onthisdate_maxdisp', 3),
+    '#size' => 2,
+    '#maxlength' => 2,
+    '#description' => t("The maximum number of links to display in the block."),
+    '#required' => TRUE,
+  );
+
+  return system_settings_form($form);
+}

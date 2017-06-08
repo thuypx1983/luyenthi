@@ -1,0 +1,12 @@
+name = Payments
+description = Payments.
+package = Usermoneys
+core = 7.x
+;configure = admin/config/people/usermoneys/settings
+
+; Information added by Drupal.org packaging script on 2017-05-01
+version = "7.x-1.0"
+core = "7.x"
+project = "usermoneys"
+datestamp = "1496892208"
+
