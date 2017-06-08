@@ -31,19 +31,19 @@ function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
     '#maxlength' => 60,
     '#default_value' => isset($txn_user) ? $txn_user->name : '',
     '#autocomplete_path' => $mode == 'edit' ? NULL : 'user/autocomplete',
-    '#description' => t('The name of the user who should gain or lose !points.'),
+    '#description' => t('The name of the user who should gain or lose !moneys.'),
     '#required' => TRUE,
     '#weight' => -20,
     '#disabled' => $mode == 'edit',
   );
 
-  $form['points'] = array(
+  $form['moneys'] = array(
     '#type' => 'textfield',
-    '#title' => t('Points'),
+    '#title' => t('moneys'),
     '#size' => 10,
     '#maxlength' => 10,
-    '#default_value' => isset($txn->points) ? $txn->points : 0,
-    '#description' => t('The number of !points to add or subtract.  For example, enter %positive to add !points or %negative to deduct !points.', array('%positive' => 25, '%negative' => -25)),
+    '#default_value' => isset($txn->moneys) ? $txn->moneys : 0,
+    '#description' => t('The number of !moneys to add or subtract.  For example, enter %positive to add !moneys or %negative to deduct !moneys.', array('%positive' => 25, '%negative' => -25)),
     '#required' => TRUE,
     '#weight' => -15,
   );
@@ -63,8 +63,8 @@ function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
     $form['status']['moderate'] = array(
       '#title' => t('Moderated'),
       '#type' => 'checkbox',
-      '#description' => t('If checked, this !points transaction must be approved, through the moderation process.'),
-      '#default_value' => variable_get(usermoneys_POINTS_MODERATION, 0),
+      '#description' => t('If checked, this !moneys transaction must be approved, through the moderation process.'),
+      '#default_value' =>0,
       '#access' => usermoneys_admin_access('moderate'),
       '#weight' => -10,
     );
@@ -90,7 +90,7 @@ function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
     '#description' => t('The date and time recorded for this transaction. Use this format: YYYY-MM-DD HH:MM +ZZZZ.'),
     '#weight' => -5,
     // Do not show this if it is not allowed to change the timestamp anyway.
-    '#access' => !variable_get(usermoneys_TRANSACTION_TIMESTAMP, 1),
+    '#access' => 1,
   );
 
   $expirydate = 0;
@@ -112,7 +112,7 @@ function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
     '#default_value' => $expirydate ? $expirydate : '',
     '#size' => 30,
     '#maxlength' => 30,
-    '#description' => t('The date and time that the !points should expire. Use this format: YYYY-MM-DD HH:MM +ZZZZ. Leave this field blank if the !points should never expire.'),
+    '#description' => t('The date and time that the !moneys should expire. Use this format: YYYY-MM-DD HH:MM +ZZZZ. Leave this field blank if the !moneys should never expire.'),
     '#weight' => 25,
   );
 
@@ -139,7 +139,7 @@ function usermoneys_admin_txn($form, &$form_state, $mode, $txn = NULL) {
     '#default_value' => isset($txn->description) ? $txn->description : '',
     '#rows' => 7,
     '#cols' => 40,
-    '#description' => t('Enter an optional description for this transaction, such as the reason !points were added or subtracted.'),
+    '#description' => t('Enter an optional description for this transaction, such as the reason !moneys were added or subtracted.'),
     '#weight' => 10,
   );
 
@@ -220,8 +220,8 @@ function usermoneys_admin_txn_validate($form, &$form_state) {
         form_set_value($form['txn_user'], $txn_user, $form_state);
     }
 
-    if ((int)$form_state['values']['points'] == 0) {
-        form_set_error('points', t('Amount of !points must be a positive or negative number.'));
+    if ((int)$form_state['values']['moneys'] == 0) {
+        form_set_error('moneys', t('Amount of !moneys must be a positive or negative number.'));
     }
 
     if (!strtotime($form_state['values']['time_stamp'])) {
@@ -237,12 +237,11 @@ function usermoneys_admin_txn_submit($form, &$form_state) {
     global $user;
     if ($form_state['values']['mode'] == 'add') {
         $params = array(
-            'points' => $form_state['values']['points'],
+            'moneys' => $form_state['values']['moneys'],
             'uid' => $form_state['values']['txn_user']->uid,
             'operation' => $form_state['values']['operation'],
             'description' => $form_state['values']['description'],
             'reference' => $form_state['values']['reference'],
-            'tid' => $form_state['values']['tid'],
             'time_stamp' => strtotime($form_state['values']['time_stamp']),
             'moderate' => (bool)$form_state['values']['moderate'],
             'approver_uid' => $user->uid,
@@ -274,7 +273,7 @@ function usermoneys_admin_txn_submit($form, &$form_state) {
         $params = array(
             'uid' => $form_state['values']['txn']->uid,
             'approver_uid' => $approver_uid,
-            'points' => $form_state['values']['points'],
+            'moneys' => $form_state['values']['moneys'],
             'tid' => $form_state['values']['tid'],
             'time_stamp' => strtotime($form_state['values']['time_stamp']),
             'operation' => $form_state['values']['operation'],
@@ -289,7 +288,7 @@ function usermoneys_admin_txn_submit($form, &$form_state) {
             $params['entity_type'] = $form_state['values']['entity_type'];
             $params['entity_id'] = (int)$form_state['values']['entity_id'];
         }
-        drupal_set_message(t('Changes to the !points transaction have been saved.'));
+        drupal_set_message(t('Changes to the !moneys transaction have been saved.'));
     }
     usermoneys_usermoneysapi($params);
 

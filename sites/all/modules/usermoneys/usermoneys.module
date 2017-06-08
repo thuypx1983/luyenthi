@@ -1,4 +1,10 @@
 <?php
+// Copyright 2005-2007 Khalid Baheyeldin http://2bits.com
+define('USERMONEYS_TRANS_UCPOINTS', 'usermoneys_trans_ucpoints');
+define('USERMONEYS_TRANS_LCPOINTS', 'usermoneys_trans_lcpoints');
+define('USERMONEYS_TRANS_UCPOINT', 'usermoneys_trans_ucpoint');
+define('USERMONEYS_TRANS_LCPOINT', 'usermoneys_trans_lcpoint');
+define('USERMONEYS_TRANS_UNCAT', 'usermoneys_trans_uncat');
 
 define('USERMONEYS_TXN_STATUS_APPROVED', 0);
 define('USERMONEYS_TXN_STATUS_PENDING', 1);
@@ -7,7 +13,13 @@ define('USERMONEYS_TXN_STATUS_DECLINED', 2);
 
 define('USERMONEYS_DISPLAY_MESSAGE', 'usermoneys_display_message');
 
-//define('USERPOINTS_TRANSACTION_TIMESTAMP', 'userpoints_transaction_timestamp');
+define('USERMONEYS_EXPIREAFTER_DATE', 'usermoneys_expireafter_date');
+define('USERMONEYS_EXPIREON_DATE', 'usermoneys_expireon_date');
+
+
+define('USERMONEYS_MONEYS_MODERATION', 'usermoneys_moneys_moderation');
+
+//define('USERmoneys_TRANSACTION_TIMESTAMP', 'usermoneys_transaction_timestamp');
 /**
  * Hook_init
  */
@@ -24,6 +36,14 @@ function usermoneys_menu() {
       'title' => 'Edit transaction',
       'page callback' => 'drupal_get_form',
       'page arguments' => array('usermoneys_admin_txn',3,2),
+      'access arguments' => array('access adminstration page'),
+      'file' => 'usermoneys.admin.inc',
+      'type' => MENU_LOCAL_TASK,
+    );
+    $items['admin/usermoneys/add'] = array(
+      'title' => 'ADD point',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('usermoneys_admin_txn',2),
       'access arguments' => array('access adminstration page'),
       'file' => 'usermoneys.admin.inc',
       'type' => MENU_LOCAL_TASK,
@@ -360,7 +380,7 @@ function usermoneys_transaction_load($txn_id) {
  * Implements hook_menu_local_tasks_alter().
  */
 function usermoneys_menu_local_tasks_alter(&$data, $router_item, $root_path) {
-    // Add action link to add points on 'usermoneys' administration pages.
+    // Add action link to add moneys on 'usermoneys' administration pages.
     if (strpos($root_path, 'admin/usermoneys_transaction') !== FALSE) {
 
         // Don't display the action link on some pages like settings and
@@ -408,24 +428,24 @@ function usermoneys_txn_status() {
  * Save usermoneys changes and call hooks.
  *
  * @param $params
- *    if (int) assumed to be points for current user
+ *    if (int) assumed to be moneys for current user
  *    Accepts an array of keyed variables and parameters
- *    'points' => # of points (int) (required)
+ *    'moneys' => # of moneys (int) (required)
  *    'moderate' => TRUE/FALSE
  *    'uid' => $user->uid
- *    'time_stamp' => unix time of the points assignment date
+ *    'time_stamp' => unix time of the moneys assignment date
  *    'operation' => 'published' 'moderated' etc.
  *    'expirydate' => timestamp or 0, 0 = non-expiring; NULL = site default
  *    'description' => 'description'
  *    'reference' => reserved for module specific use
- *    'display' => whether or not to display "points awarded" message
- *    'txn_id' => Transaction ID of points, If present an UPDATE is performed
+ *    'display' => whether or not to display "moneys awarded" message
+ *    'txn_id' => Transaction ID of moneys, If present an UPDATE is performed
  *    'entity_id' => ID of an entity in the Database. ex. $node->id or $user->uid
  *    'entity_type' => string of the entity type. ex. 'node' or 'user' NOT 'node-content-custom'
  *
  * @return
  *   Array with status and reason.
- *     'status' => FALSE when no action is take, TRUE when points are credited or debited
+ *     'status' => FALSE when no action is take, TRUE when moneys are credited or debited
  *     'reason' => (string) error message to indicate reason for failure
  */
 function usermoneys_usermoneysapi($params) {
@@ -435,7 +455,7 @@ function usermoneys_usermoneysapi($params) {
     if (!isset($params['txn_id'])) {
         // If a txn_id is passed in we'll do an UPDATE thus the std checks don't apply.
         if (is_int($params)) {
-            $params = array('points' => $params);
+            $params = array('moneys' => $params);
         }
         if (!is_array($params)) {
             // Has to be an array to continue.
@@ -460,17 +480,17 @@ function usermoneys_usermoneysapi($params) {
 
         if (!isset($params['moderate'])) {
             // If not passed then site default is used.
-            $params['status'] = variable_get(usermoneys_POINTS_MODERATION, usermoneys_TXN_STATUS_APPROVED);
+            $params['status'] = variable_get(USERMONEYS_MONEYS_MODERATION, USERMONEYS_TXN_STATUS_APPROVED);
         }
         else {
-            $params['status'] = $params['moderate'] ? usermoneys_TXN_STATUS_PENDING : usermoneys_TXN_STATUS_APPROVED;
+            $params['status'] = $params['moderate'] ? USERMONEYS_TXN_STATUS_PENDING : USERMONEYS_TXN_STATUS_APPROVED;
         }
 
-        // Anonymous users do not get points, and there have to be points to process.
-        if (empty($params['uid']) || empty($params['points'])) {
+        // Anonymous users do not get moneys, and there have to be moneys to process.
+        if (empty($params['uid']) || empty($params['moneys'])) {
             return array(
                 'status' => FALSE,
-                'reason' => 'uid or points not given. Anonymous users do not get points and there must be points to process.',
+                'reason' => 'uid or moneys not given. Anonymous users do not get moneys and there must be moneys to process.',
             );
         }
     }
@@ -478,7 +498,7 @@ function usermoneys_usermoneysapi($params) {
         // We have a txn_id so we can look up some user information.
         $params['uid'] = db_query('SELECT uid from {usermoneys_txn} WHERE txn_id = :txn_id', array(':txn_id' => $params['txn_id']))->fetchField();
     } // If txn_id.
-    // Load the user object that will be awarded the points.
+    // Load the user object that will be awarded the moneys.
     $account = user_load($params['uid']);
     if (!$account) {
         return array(
@@ -492,10 +512,10 @@ function usermoneys_usermoneysapi($params) {
 
     foreach ($rc as $key => $value) {
         if ($value == FALSE) {
-            // Do not process the points.
+            // Do not process the moneys.
             return array(
                 'status' => FALSE,
-                'reason' => t('@key returned FALSE from the hook_usermoneys points before call', array('@key' => $key)),
+                'reason' => t('@key returned FALSE from the hook_usermoneys moneys before call', array('@key' => $key)),
             );
         }
     }
@@ -503,7 +523,7 @@ function usermoneys_usermoneysapi($params) {
     $ret = _usermoneys_transaction($params);
 
     // Reset the static cache of usermoneys.
-    drupal_static_reset('usermoneys_get_current_points');
+    drupal_static_reset('usermoneys_get_current_moneys');
 
     if ($ret == FALSE) {
         return array(
@@ -525,55 +545,55 @@ function usermoneys_usermoneysapi($params) {
             '%total' => usermoneys_get_current_moneys($params['uid']),
         ));
 
-        $view_own_points = user_access('view own usermoneys') || user_access('view usermoneys') || user_access('administer usermoneys');
-        $view_all_points = user_access('view usermoneys') || user_access('administer usermoneys');
+        $view_own_moneys = user_access('view own usermoneys') || user_access('view usermoneys') || user_access('administer usermoneys');
+        $view_all_moneys = user_access('view usermoneys') || user_access('administer usermoneys');
 
         if ($params['status'] == USERMONEYS_TXN_STATUS_DECLINED) {
-            // Points have been declined.
-            if ($account->uid == $user->uid && $view_own_points) {
-                $message = format_plural($params['points'], 'You did not receive approval for @count !point in the %category category.', 'You did not receive approval for @count !points in the %category category.', $arguments);
+            // moneys have been declined.
+            if ($account->uid == $user->uid && $view_own_moneys) {
+                $message = format_plural($params['moneys'], 'You did not receive approval for @count !point in the %category category.', 'You did not receive approval for @count !moneys in the %category category.', $arguments);
             }
-            elseif ($view_all_points) {
-                $message = format_plural($params['points'], '!username did not receive approval for @count !point in the %category category.', '!username did not receive approval for @count !points in the %category category.', $arguments);
+            elseif ($view_all_moneys) {
+                $message = format_plural($params['moneys'], '!username did not receive approval for @count !point in the %category category.', '!username did not receive approval for @count !moneys in the %category category.', $arguments);
             }
         }
-        elseif (isset($params['points']) && $params['points'] < 0) {
+        elseif (isset($params['moneys']) && $params['moneys'] < 0) {
             if ($params['status'] == USERMONEYS_TXN_STATUS_PENDING) {
-                if ($account->uid == $user->uid && $view_own_points) {
-                    // Directly address the user if he is loosing points.
-                    $message = format_plural(abs($params['points']), 'You just had a !point deducted, pending administrator approval.', 'You just had @count !points deducted, pending administrator approval.', $arguments);
+                if ($account->uid == $user->uid && $view_own_moneys) {
+                    // Directly address the user if he is loosing moneys.
+                    $message = format_plural(abs($params['moneys']), 'You just had a !point deducted, pending administrator approval.', 'You just had @count !moneys deducted, pending administrator approval.', $arguments);
                 }
-                elseif ($view_all_points) {
+                elseif ($view_all_moneys) {
                     // Only display message about other users if user has permission to view usermoneys.
-                    $message = format_plural(abs($params['points']), '!username just had a !point deducted, pending administrator approval.', '!username just had @count !points deducted, pending administrator approval.', $arguments);
+                    $message = format_plural(abs($params['moneys']), '!username just had a !point deducted, pending administrator approval.', '!username just had @count !moneys deducted, pending administrator approval.', $arguments);
                 }
             }
             else {
-                if ($account->uid == $user->uid && $view_own_points) {
-                    $message = format_plural(abs($params['points']), 'You just had a !point deducted and now have %total !points in the %category category.', 'You just had @count !points deducted and now have %total !points in the %category category.', $arguments);
+                if ($account->uid == $user->uid && $view_own_moneys) {
+                    $message = format_plural(abs($params['moneys']), 'You just had a !point deducted and now have %total !moneys in the %category category.', 'You just had @count !moneys deducted and now have %total !moneys in the %category category.', $arguments);
                 }
-                elseif ($view_all_points) {
-                    $message = format_plural(abs($params['points']), '!username just had a !point deducted and now has %total !points in the %category category.', '!username just had @count !points deducted and now has %total !points in the %category category.', $arguments);
+                elseif ($view_all_moneys) {
+                    $message = format_plural(abs($params['moneys']), '!username just had a !point deducted and now has %total !moneys in the %category category.', '!username just had @count !moneys deducted and now has %total !moneys in the %category category.', $arguments);
                 }
             }
         }
-        elseif (!empty($params['points'])) {
+        elseif (!empty($params['moneys'])) {
             if ($params['status'] == USERMONEYS_TXN_STATUS_PENDING) {
-                if ($account->uid == $user->uid && $view_own_points) {
-                    // Directly address the user if he is loosing points.
-                    $message = format_plural(abs($params['points']), 'You just earned a !point, pending administrator approval.', 'You just earned @count !points, pending administrator approval.', $arguments);
+                if ($account->uid == $user->uid && $view_own_moneys) {
+                    // Directly address the user if he is loosing moneys.
+                    $message = format_plural(abs($params['moneys']), 'You just earned a !point, pending administrator approval.', 'You just earned @count !moneys, pending administrator approval.', $arguments);
                 }
-                elseif ($view_all_points) {
+                elseif ($view_all_moneys) {
                     // Only display message about other users if user has permission to view usermoneys.
-                    $message = format_plural(abs($params['points']), '!username just earned a !point, pending administrator approval.', '!username just earned @count !points, pending administrator approval.', $arguments);
+                    $message = format_plural(abs($params['moneys']), '!username just earned a !point, pending administrator approval.', '!username just earned @count !moneys, pending administrator approval.', $arguments);
                 }
             }
             else {
-                if ($account->uid == $user->uid && $view_own_points) {
-                    $message = format_plural(abs($params['points']), 'You just earned a !point and now have %total !points in the %category category.', 'You just earned @count !points and now have %total !points in the %category category.', $arguments);
+                if ($account->uid == $user->uid && $view_own_moneys) {
+                    $message = format_plural(abs($params['moneys']), 'You just earned a !point and now have %total !moneys in the %category category.', 'You just earned @count !moneys and now have %total !moneys in the %category category.', $arguments);
                 }
-                elseif ($view_all_points) {
-                    $message = format_plural(abs($params['points']), '!username just earned a !point and now has %total !points in the %category category.', '!username just earned @count !points and now has %total !points in the %category category.', $arguments);
+                elseif ($view_all_moneys) {
+                    $message = format_plural(abs($params['moneys']), '!username just earned a !point and now has %total !moneys in the %category category.', '!username just earned @count !moneys and now has %total !moneys in the %category category.', $arguments);
                 }
             }
         }
@@ -582,8 +602,8 @@ function usermoneys_usermoneysapi($params) {
             drupal_set_message($message);
         }
     }
-    // Call the _usermoneys hook to allow modules to act after points are awarded.
-    usermoneys_invoke_all('points after', $params);
+    // Call the _usermoneys hook to allow modules to act after moneys are awarded.
+    usermoneys_invoke_all('moneys after', $params);
     return array(
         'status' => TRUE,
         'transaction' => $params,
@@ -591,7 +611,7 @@ function usermoneys_usermoneysapi($params) {
 }
 
 /**
- * Adds the points to the txn table.
+ * Adds the moneys to the txn table.
  */
 function _usermoneys_transaction(&$params) {
     // Check, again, for a properly formed array.
@@ -601,13 +621,13 @@ function _usermoneys_transaction(&$params) {
     if (!isset($params['txn_id'])) {
         // If a txn_id is preset we UPDATE the record instead of adding one
         // the standard checks don't apply.
-        if (!is_numeric($params['points'])) {
+        if (!is_numeric($params['moneys'])) {
             return FALSE;
         }
         if (!isset($params['uid'])) {
             global $user;
             $params['uid'] = $user->uid;
-            // There must be a UID, anonymous does not receive points.
+            // There must be a UID, anonymous does not receive moneys.
             if (!$params['uid'] > 0) {
                 return FALSE;
             }
@@ -667,7 +687,7 @@ function usermoneys_admin_access(){
 }
 
 /**
- * Invokes hook_userpoints() with params passed by references.
+ * Invokes hook_usermoneys() with params passed by references.
  *
  * @param $op
  *   The operation being performed.
@@ -707,10 +727,10 @@ function _usermoneys_update_cache($txn, $old_txn = NULL) {
     $totals = array();
     if (!$old_txn) {
         // For new transactions, only update the cache for fully approved non-expired
-        // points.
-        if ($txn['status'] == USERPOINTS_TXN_STATUS_APPROVED && $txn['expired'] != 1) {
-            // Calculate the current points based upon the tid.
-            $updates['moneys'] = $txn['moneys'] + usermoneys_get_current_moneys($txn['uid'], $txn['tid']);
+        // moneys.
+        if ($txn['status'] == USERMONEYS_TXN_STATUS_APPROVED && $txn['expired'] != 1) {
+            // Calculate the current moneys based upon the tid.
+            $updates['moneys'] = $txn['moneys'] + usermoneys_get_current_moneys($txn['uid']);
             $totals['moneys'] = $txn['moneys'] + usermoneys_get_current_moneys($txn['uid'], 'all');
         }
     } else  {
@@ -722,63 +742,62 @@ function _usermoneys_update_cache($txn, $old_txn = NULL) {
         }
 
         if ($old_txn['tid'] != $txn['tid']) {
-            // If the category has changed, remove the points of the old transaction
+            // If the category has changed, remove the moneys of the old transaction
             // from the old category.
-            $remove_points = usermoneys_get_current_moneys($txn['uid'], $old_txn['tid']) - $old_txn['points'];
-            db_merge('userpoints')
+            $remove_moneys = usermoneys_get_current_moneys($txn['uid'], $old_txn['tid']) - $old_txn['moneys'];
+            db_merge('usermoneys')
                 ->key(array(
                     'uid' => $txn['uid'],
                     'tid' => (int) $old_txn['tid'],
                 ))
                 ->fields(array(
-                    'points' => $remove_points,
+                    'moneys' => $remove_moneys,
                 ))
                 ->execute();
 
-            // Subtract the points from the total.
-            $totals['points'] = usermoneys_get_current_moneys($txn['uid'], 'all') - $old_txn['points'];
+            // Subtract the moneys from the total.
+            $totals['moneys'] = usermoneys_get_current_moneys($txn['uid'], 'all') - $old_txn['moneys'];
 
-            if ($txn['status'] == USERPOINTS_TXN_STATUS_APPROVED) {
-                // Make sure to add the points so that they are added to the new category.
-                $updates['points'] = usermoneys_get_current_moneys($txn['uid'], $txn['tid']) +  $txn['points'];
+            if ($txn['status'] == USERMONEYS_TXN_STATUS_APPROVED) {
+                // Make sure to add the moneys so that they are added to the new category.
+                $updates['moneys'] = usermoneys_get_current_moneys($txn['uid'], $txn['tid']) +  $txn['moneys'];
 
                 // Add them to the totals.
-                $totals['points'] += $txn['points'];
+                $totals['moneys'] += $txn['moneys'];
             }
         }
-        else if ($old_txn['status'] == USERPOINTS_TXN_STATUS_APPROVED && $txn['status'] != USERPOINTS_TXN_STATUS_APPROVED) {
+        else if ($old_txn['status'] == USERMONEYS_TXN_STATUS_APPROVED && $txn['status'] != USERMONEYS_TXN_STATUS_APPROVED) {
             // If the transaction goes from approved to not approved, subtract the
-            // points to the total.
-            $updates['points'] = usermoneys_get_current_moneys($txn['uid'], $txn['tid']) - $old_txn['points'];
-            $totals['points'] = usermoneys_get_current_moneys($txn['uid'], 'all') - $old_txn['points'];
+            // moneys to the total.
+            $updates['moneys'] = usermoneys_get_current_moneys($txn['uid'], $txn['tid']) - $old_txn['moneys'];
+            $totals['moneys'] = usermoneys_get_current_moneys($txn['uid'], 'all') - $old_txn['moneys'];
         }
-        else if ($txn['points'] != $old_txn['points'] && $old_txn['status'] == USERPOINTS_TXN_STATUS_APPROVED && $txn['status'] == USERPOINTS_TXN_STATUS_APPROVED) {
-            // If the category did not change but the points and the transaction
-            // was and still is approved, update the points difference.
-            $updates['points'] = usermoneys_get_current_moneys($txn['uid'], $txn['tid']) + ($txn['points'] - $old_txn['points']);
-            $totals['points'] = usermoneys_get_current_moneys($txn['uid'], 'all') + ($txn['points'] - $old_txn['points']);
+        else if ($txn['moneys'] != $old_txn['moneys'] && $old_txn['status'] == USERMONEYS_TXN_STATUS_APPROVED && $txn['status'] == USERmoneys_TXN_STATUS_APPROVED) {
+            // If the category did not change but the moneys and the transaction
+            // was and still is approved, update the moneys difference.
+            $updates['moneys'] = usermoneys_get_current_moneys($txn['uid'], $txn['tid']) + ($txn['moneys'] - $old_txn['moneys']);
+            $totals['moneys'] = usermoneys_get_current_moneys($txn['uid'], 'all') + ($txn['moneys'] - $old_txn['moneys']);
 
         }
-        elseif ($old_txn['status'] != USERPOINTS_TXN_STATUS_APPROVED && $txn['status'] == USERPOINTS_TXN_STATUS_APPROVED) {
-            // Calculate the current points based upon the tid.
-            $updates['points'] = usermoneys_get_current_moneys($txn['uid'], $txn['tid']) + $txn['points'];
-            $totals['points'] = usermoneys_get_current_moneys($txn['uid'], 'all') + $txn['points'];
+        elseif ($old_txn['status'] != USERMONEYS_TXN_STATUS_APPROVED && $txn['status'] == USERMONEYS_TXN_STATUS_APPROVED) {
+            // Calculate the current moneys based upon the tid.
+            $updates['moneys'] = usermoneys_get_current_moneys($txn['uid'], $txn['tid']) + $txn['moneys'];
+            $totals['moneys'] = usermoneys_get_current_moneys($txn['uid'], 'all') + $txn['moneys'];
         }
     }
     if (!empty($updates)) {
-        $max_points = userpoints_get_max_points($txn['uid'], $txn['tid']);
-        // If the new points are higher then the maximum, update it.
-        if ($updates['points'] > $max_points) {
-            $updates['max_points'] = $updates['points'];
+        $max_moneys = usermoneys_get_max_moneys($txn['uid']);
+        // If the new moneys are higher then the maximum, update it.
+        if ($updates['moneys'] > $max_moneys) {
+            $updates['max_moneys'] = $updates['moneys'];
         }
         $updates['last_update'] = REQUEST_TIME;
 
-        // Insert or update the userpoints caching table with the user's current
-        // points.
-        db_merge('userpoints')
+        // Insert or update the usermoneys caching table with the user's current
+        // moneys.
+        db_merge('usermoneys')
             ->key(array(
-                'uid' => $txn['uid'],
-                'tid' => (int) $txn['tid'],
+                'uid' => $txn['uid']
             ))
             ->fields($updates)
             ->execute();
@@ -786,16 +805,16 @@ function _usermoneys_update_cache($txn, $old_txn = NULL) {
 
     // Update totals if necessary.
     if (!empty($totals)) {
-        // Update the total max points if necessary.
-        $max_points_total = userpoints_get_max_points($txn['uid'], 'all');
-        if ($totals['points'] > $max_points_total) {
-            $totals['max_points'] = $totals['points'];
+        // Update the total max moneys if necessary.
+        $max_moneys_total = usermoneys_get_max_moneys($txn['uid'], 'all');
+        if ($totals['moneys'] > $max_moneys_total) {
+            $totals['max_moneys'] = $totals['moneys'];
         }
         $totals['last_update'] = REQUEST_TIME;
 
-        // Insert or update the userpoints total caching table with the user's current
-        // points.
-        db_merge('userpoints_total')
+        // Insert or update the usermoneys total caching table with the user's current
+        // moneys.
+        db_merge('usermoneys_total')
             ->key(array(
                 'uid' => $txn['uid'],
             ))
@@ -808,12 +827,12 @@ function _usermoneys_update_cache($txn, $old_txn = NULL) {
  * Get current moneys of a user.
  *
  * @param $uid
- *   User ID of the user to get or lose the points.
+ *   User ID of the user to get or lose the moneys.
  * @param $tid
  *   Term ID to get moneys for, or 'all'.
  *
  * @return
- *   Number of current points in that user's account.
+ *   Number of current moneys in that user's account.
  */
 function usermoneys_get_current_moneys($uid = NULL, $tid = 'all') {
     $moneys = drupal_static(__FUNCTION__, array());
@@ -822,7 +841,84 @@ function usermoneys_get_current_moneys($uid = NULL, $tid = 'all') {
         $uid = $user->uid;
     }
     if (!isset($moneys[$uid])) {
-        $moneys[$uid][$tid] = (int) db_query('SELECT points FROM {userpoints} WHERE uid = :uid', array(':uid' => $uid))->fetchField();
+        $moneys[$uid] = (int) db_query('SELECT moneys FROM {usermoneys} WHERE uid = :uid', array(':uid' => $uid))->fetchField();
     }
     return $moneys[$uid];
+}
+
+
+/**
+ * Determines the correct default expiration date.
+ *
+ * @return
+ *   The default expiration date.
+ */
+function usermoneys_get_default_expiry_date() {
+  $expirydate = usermoneys_date_to_timestamp(variable_get(USERMONEYS_EXPIREON_DATE, 0));
+  if ($expirydate < REQUEST_TIME) {
+    $expirydate = variable_get(USERMONEYS_EXPIREON_DATE, 0);
+    if ($expirydate) {
+      $expirydate = REQUEST_TIME + $expirydate;
+    }
+  }
+  return (int) $expirydate;
+}
+
+/**
+ * Gets the number of maximal moneys of that user.
+ *
+ * @param $uid
+ *   User id of the user to get or lose the moneys.
+ *
+ * @return
+ *   Number of max moneys in that user's account.
+ */
+function usermoneys_get_max_moneys($uid = NULL, $tid = 'all') {
+  $max = drupal_static(__FUNCTION__, array());
+
+  // Check if uid is passed as a parameter.
+  if (!$uid) {
+    // It is not, so we use the currently logged in user's uid.
+    global $user;
+    $uid = $user->uid;
+  }
+
+
+  // Check if we have already cached the maximum for the user/term combination on previous calls.
+  if (!isset($max[$uid])) {
+    $max[$uid] = db_query('SELECT max_moneys FROM {usermoneys} WHERE uid = :uid', array(':uid' => $uid))->fetchField();
+  }
+  // Return the cached value.
+  return $max[$uid];
+}
+
+/**
+ * Modifies FAPI date setting to timestamp.
+ *
+ * @return
+ *   UNIX timestamp.
+ */
+function usermoneys_date_to_timestamp($date) {
+  //This takes the FAPI date form array and returns a timestamp
+  if ($date) {
+    return mktime(0, 0, 0, $date['month'], $date['day'], $date['year']);
+  }
+}
+
+/**
+ * Returns an array of common translation placeholders.
+ */
+function usermoneys_translation() {
+  static $trans;
+
+  if (!isset($trans)) {
+    $trans = array(
+      '!Moneys' => check_plain(variable_get(USERMONEYS_TRANS_UCPOINTS, 'Moneys')),
+      '!moneys' => check_plain(variable_get(USERMONEYS_TRANS_LCPOINTS, 'moneys')),
+      '!Money' => check_plain(variable_get(USERMONEYS_TRANS_UCPOINT, 'Money')),
+      '!money' => check_plain(variable_get(USERMONEYS_TRANS_LCPOINT, 'money')),
+      '!Uncategorized' => check_plain(variable_get(USERMONEYS_TRANS_UNCAT, 'General')),
+    );
+  }
+  return $trans;
 }
