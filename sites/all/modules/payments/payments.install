@@ -1,0 +1,97 @@
+<?php
+/**
+ * Implements hook_install().
+ *
+ * Install a default content type, set some defaults.
+ */
+function payments_install() {
+
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function payments_uninstall() {
+
+}
+
+/**
+ * Implements hook_schema().
+ */
+function payments_schema() {
+  $schema = array();
+  $schema['payments_paycard'] = array(
+    'description' => 'payments paycard Transactions',
+    'fields' => array(
+      'paycard_id' => array(
+        'description' => 'Transaction ID',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'description' => 'User ID',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'approver_uid' => array(
+        'description' => 'Moderator User ID',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'card_type'=>array(
+        'description' => 'Card type',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+
+      'card_number' => array(
+        'description' => 'Card number',
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+
+      'card_serial' => array(
+        'description' => 'Card serial',
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'moneys' => array(
+        'description' => 'Moneys',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'time_stamp' => array(
+        'description' => 'Timestamp',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'Effective timestamp of last action on this transaction, for tracking purposes.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'status' => array(
+        'description' => 'Status',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'description' => array(
+        'description' => 'Description',
+        'type' => 'text',
+      )
+
+    ),
+    'primary key' => array('paycard_id'),
+  );
+  return $schema;
+}
