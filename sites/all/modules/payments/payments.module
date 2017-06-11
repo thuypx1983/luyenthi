@@ -157,7 +157,7 @@ function payments_views_data() {
   $data['payments_paycard']['table']['group'] = t('Payment paycard Transactions');
 
   $data['payments_paycard']['table']['base'] = array(
-    'field' => 'txn_id',
+    'field' => 'paycard_id',
     'title' => t('Payment paycard Transactions'),
     'help' => t('Moneys transactions accumulated by users on your site.'),
   );
@@ -288,7 +288,7 @@ function payments_views_data() {
     'sort' => array(
       'handler' => 'views_handler_sort',
     ),
-    $data['payments_paycard']['txn_id'] = array(
+    $data['payments_paycard']['paycard_id'] = array(
       'title' => t('Transaction ID'),
       'help' => t('Payment paycard Transaction ID'),
       'field' => array(
@@ -379,3 +379,14 @@ function payments_pay_card_api($params) {
   );
 }
 
+
+/**
+ * hook_views_data()..
+ *
+ */
+
+function payments_field_views_data_views_data_alter(&$data, $field) {
+    $field_name = $field['field_name'];
+    $data_key = 'field_data_' . $field_name;
+    // Views data for this field is in $data[$data_key]
+}
