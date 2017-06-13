@@ -4,6 +4,12 @@ define('PAYMENTS_PAYCARD_STATUS_APPROVED', 0);
 define('PAYMENTS_PAYCARD_STATUS_PENDING', 1);
 define('PAYMENTS_PAYCARD_STATUS_DECLINED', 2);
 
+define('CARD_STATUS',array(
+    PAYMENTS_PAYCARD_STATUS_APPROVED=>t('Approved'),
+    PAYMENTS_PAYCARD_STATUS_PENDING=>t('Pending'),
+    PAYMENTS_PAYCARD_STATUS_DECLINED=>t('Declined'),
+));
+
 define('CARD_TYPE', array(
   1=>'Viettel',
   2=>'Mobilephone',
@@ -235,10 +241,7 @@ function payments_views_data() {
     'title' => t('Status'),
     'help' => t('The status of the transaction.'),
     'field' => array(
-      'handler' => 'views_handler_field_numeric',
-    ),
-    'filter' => array(
-      'handler' => 'views_handler_filter_numeric',
+      'handler' => 'views_handler_field',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
@@ -383,10 +386,23 @@ function payments_pay_card_api($params) {
 /**
  * hook_views_data()..
  *
+ * alter card type from integer to text
+ * alter card status from integer to text
  */
 
-function payments_field_views_data_views_data_alter(&$data, $field) {
-    $field_name = $field['field_name'];
-    $data_key = 'field_data_' . $field_name;
-    // Views data for this field is in $data[$data_key]
+function payments_views_pre_render(&$view) {
+
+    switch ($view->name) {
+        case 'payments_paycard':
+            //  override the global custom text field value
+
+            $count=count($view->result);
+            for($i=0;$i<$count;$i++){
+                $view->result[$i]->payments_paycard_card_type=CARD_TYPE[$view->result[$i]->payments_paycard_card_type];
+                $view->result[$i]->payments_paycard_status=CARD_STATUS[$view->result[$i]->payments_paycard_status];
+            }
+            //$x=1;
+            //$view->field['paycard_id']->options['alter']['html'] = 'My custom text';
+            break;
+    }
 }
