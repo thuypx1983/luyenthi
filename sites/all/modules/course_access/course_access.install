@@ -1,0 +1,72 @@
+<?php
+
+/**
+ * @file
+ * Install/uninstall functions for Nodeaccess.
+ */
+
+/**
+ * Implements hook_enable().
+ */
+function course_access_enable() {
+}
+
+/**
+ * Implements hook_disable().
+ */
+function course_access_disable() {
+    course_access_disabling(TRUE);
+}
+
+/**
+ * Implements hook_install().
+ */
+function course_access_install() {
+
+}
+
+/**
+ * Implements hook_schema().
+ */
+function course_access_schema() {
+  $schema['course_access'] = array(
+    'fields' => array(
+        'nid' => array(
+            'type' => 'int',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
+            'default' => 0,
+        ),
+        'ntype' => array(
+            'description' => 'node type',
+            'type' => 'varchar',
+            'not null' => TRUE,
+            'default' => '',
+            'length' => 64,
+        ),
+        'uid' => array(
+            'type' => 'int',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
+            'default' => 0,
+        ),
+        'expiry_date' => array(
+            'description' => 'expiry_date.',
+            'type' => 'int',
+            'not null' => TRUE,
+            'default' => 0,
+        )
+    ),
+    'primary key' => array('nid', 'uid'),
+  );
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function course_access_uninstall() {
+  // Remove variables.
+  // Remove tables.
+  drupal_uninstall_schema('course_access');
+}

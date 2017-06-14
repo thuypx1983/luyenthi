@@ -1,0 +1,10 @@
+name = Course access
+description = Course access.
+package = Course
+core = 7.x
+
+; Information added by Drupal.org packaging script on 2017-14-06
+version = "7.x-1.0"
+core = "7.x"
+project = "Course"
+datestamp = "1496899908"

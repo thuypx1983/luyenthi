@@ -30,7 +30,6 @@ function payments_menu() {
     'access callback' => TRUE
   );
 
-
   $items['payments/bank-transfer'] = array(
     'title' => 'Chuyển khoản qua ngân hàng',
     'page callback' => '_bank_transfer_content',
@@ -53,6 +52,15 @@ function payments_menu() {
     'page arguments' => array('payments_configure_form', 1),
     'access arguments' => array('administer site configuration'),
   );
+
+  $items['payments/course/%/buy']=array(
+      'title' => t('Buy course'), //page title
+      'description' => 'Buy course.',
+      'page callback' => 'drupal_get_form', //this is the function that will be called when the page is accessed.  for a form, use drupal_get_form
+      'page arguments' => array('payments_buy_course_form',1), //put the name of the form here
+      'access callback' => TRUE
+  );
+
   return $items;
 }
 
@@ -405,4 +413,28 @@ function payments_views_pre_render(&$view) {
             //$view->field['paycard_id']->options['alter']['html'] = 'My custom text';
             break;
     }
+}
+
+function payments_buy_course_form($form, &$form_state) {
+    $form['card_type']=array(
+        '#title'=>t('Loại thẻ'),
+        '#type' => 'select',
+        '#options' => CARD_TYPE,
+        '#required' => TRUE,
+    );
+    $form['card_number']=array(
+        '#type' => 'textfield',
+        '#title' => t('Mã thẻ:'),
+        '#required' => TRUE,
+    );
+    $form['card_serial']=array(
+        '#type' => 'textfield',
+        '#title' => t('Số thẻ'),
+        '#required' => TRUE,
+    );
+    $form['submit_button'] = array(
+        '#type' => 'submit',
+        '#value' => t('Nạp thẻ'),
+    );
+    return $form;
 }
