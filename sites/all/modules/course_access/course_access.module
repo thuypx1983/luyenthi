@@ -1,0 +1,36 @@
+<?php
+function course_access_add($nid,$uid){
+    $course=node_load($nid);
+
+    db_insert('course_access')
+        ->fields($params=array(
+            'nid'=>$nid,
+            'ntype'=>$course->type,
+            'uid'=>$uid,
+            'expiry_date'=>'12434343',
+        ))->execute();
+
+    //add sub nodes
+    foreach($course->field_lessons[LANGUAGE_NONE] as $item){
+        $obj=node_load($item['target_id']);
+        db_insert('course_access')
+            ->fields($params=array(
+                'nid'=>$obj->nid,
+                'ntype'=>$obj->type,
+                'uid'=>$uid,
+                'expiry_date'=>'12434343',
+            ))->execute();
+    }
+}
+
+function course_access_check($nid,$uid){
+    $query = db_select('course_access', 'b');
+    $query->fields('b', array('nid','uid','expiry_date'));
+    $query->condition('b.nid', $nid);
+    $query->condition('b.uid', $uid);
+    $result = $query->execute();
+    if($result->rowCount()>0) {
+        return true;
+    }
+    return false;
+}
