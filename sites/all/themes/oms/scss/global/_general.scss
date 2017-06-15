@@ -1,0 +1,30 @@
+body{
+  font-size: 13px;
+}
+ul{
+  padding: 0px;
+  li{
+    list-style: none;
+  }
+}
+ul.menu{
+  li{
+    margin: 0px;
+    padding: 0px;
+  }
+}
+img{
+  max-width: 100%;
+}
+
+a:hover{
+  text-decoration: none;
+}
+li a.active{
+  color: $color_link;
+}
+.form-text{
+  border: none;
+  padding: 5px;
+  max-width: 100%;
+}

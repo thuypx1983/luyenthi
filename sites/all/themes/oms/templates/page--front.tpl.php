@@ -68,7 +68,7 @@
 <div id="wrap">
 
     <header id="header" class="clearfix" role="banner">
-        <div class="header-top">
+        <div class="header-top container-out">
             <div class="container">
                 <div class="row">
                     <?php print render($page['header_top']); ?>
@@ -81,6 +81,11 @@
                     <?php print render($page['header']); ?>
                 </div>
 
+            </div>
+
+        </div>
+        <div class="container-out main-menu-container">
+            <div class="container">
                 <div class="main-menu">
                     <!-- start main-menu -->
                     <nav id="navigation" class="clearfix" role="navigation">
@@ -97,7 +102,13 @@
                     </nav><!-- end main-menu -->
                 </div>
             </div>
-
+        </div>
+        <div class="container-out header-bottom">
+            <div class="container">
+                <div class="row">
+                    <?php print render($page['header_bottom']); ?>
+                </div>
+            </div>
         </div>
     </header>
 

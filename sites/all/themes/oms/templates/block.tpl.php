@@ -44,7 +44,7 @@
 
   <?php print render($title_prefix); ?>
   <?php if (!empty($block->subject)): ?>
-    <h2 <?php print $title_attributes; ?>><?php print $block->subject ?></h2>
+    <span class="block-title" <?php print $title_attributes; ?>><?php print $block->subject ?></span>
   <?php endif;?>
   <?php print render($title_suffix); ?>
 

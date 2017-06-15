@@ -1,0 +1,38 @@
+
+.main-menu-container{
+  background-color:$color_main;
+
+  .main-menu{
+    ul.menu{
+      display: inline;
+      width: 100%;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      li{
+        list-style: none;
+        display: inline-block;
+        float: left;
+        padding-left: 15px;
+        padding-right: 15px;
+        border-left: 1px solid #598829;
+        border-right: 1px solid #96db51;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        &:first-child{
+          padding-left: 0px;
+          border-left: none;
+          i{
+            font-size: 18px;
+          }
+        }
+        &:last-child{
+          border-right: none;
+        }
+        a{
+          text-transform: uppercase;
+          color: $color_white;
+        }
+      }
+    }
+  }
+}

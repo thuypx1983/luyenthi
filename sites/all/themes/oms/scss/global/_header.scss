@@ -1,0 +1,111 @@
+.container-out{
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
+  &.header-top{
+    background-color: $bg_header;
+    padding-bottom: 10px;
+    border-bottom: 1px solid $color_gray;
+  }
+}
+
+.menu-link-top {
+  .menu {
+    li{
+      display: inline-block;
+      float: left;
+      padding-right: 20px;
+    }
+  }
+}
+
+.support-top{
+  ul{
+    li{
+      display: inline-block;
+      float: left;
+      .hotline{
+        color: $color_red;
+        font-weight: bold;
+      }
+      &:first-child{
+        padding-right: 20px;
+      }
+    }
+  }
+}
+
+.menu-top-right{
+  ul{
+    margin: 0px;
+    li{
+      list-style: none;
+      padding-top: 10px;
+      a{
+
+        padding: 5px;
+        border-radius: 2px;
+        background-color: $color_red;
+        color: $color_white;
+      }
+    }
+  }
+}
+
+.login-block{
+  ul.menu{
+    li{
+      list-style: none;
+      display: inline-block;
+      float: left;
+      &:first-child{
+        margin-right: 5px;
+        a.i-button{
+          background-color: $color_gray_bold;
+        }
+      }
+    }
+  }
+}
+
+.region-header {
+  div.block{
+    display:flex;
+    align-items:center;
+    .content{
+      padding-top: 10px;
+      padding-bottom: 10px;
+      p{
+        margin: 0px;
+      }
+    }
+  }
+
+}
+a.i-button{
+  border-radius: 2px;
+  padding: 5px 18px 5px 18px;
+  background-color: $color_main;
+  color: $color_white;
+  &:hover{
+    color: $color_white;
+  }
+}
+
+.header-bottom{
+  background-color: $bg_header;
+  padding-top: 10px;
+  .new-hot{
+    ul{
+      li{
+        padding-left: 35px;
+        margin: 0px;
+        background: url("../images/new-icon.png") no-repeat center left transparent;
+      }
+    }
+  }
+}
+@include bp(min-width,$bp-tablet+1){
+
+}
+

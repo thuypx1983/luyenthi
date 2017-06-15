@@ -7,10 +7,12 @@ stylesheets[all][] = fronts/font-awesome-4.7.0/css/font-awesome.min.css
 stylesheets[all][] = css/style.css
 stylesheets[all][] = color/colors.css
 scripts[] = css/bootstrap-3.3.7/js/bootstrap.js
+scripts[] = js/jquery.matchHeight-min.js
 scripts[] = js/scripts.js
 
 regions[header_top]         = Header top
 regions[header]         = Header
+regions[header_bottom]         = header_bottom
 regions[homequotes]     = Home Quotes
 regions[home_highlight_left]     = Home Highlight left
 regions[home_highlight_right]     = Home Highlight right

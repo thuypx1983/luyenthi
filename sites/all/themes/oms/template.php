@@ -142,3 +142,13 @@ function oms_preprocess_node(&$variables) {
 if (drupal_is_front_page()) {
   //drupal_add_js(drupal_get_path('theme', 'oms') . '/js/sliding_effect.js');
 }
+
+
+
+function oms_form_alter( &$form, &$form_state,$form_id ){
+    // this is for your developer information and shows you the
+    // structure of the form array
+
+
+}
+

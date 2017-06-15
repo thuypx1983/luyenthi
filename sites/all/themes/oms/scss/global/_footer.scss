@@ -1,0 +1,47 @@
+#footer-saran{
+  background-color: $color_main;
+  span.block-title{
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 30px;
+    color: $color_white;
+    border-bottom:  1px solid $color_white;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+  }
+  p{
+    color: $color_white;
+    a{
+      color: $color_white;
+    }
+  }
+  #block-menu-menu-gioi-thieu{
+    ul.menu{
+      li{
+        padding-bottom: 5px;
+        list-style: none;
+        a{
+          color: $color_white;
+        }
+      }
+
+    }
+  }
+  .support-block{
+    i{
+      margin-right: 5px;
+      font-size: 15px;
+    }
+  }
+
+
+}
+#footer-bottom{
+  background-color: $color_main_bold;
+  p{
+    margin-top: 10px;
+    color:$color_white;
+  }
+  color:$color_white;
+}
