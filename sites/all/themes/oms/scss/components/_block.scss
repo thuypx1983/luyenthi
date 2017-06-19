@@ -1,0 +1,38 @@
+.regular-block{
+  margin-bottom: 30px;
+  .block-title{
+    display: block;
+    font-size: 20px;
+    text-transform: uppercase;
+    color: $color_main;
+    border-bottom:  1px solid $color_gray;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+  }
+}
+
+.news-slider-bar{
+  .views-row{
+      display: table;
+      margin-bottom: 20px;
+      width: 100%;
+    .views-field-field-image{
+      float: left;
+      width: 38%;
+      margin-right: 15px;
+    }
+    .views-field-title {
+      a{
+        font-weight: bold;
+        color: $color_black;
+      }
+    }
+    .views-field-created{
+      padding-top: 5px;
+      color: $color_gray_blurry;
+    }
+    .views-field-body{
+      color: $color_gray_blurry;
+    }
+  }
+}

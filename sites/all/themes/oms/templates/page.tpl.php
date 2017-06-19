@@ -68,7 +68,7 @@
 <div id="wrap">
 
   <header id="header" class="clearfix" role="banner">
-    <div class="header-top">
+    <div class="header-top container-out">
       <div class="container">
         <div class="row">
           <?php print render($page['header_top']); ?>
@@ -81,6 +81,11 @@
           <?php print render($page['header']); ?>
         </div>
 
+      </div>
+
+    </div>
+    <div class="container-out main-menu-container">
+      <div class="container">
         <div class="main-menu">
           <!-- start main-menu -->
           <nav id="navigation" class="clearfix" role="navigation">
@@ -97,7 +102,13 @@
           </nav><!-- end main-menu -->
         </div>
       </div>
-
+    </div>
+    <div class="container-out header-bottom">
+      <div class="container">
+        <div class="row">
+          <?php print render($page['header_bottom']); ?>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -123,57 +134,61 @@
     </div>
   <?php endif; ?>
 
-  <div id="main" class="container">
-    <div class="row">
-      <section class="col-md-9" id="post-content" role="main">
-        <?php if ($page['content_top']): ?><div id="content_top"><?php print render($page['content_top']); ?></div><?php endif; ?>
-
-        <?php if (!empty($tabs['#primary'])): ?><div class="tabs-wrapper clearfix"><?php print render($tabs); ?></div><?php endif; ?>
-        <?php print render($page['help']); ?>
-        <?php if ($action_links): ?><ul class="action-links"><?php print render($action_links); ?></ul><?php endif; ?>
-        <?php print render($page['content']); ?>
-      </section> <!-- /#main -->
-
-      <?php if ($page['sidebar_first']): ?>
-        <aside id="sidebar" role="complementary" class="sidebar col-md-3 clearfix">
-          <?php print render($page['sidebar_first']); ?>
-        </aside>  <!-- /#sidebar-first -->
+  <?php if (theme_get_setting('show_front_content') == 1): ?>
+    <div id="main" class="container">
+      <?php if ($breadcrumb): ?>
+        <div id="breadcrumb"><?php print $breadcrumb; ?></div>
       <?php endif; ?>
+
+     <div class="row">
+       <section class="<?php if($page['sidebar_first']) echo 'col-md-8'; else echo 'col-md-12';?>" id="post-content" role="main">
+         <?php if ($page['content_top']): ?><div id="content_top"><?php print render($page['content_top']); ?></div><?php endif; ?>
+
+         <?php if (!empty($tabs['#primary'])): ?><div class="tabs-wrapper clearfix"><?php print render($tabs); ?></div><?php endif; ?>
+         <?php print render($page['help']); ?>
+         <?php if ($action_links): ?><ul class="action-links"><?php print render($action_links); ?></ul><?php endif; ?>
+         <h1 class="page-title"><?php echo $title?></h1>
+         <?php print render($page['content']); ?>
+       </section> <!-- /#main -->
+
+       <?php if ($page['sidebar_first']): ?>
+         <aside id="sidebar" role="complementary" class="sidebar col-md-4">
+           <?php print render($page['sidebar_first']); ?>
+         </aside>  <!-- /#sidebar-first -->
+       <?php endif; ?>
+     </div>
     </div>
-  </div>
+    <div class="clear"></div>
+  <?php endif; ?>
 
   <?php if ($page['footer_first'] || $page['footer_second'] || $page['footer_third'] || $page['footer_fourth']): ?>
-    <div id="footer-saran" class="clearfix">
-      <div id="footer-wrap">
-        <?php if ($page['footer_first']): ?>
-          <div class="footer-box"><?php print render($page['footer_first']); ?></div>
-        <?php endif; ?>
-        <?php if ($page['footer_second']): ?>
-          <div class="footer-box"><?php print render($page['footer_second']); ?></div>
-        <?php endif; ?>
-        <?php if ($page['footer_third']): ?>
-          <div class="footer-box"><?php print render($page['footer_third']); ?></div>
-        <?php endif; ?>
-        <?php if ($page['footer_fourth']): ?>
-          <div class="footer-box remove-margin"><?php print render($page['footer_fourth']); ?></div>
-        <?php endif; ?>
+    <div id="footer-saran" class=" clearfix">
+      <div id="footer-wrap" class="container">
+        <div class="row">
+          <?php if ($page['footer_first']): ?>
+            <div class="footer-box col-md-3"><?php print render($page['footer_first']); ?></div>
+          <?php endif; ?>
+          <?php if ($page['footer_second']): ?>
+            <div class="footer-box col-md-3"><?php print render($page['footer_second']); ?></div>
+          <?php endif; ?>
+          <?php if ($page['footer_third']): ?>
+            <div class="footer-box col-md-3"><?php print render($page['footer_third']); ?></div>
+          <?php endif; ?>
+          <?php if ($page['footer_fourth']): ?>
+            <div class="footer-box remove-margin col-md-3"><?php print render($page['footer_fourth']); ?></div>
+          <?php endif; ?>
+        </div>
       </div>
     </div>
     <div class="clear"></div>
   <?php endif; ?>
 
   <!--END footer -->
-  <?php print render($page['footer']) ?>
-
-  <?php if (theme_get_setting('footer_copyright') || theme_get_setting('footer_credits')): ?>
-    <div class="clear"></div>
-    <div id="copyright">
-      <?php if ($footer_copyright): ?>
-        <?php print $footer_copyright; ?>
-      <?php endif; ?>
-      <?php if (theme_get_setting('footer_credits')): ?>
-        <span class="credits"><?php print t('Designed by'); ?>  <a href="http://www.devsaran.com">Devsaran</a>.</span>
-      <?php endif; ?>
+  <div id="footer-bottom">
+    <div class="container">
+      <div class="row">
+        <?php print render($page['footer']) ?>
+      </div>
     </div>
-  <?php endif; ?>
+  </div>
 </div>

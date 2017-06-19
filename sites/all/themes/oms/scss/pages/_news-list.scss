@@ -1,0 +1,45 @@
+.page-taxonomy-term{
+  h1.page-title{
+    color: $color_main;
+    border-bottom: 1px solid $color_gray;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    margin-top: 0px;
+  }
+}
+.view-taxonomy-term{
+  .view-header{
+    background-color: $bg_header;
+    font-style: italic;
+    padding: 15px 10px;
+    p{
+      margin: 0px;
+    }
+    margin-bottom: 15px;
+  }
+  .views-row{
+    display: table;
+    margin-bottom: 30px;
+    width: 100%;
+    .views-field-field-image{
+      float: left;
+      width: 30%;
+      margin-right: 15px;
+    }
+    .views-field-title{
+      a{
+        font-size: 16px;
+        font-weight: 700;
+        color: $color_black;
+      }
+      padding-bottom: 10px;
+    }
+    .views-field-created{
+      padding-bottom: 10px;
+      color: $color_gray_blurry;
+      font-style: italic;
+    }
+
+  }
+}
