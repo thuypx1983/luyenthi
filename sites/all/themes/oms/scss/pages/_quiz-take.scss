@@ -1,0 +1,63 @@
+.page-node-take{
+  #main{
+    .main-quiz-take{
+      border: 1px solid $color_gray;
+      border-radius: 5px 5px 2px 2px;
+    }
+    h1.page-title{
+      text-align: center;
+      background-color: $color_main;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      font-size: 18px;
+      text-transform: uppercase;
+      color: $color_white;
+    }
+  }
+  .quiz-question-multichoice{
+    h2{
+      font-size: 13px;
+      font-weight: bold;
+      border-bottom: 1px solid $color_gray;
+      border-top: 1px solid $color_gray;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      padding-left: 10px;
+    }
+    .field-name-body{
+      padding-left: 15px;
+    }
+
+    .form-type-radios{
+      label{
+        display: none;
+      }
+    }
+    table{
+      background-color: transparent;
+      width: 100%;
+      tbody{
+        border: none;
+        tr{
+          background-color: transparent;
+          border: none;
+          td{
+            padding-top: 5px;
+            padding-bottom: 5px;
+            padding-left: 15px;
+            input[type=radio]{
+              margin-top: 0px;
+              width: 25px;
+              height: 25px;
+
+            }
+
+            p{
+              margin-bottom: 0px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
