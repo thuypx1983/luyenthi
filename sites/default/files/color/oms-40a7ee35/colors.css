@@ -33,6 +33,6 @@ a:hover { color: #79b43e; }
 
 /* Button */
 
-.form-submit { background: #79b43e; border-color:#79b43e; }
+.form-submit { background: #ff6d00; border-color:#ff6d00; }
 
-.form-submit:hover { background: #555555; }
+.form-submit:hover { background: #79b43e; }

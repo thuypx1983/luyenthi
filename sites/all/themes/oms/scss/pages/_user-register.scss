@@ -1,0 +1,28 @@
+.page-user-register{
+  #user-register-form{
+    label{
+      width: 150px;
+      text-align: left;
+    }
+    .description{
+      margin-left: 155px;
+    }
+    .confirm-parent{
+      width: auto;
+    }
+    .password-parent{
+      width: auto;
+    }
+    .captcha{
+      legend{
+        display: none;
+      }
+      img{
+        margin-left: 155px;
+      }
+      .fieldset-description{
+        display: none;
+      }
+    }
+  }
+}

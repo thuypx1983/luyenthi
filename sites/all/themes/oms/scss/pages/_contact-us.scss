@@ -1,8 +1,72 @@
 .page-node-25{
   #webform-client-form-26{
-
     .webform-component--row--form-r{
       margin-left: 0px;
     }
+    .form-text{
+      width: 100%;
+    }
+    .form-textarea{
+      width: 100%;
+    }
+
+  }
+  .block-title {
+    margin-top: 25px;
+    color: #79b43e;
+    display: block;
+    font-size: 20px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+  }
+  .contact-us-info{
+    .col-md-4{
+
+      &>div{
+        padding-top: 15px;
+        padding-bottom: 15px;
+        background-color: $bg_contact;
+        text-align: center;
+        label{
+          display: block;
+        }
+
+      }
+      &:first-child{
+        i.fa{
+          font-size: 30px;
+        }
+      }
+      &:last-child{
+        i.fa{
+          font-size: 30px;
+        }
+      }
+    }
+  }
+  h1.page-title{
+    overflow: hidden;
+    margin-top: 0px;
+    color: #79b43e;
+    display: block;
+    font-size: 20px;
+    line-height: inherit;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    text-transform: uppercase;
+    &:after{
+      background-color: $color_gray;
+      content: "";
+      display: inline-block;
+      height: 1px;
+      position: relative;
+      vertical-align: middle;
+      width: 100%;
+      left: 0.5em;
+      margin-right: -50%;
+    }
+  }
+  .contact-phone{
+    margin-bottom: 5px;
   }
 }
