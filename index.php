@@ -19,7 +19,3 @@ define('DRUPAL_ROOT', getcwd());
 require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
 drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
 menu_execute_active_handler();
-
-global $user;
-#course_access_add(17,$user->uid);
-#var_dump(course_access_check(10,$user->uid));

@@ -1,0 +1,24 @@
+.node-type-teacher{
+  #block-system-main{
+    display: table;
+    padding-bottom: 20px;
+  }
+  .field-name-field-links{
+    display: block;
+    text-align: center;
+    .field-item{
+      display: inline-block;
+      font-size: 20px;
+      color: $color_main;
+      border-radius: 50%;
+      border: 1px solid $color_gray;
+      width: 30px;
+      height: 30px;
+      margin: 10px 5px 5px 5px;
+      background-color: $color_gray;
+      i.fa{
+        color: $color_main;
+      }
+    }
+  }
+}

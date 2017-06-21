@@ -42,7 +42,13 @@ function oms_process_page(&$variables) {
   if (module_exists('color')) {
     _color_page_alter($variables);
   }
- 
+
+  #edit template page node type
+  if (!empty($variables['node']) && !empty($variables['node']->type)) {
+    $variables['theme_hook_suggestions'][] = 'page__node__' . $variables['node']->type;
+  }
+
+
 }
 
 /**

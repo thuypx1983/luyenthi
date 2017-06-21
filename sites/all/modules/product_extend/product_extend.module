@@ -1,0 +1,35 @@
+<?php
+/**
+ * Implements hook_node_view().
+ *
+ * Adds a Facebook like button to page nodes.
+ */
+function product_extend_node_view($node, $view_mode, $langcode) {
+    switch ($node->type) {
+        case 'teacher':
+            $node->content['product_title'] = array(
+                '#type' => 'item',
+                '#title' => '',
+                '#markup' =>  '<h1 class="page-title">'.$node->title.'</h1>',
+            );
+            break;
+
+            break;
+    }
+}
+
+/**
+ * Implements hook_field_extra_fields().
+ *
+ * Declare our Facebook Like button as a pseudo-field.
+ */
+function product_extend_field_extra_fields() {
+    $extra['node']['teacher']['display'] = array(
+        'product_title' => array(
+            'label' => t('Title'),
+            'description' => t('Title.'),
+            'weight' => 12,
+        )
+    );
+    return $extra;
+}
