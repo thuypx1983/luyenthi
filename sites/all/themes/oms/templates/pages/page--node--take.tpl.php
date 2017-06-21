@@ -135,18 +135,65 @@
         </section> <!-- /#main -->
 
         <aside id="sidebar" role="complementary" class="sidebar col-md-4">
-          Nội dung ở đây
+          <div class="table-question">
+            <div class="title">
+              <span>Bảng câu hỏi</span>
+            </div>
+            <div class="guide">
+              <span><i class="fa fa-square answered"></i> Đã trả lời</span>
+              <span><i class="fa fa-square"></i> Chưa trả lời</span>
+              <span><i class="fa fa-square remember"></i> Cần xem lại</span>
+            </div>
+            <div class="question-list">
+
+            </div>
+            <div class="clearfix"></div>
+            <div class="timer">
+              <div class="countdown"></div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
           <script type="text/javascript">
               (function($){
                   $(function(){
-                      var html="";
-                      var i=1;
+                    var html="";
+                    var i=1;
                     $('.quiz-question-multichoice').each(function(){
+                      var nid=($(this).attr('id').replace('edit-question-',''));
+                      html+='<div class="item-question" data-i="'+i+'" style="float:left">' +
+                          '<a class="qnbutton" id="quiznavbutton'+i+'" title="Chưa trả lời" data-quiz-page="'+nid+'" href="#edit-question-'+nid+'">' +
 
-                        html+='<div data-i='+i+' style="float:left"><a class="qnbutton notyetanswered free thispage" id="quiznavbutton'+i+'" title="Chưa trả lời" data-quiz-page="0" href="#edit-question-'+i+'"><span class="thispageholder"></span><span class="trafficlight"></span><span class="accesshide">Question </span>'+i+'<span class="accesshide"> This page <span class="flagstate"></span></span></a></div>';
-                        i++;
+                          i+'</a>' +
+                          '</div>';
+                      i++;
                     })
-                    $('#sidebar').append(html);
+                    $('.question-list').append(html);
+
+                    $('.quiz-question-multichoice .multichoice-row').click(function () {
+                      var input=$(this).find('input[type=radio]');
+                      var nid=input.attr('name').replace('question[','').replace('][answer][user_answer]','');
+                      $('.question-list').find('a[data-quiz-page='+nid+']').addClass('answered');
+                    })
+
+
+
+                    $('.quiz-question-multichoice').each(function () {
+                      var flag=false;
+
+                      $(this).find('input[type=radio]').each(function () {
+                        if($(this).is( ":checked" )){
+                          flag=true;
+                        }
+                      })
+                      if(flag){
+                        var nid=$(this).attr('id').replace('edit-question-','');
+                        $('.question-list').find('a[data-quiz-page='+nid+']').addClass('answered');
+                      }
+
+                    })
+
+
+
                   })
               })(jQuery)
           </script>

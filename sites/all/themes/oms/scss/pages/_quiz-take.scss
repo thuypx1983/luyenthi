@@ -60,4 +60,77 @@
       }
     }
   }
+
+
+}
+
+.table-question{
+  display: block;
+  border-radius: 5px 5px 2px 2px;
+  border: 1px solid $color_gray;
+
+  padding-bottom: 15px;
+  .title{
+    text-align: center;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    background-color: $color_gray;
+    font-size: 18px;
+  }
+  .guide{
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+  }
+  .question-list{
+
+    padding-left: 5px;
+    padding-right: 5px;
+    .item-question{
+      float: left;
+      padding: 5px;
+      .qnbutton{
+        border: 1px solid $color_gray;
+        border-radius: 2px;
+        font-weight: bold;
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+    }
+    .answered{
+      background-color: $color_main;
+      color: $color_white;
+    }
+    .remember{
+      background-color: yellow;
+      color: $color_white;
+    }
+  }
+  .timer{
+    text-align: center;
+    .countdown{
+      font-size: 30px;
+      color: $color_red;
+      text-transform: uppercase;
+      background-color: transparent;
+      border: none;
+      span{
+        font-size: 14px;
+        color: $color_black_blurry;
+        display: block;
+      }
+    }
+  }
+}
+.guide{
+  margin-bottom: 15px;
+}
+
+
+.fa.answered{
+  color: $color_main;
+}
+.fa.remember{
+  color: $color_white;
+  border: 1px solid $color_gray;
 }
