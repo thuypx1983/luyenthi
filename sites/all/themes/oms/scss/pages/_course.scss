@@ -1,0 +1,36 @@
+.view-couses{
+
+  .views-field {
+     padding-left: 10px;
+     padding-right: 10px;
+    .views-label{
+      display: inline-block;
+    }
+    .field-content{
+      display: inline-block;
+    }
+    padding-bottom: 5px;
+  }
+
+  .row-content{
+    border: 1px solid $color_gray;
+    .views-field-title{
+      font-size: 15px;
+      font-weight: bold;
+      color: $color_black_blurry;
+    }
+    .views-field-view-node{
+      text-align: right;
+      padding-bottom: 10px;
+      a{
+        background-color: $color_main;
+        padding: 5px 10px;
+        color: $color_white;
+      }
+    }
+    .views-field-field-image{
+      padding-left: 0px;
+      padding-right: 0px;
+    }
+  }
+}

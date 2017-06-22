@@ -105,6 +105,12 @@ a.i-button{
     }
   }
 }
+
+.front {
+  .header-bottom{
+    margin-bottom: 18px;
+  }
+}
 @include bp(min-width,$bp-tablet+1){
 
 }

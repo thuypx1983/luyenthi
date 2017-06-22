@@ -112,7 +112,6 @@
         </div>
     </header>
 
-
     <?php print $messages; ?>
 
     <?php if ($page['homequotes']): ?>
@@ -128,6 +127,35 @@
                     <?php endif; ?>
                     <?php if ($page['home_highlight_right']): ?>
                         <div class="home-highlight-right col-md-3"><?php print render($page['home_highlight_right']); ?></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+    <?php if ($page['home_top']): ?>
+        <div id="home-highlights" class="clearfix">
+            <div class="container">
+                <div class="row">
+                    <?php if ($page['home_top']): ?>
+                        <div class="home-top col-md-12"><?php print render($page['home_top']); ?></div>
+                    <?php endif; ?>
+
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
+
+
+    <?php if ($page['home_middle_left'] || $page['home_middle_right']): ?>
+        <div id="home-highlights" class="clearfix">
+            <div class="container">
+                <div class="row">
+                    <?php if ($page['home_middle_left']): ?>
+                        <div class="home-middle-left col-md-9"><?php print render($page['home_middle_left']); ?></div>
+                    <?php endif; ?>
+                    <?php if ($page['home_middle_right']): ?>
+                        <div class="home-middle-right col-md-3"><?php print render($page['home_middle_right']); ?></div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -158,18 +186,18 @@
         <div id="footer-saran" class=" clearfix">
             <div id="footer-wrap" class="container">
                 <div class="row">
-                  <?php if ($page['footer_first']): ?>
-                    <div class="footer-box col-md-3"><?php print render($page['footer_first']); ?></div>
-                  <?php endif; ?>
-                  <?php if ($page['footer_second']): ?>
-                    <div class="footer-box col-md-3"><?php print render($page['footer_second']); ?></div>
-                  <?php endif; ?>
-                  <?php if ($page['footer_third']): ?>
-                    <div class="footer-box col-md-3"><?php print render($page['footer_third']); ?></div>
-                  <?php endif; ?>
-                  <?php if ($page['footer_fourth']): ?>
-                    <div class="footer-box remove-margin col-md-3"><?php print render($page['footer_fourth']); ?></div>
-                  <?php endif; ?>
+                    <?php if ($page['footer_first']): ?>
+                        <div class="footer-box col-md-3"><?php print render($page['footer_first']); ?></div>
+                    <?php endif; ?>
+                    <?php if ($page['footer_second']): ?>
+                        <div class="footer-box col-md-3"><?php print render($page['footer_second']); ?></div>
+                    <?php endif; ?>
+                    <?php if ($page['footer_third']): ?>
+                        <div class="footer-box col-md-3"><?php print render($page['footer_third']); ?></div>
+                    <?php endif; ?>
+                    <?php if ($page['footer_fourth']): ?>
+                        <div class="footer-box remove-margin col-md-3"><?php print render($page['footer_fourth']); ?></div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -178,10 +206,10 @@
 
     <!--END footer -->
     <div id="footer-bottom">
-      <div class="container">
-        <div class="row">
-          <?php print render($page['footer']) ?>
+        <div class="container">
+            <div class="row">
+                <?php print render($page['footer']) ?>
+            </div>
         </div>
-      </div>
     </div>
 </div>

@@ -1,6 +1,6 @@
 (function ($) {
     $(function () {
-        $('.region-header >div.block,.contact-us-info>div.col-md-4').matchHeight({
+        $('.region-header >div.block,.contact-us-info>div.col-md-4,#block-block-14 .col-md-6').matchHeight({
             byRow: true,
             property: 'height',
             target: null,
