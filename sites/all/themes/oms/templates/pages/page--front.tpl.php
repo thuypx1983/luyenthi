@@ -133,7 +133,7 @@
         </div>
     <?php endif; ?>
     <?php if ($page['home_top']): ?>
-        <div id="home-highlights" class="clearfix">
+        <div id="home-top" class="clearfix">
             <div class="container">
                 <div class="row">
                     <?php if ($page['home_top']): ?>
@@ -148,7 +148,7 @@
 
 
     <?php if ($page['home_middle_left'] || $page['home_middle_right']): ?>
-        <div id="home-highlights" class="clearfix">
+        <div id="home-middle" class="clearfix">
             <div class="container">
                 <div class="row">
                     <?php if ($page['home_middle_left']): ?>
@@ -161,6 +161,19 @@
             </div>
         </div>
     <?php endif; ?>
+
+  <?php if ($page['home_bottom']): ?>
+      <div id="home-bottom" class="clearfix">
+          <div class="container">
+              <div class="row">
+                <?php if ($page['home_bottom']): ?>
+                  <?php print render($page['home_bottom']); ?>
+                <?php endif; ?>
+
+              </div>
+          </div>
+      </div>
+  <?php endif; ?>
 
     <?php if (theme_get_setting('show_front_content') == 1): ?>
         <div id="main" class="container">
