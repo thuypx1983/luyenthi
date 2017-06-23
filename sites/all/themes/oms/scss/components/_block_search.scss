@@ -1,0 +1,19 @@
+#block-search-form{
+  .container-inline{
+    display: block;
+    position: relative;
+    .form-type-textfield{
+      display: block;
+      margin: 0px;
+      input{
+        width: 100%;
+      }
+    }
+    .form-actions{
+      display: block;
+      position: absolute;
+      right: 0px;
+      top: 0px;
+    }
+  }
+}

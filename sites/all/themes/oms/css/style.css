@@ -365,6 +365,28 @@ body {
   color: #333333;
 }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_block_search\.scss}line{font-family:\000032}}
+#block-search-form .container-inline {
+  display: block;
+  position: relative;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_block_search\.scss}line{font-family:\000035}}
+#block-search-form .container-inline .form-type-textfield {
+  display: block;
+  margin: 0px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_block_search\.scss}line{font-family:\000038}}
+#block-search-form .container-inline .form-type-textfield input {
+  width: 100%;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_block_search\.scss}line{font-family:\0000312}}
+#block-search-form .container-inline .form-actions {
+  display: block;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+}
+
 /*page*/
 @media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_news-list\.scss}line{font-family:\000032}}
 .page-taxonomy-term h1.page-title {
@@ -1076,4 +1098,48 @@ body {
 .view-couses .row-content .views-field-field-image {
   padding-left: 0px;
   padding-right: 0px;
+}
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_document\.scss}line{font-family:\000031}}
+.related-document {
+  margin-top: 30px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_document\.scss}line{font-family:\000034}}
+.related-document ul li {
+  margin: 0px;
+  padding-top: 10px;
+  padding-top: 10px;
+  padding-left: 10px;
+  font-weight: bold;
+  color: #333333;
+  position: relative;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_document\.scss}line{font-family:\0000312}}
+.related-document ul li:before {
+  position: absolute;
+  left: 0px;
+  content: "\f0c8";
+  -x-system-font: none;
+  display: inline-block;
+  font-family: FontAwesome;
+  font-feature-settings: normal;
+  font-kerning: auto;
+  font-language-override: normal;
+  font-size: inherit;
+  font-size-adjust: none;
+  font-stretch: normal;
+  font-style: normal;
+  font-synthesis: weight style;
+  font-variant-alternates: normal;
+  font-variant-caps: normal;
+  font-variant-east-asian: normal;
+  font-variant-ligatures: normal;
+  font-variant-numeric: normal;
+  font-variant-position: normal;
+  font-weight: normal;
+  line-height: 1;
+  text-rendering: auto;
+  font-size: 7px;
+  color: #ff4747;
+  top: 50%;
 }

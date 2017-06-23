@@ -1,0 +1,43 @@
+.related-document{
+  margin-top: 30px;
+  ul{
+    li{
+      margin: 0px;
+      padding-top: 10px;
+      padding-top: 10px;
+      padding-left: 10px;
+      font-weight: bold;
+      color: $color_black_blurry;
+      position: relative;
+      &:before{
+        position: absolute;
+        left: 0px;
+        content:  "\f0c8";
+
+        -x-system-font: none;
+        display: inline-block;
+        font-family: FontAwesome;
+        font-feature-settings: normal;
+        font-kerning: auto;
+        font-language-override: normal;
+        font-size: inherit;
+        font-size-adjust: none;
+        font-stretch: normal;
+        font-style: normal;
+        font-synthesis: weight style;
+        font-variant-alternates: normal;
+        font-variant-caps: normal;
+        font-variant-east-asian: normal;
+        font-variant-ligatures: normal;
+        font-variant-numeric: normal;
+        font-variant-position: normal;
+        font-weight: normal;
+        line-height: 1;
+        text-rendering: auto;
+        font-size: 7px;
+        color: $color_red;
+        top: 50%;
+      }
+    }
+  }
+}
