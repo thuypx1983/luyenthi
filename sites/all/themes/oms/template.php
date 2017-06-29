@@ -158,3 +158,12 @@ function oms_form_alter( &$form, &$form_state,$form_id ){
 
 }
 
+function oms_preprocess_menu_link(&$variables) {
+    $x=1;
+    if(isset($variables['element']['#localized_options']['content']['image'])){
+        $fid=$variables['element']['#localized_options']['content']['image'];
+        $file = file_load($fid);
+        $icon='<img src="'.file_create_url($file->uri).'">';
+        $variables['element']['#title']=$icon.$variables['element']['#title'];
+    }
+}
