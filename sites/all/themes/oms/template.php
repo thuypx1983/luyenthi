@@ -164,6 +164,6 @@ function oms_preprocess_menu_link(&$variables) {
         $fid=$variables['element']['#localized_options']['content']['image'];
         $file = file_load($fid);
         $icon='<img src="'.file_create_url($file->uri).'">';
-        $variables['element']['#title']=$icon.$variables['element']['#title'];
+        $variables['element']['#title']=$icon.'<span class="link-text">'.$variables['element']['#title'].'</span>';
     }
 }
