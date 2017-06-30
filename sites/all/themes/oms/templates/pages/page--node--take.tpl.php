@@ -113,7 +113,9 @@
   </header>
 
 
-  <?php print $messages; ?>
+  <div class="container">
+    <?php print $messages; ?>
+  </div>
 
   <?php if (theme_get_setting('show_front_content') == 1): ?>
     <div id="main" class="container">

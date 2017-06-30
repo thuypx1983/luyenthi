@@ -112,8 +112,9 @@
     </div>
   </header>
 
-
-  <?php print $messages; ?>
+  <div class="container">
+    <?php print $messages; ?>
+  </div>
 
   <?php if ($page['homequotes']): ?>
     <div id="home-quote"> <?php print render($page['homequotes']); ?></div>

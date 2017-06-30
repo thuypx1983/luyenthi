@@ -1,4 +1,13 @@
 .page-node-take{
+  .tabs-wrapper{
+    display: none;
+  }
+  #quiz-progress{
+    display: none;
+  }
+  .quiz-question-quiz-page{
+    display: none;
+  }
   #main{
     .main-quiz-take{
       border: 1px solid $color_gray;
@@ -60,7 +69,6 @@
       }
     }
   }
-
 
 }
 
@@ -171,19 +179,35 @@
   }
 }
 
-.group-take{
-  margin-top: 30px;
-  padding-top: 30px;
-  text-align: center;
-  width: 100%;
-  display: table;
-  border-top: 1px solid $color_gray;
 
-  .quiz-start-link{
-    background-color: $bg_button;
-    padding: 10px;
-    font-size: 14px;
-    color: $color_white;
+.node-type-quiz{
+  .group-take{
+    margin-top: 30px;
+    padding-top: 30px;
+    text-align: center;
+    width: 100%;
+    display: table;
+    border-top: 1px solid $color_gray;
+
+    .quiz-start-link{
+      background-color: $bg_button;
+      padding: 10px;
+      font-size: 14px;
+      color: $color_white;
+      display: inline-block;
+    }
+  }
+  .tabs-wrapper{
+    display: none;
+  }
+  .quiz-not-available{
     display: inline-block;
+    padding: 5px 10px;
+    font-size: 15px;
+    font-weight: bold;
+    background-color: $bg_button;
+    a{
+      color: $color_white;
+    }
   }
 }

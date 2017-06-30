@@ -2279,13 +2279,22 @@ function quiz_quiz_access($op = 'take', $quiz, $account) {
     );
   }
 
-  // Check permission and node access.
-  if (!user_access('access quiz') || !node_access('view', $quiz)) {
-    $hooks['node_perm_access'] = array(
-      'success' => FALSE,
-      'message' => t('You are not allowed to take this @quiz.', array('@quiz' => QUIZ_NAME)),
-    );
-  }
+  // Check permission and node access. modify by thuypx
+    if(user_is_logged_in()){
+        if (!user_access('access quiz') || !node_access('view', $quiz)) {
+            $hooks['node_perm_access'] = array(
+                'success' => FALSE,
+                'message' => t('You are not allowed to take this @quiz.', array('@quiz' => QUIZ_NAME)),
+            );
+        }
+    }else{
+        $redirect=url(current_path(), array('absolute' => TRUE,'query' => drupal_get_query_parameters()));
+        $hooks['node_perm_access'] = array(
+            'success' => FALSE,
+            'message' => t('<a href="'.url('user/login').'?destination='.urlencode($redirect).'">Đăng nhập để làm bài thi này</a>'),
+        );
+    }
+
 
   return $hooks;
 }
