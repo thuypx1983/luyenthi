@@ -1,0 +1,22 @@
+.page-user{
+  .profile{
+    .user-picture{
+      float: none;
+    }
+    .profile-title{
+      background-color: $color_main;
+      text-align: left;
+      text-transform: uppercase;
+      font-size: 16px;
+      color: $color_white;
+      padding: 5px;
+      margin-bottom: 15px;
+    }
+    .profile-left{
+      text-align: center;
+      .content{
+        background-color: $bg_header;
+      }
+    }
+  }
+}

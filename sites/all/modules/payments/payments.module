@@ -54,8 +54,8 @@ function payments_menu() {
   );
 
   $items['payments/course/%/buy']=array(
-      'title' => t('Buy course'), //page title
-      'description' => 'Buy course.',
+      'title' => t('Buy product'), //page title
+      'description' => 'Buy product.',
       'page callback' => 'drupal_get_form', //this is the function that will be called when the page is accessed.  for a form, use drupal_get_form
       'page arguments' => array('payments_buy_course_form',1), //put the name of the form here
       'access callback' => TRUE
@@ -416,25 +416,35 @@ function payments_views_pre_render(&$view) {
 }
 
 function payments_buy_course_form($form, &$form_state) {
-    $form['card_type']=array(
-        '#title'=>t('Loại thẻ'),
-        '#type' => 'select',
-        '#options' => CARD_TYPE,
-        '#required' => TRUE,
+    $nid=arg(2);
+    $node=node_load($nid);
+
+    if(!$node){
+      drupal_goto('/node/1');
+      drupal_exit();
+    }
+
+    $field_price=field_get_items('node',$node,'field_price');
+
+    $form['node_title']=array(
+      '#type' => 'markup',
+      '#markup'=>'<div class="product-name">'.$node->title.'</div>',
     );
-    $form['card_number']=array(
-        '#type' => 'textfield',
-        '#title' => t('Mã thẻ:'),
-        '#required' => TRUE,
+    $form['node_price']=array(
+      '#type' => 'markup',
+      '#markup'=>'<div class="product-price">'.number_format($field_price[0]['value']).'vnđ</div>',
     );
-    $form['card_serial']=array(
-        '#type' => 'textfield',
-        '#title' => t('Số thẻ'),
-        '#required' => TRUE,
+    $form['nid']=array(
+      '#type' => 'hidden',
+      '#value' => $nid,
+      '#default_value'=>$nid,
     );
-    $form['submit_button'] = array(
-        '#type' => 'submit',
-        '#value' => t('Nạp thẻ'),
+
+    $form['actions'] = array('#type' => 'actions');
+
+    $form['actions']['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Mua'),
     );
     return $form;
 }

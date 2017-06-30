@@ -1474,3 +1474,26 @@ body {
   color: #ff4747;
   top: 50%;
 }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_user-profile\.scss}line{font-family:\000033}}
+.page-user .profile .user-picture {
+  float: none;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_user-profile\.scss}line{font-family:\000036}}
+.page-user .profile .profile-title {
+  background-color: #79B43E;
+  text-align: left;
+  text-transform: uppercase;
+  font-size: 16px;
+  color: #ffffff;
+  padding: 5px;
+  margin-bottom: 15px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_user-profile\.scss}line{font-family:\0000315}}
+.page-user .profile .profile-left {
+  text-align: center;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_user-profile\.scss}line{font-family:\0000317}}
+.page-user .profile .profile-left .content {
+  background-color: #F8F8F8;
+}

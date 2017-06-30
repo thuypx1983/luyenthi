@@ -69,3 +69,9 @@ function course_access_quiz_access_alter(&$hooks, $op, $quiz, $account) {
     unset($hooks['monday']);
   }
 }
+/*
+ * hook node view
+ */
+function course_access_node_view($node, $view_mode, $langcode) {
+ $x=1;
+}
