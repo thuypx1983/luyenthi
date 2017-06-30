@@ -1,0 +1,84 @@
+.top-point{
+  .views-table{
+    width: 100%;
+    thead{
+      tr{
+        background-color: $color_gray;
+
+        th{
+          font-weight: bold;
+          padding-bottom: 6px;
+          padding-top: 6px;
+          border: none;
+        }
+      }
+    }
+    tbody{
+      tr{
+        border: none;
+        td{
+          padding-bottom: 6px;
+          padding-top: 6px;
+        }
+
+        &:nth-child(-n+3){
+          td{
+            color: $color_red;
+            a{
+              color: $color_red;
+            }
+          }
+          td.views-field-name{
+            position: relative;
+            &:after{
+              @include fontAwesome();
+              content: '\f091';
+              left: auto;
+              right: 10px;
+              font-size: 20px;
+              bottom: auto;
+
+            }
+          }
+        }
+        &:nth-child(1){
+          td.views-field-name{
+            &:after{
+              color: #FFD700;
+              background: -webkit-gradient(linear, left top, left bottom, from(#ff9700), to(#FFD700));
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+            }
+          }
+        }
+        &:nth-child(2){
+          td.views-field-name{
+            &:after{
+              color: silver;
+              background: -webkit-gradient(linear, left top, left bottom, from(#C0C0C0), to(#9a9a9a));
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+            }
+          }
+        }
+        &:nth-child(3){
+          td.views-field-name{
+            &:after{
+              color:#B87333 ;
+              background: -webkit-gradient(linear, left top, left bottom, from(#B87333), to(#9a9a9a));
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+            }
+          }
+        }
+      }
+
+      tr.odd{
+        background-color: transparent;
+      }
+    }
+  }
+  .views-field-counter{
+    text-align: center;
+  }
+}

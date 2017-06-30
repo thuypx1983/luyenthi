@@ -643,3 +643,4 @@ $conf['404_fast_html'] = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN"
  */
 # $conf['allow_css_double_underscores'] = TRUE;
 $conf['theme_debug'] = true;
+$conf['block_cache_bypass_node_grants']=true;

@@ -1,5 +1,37 @@
 /* Mixin style */
 
+/*
+before/after awesome
+ */
+
+@mixin fontAwesome(){
+    position: absolute;
+    content:  "\f017";
+
+    -x-system-font: none;
+    display: inline-block;
+    font-family: FontAwesome;
+    font-feature-settings: normal;
+    font-kerning: auto;
+    font-language-override: normal;
+    font-size: inherit;
+    font-size-adjust: none;
+    font-stretch: normal;
+    font-style: normal;
+    font-synthesis: weight style;
+    font-variant-alternates: normal;
+    font-variant-caps: normal;
+    font-variant-east-asian: normal;
+    font-variant-ligatures: normal;
+    font-variant-numeric: normal;
+    font-variant-position: normal;
+    font-weight: normal;
+    line-height: 1;
+    text-rendering: auto;
+    font-size: 30px;
+    bottom: -5px;
+}
+
 /* animation */
 @mixin animation($value) {
     -webkit-animation: $value;

@@ -158,8 +158,11 @@ function oms_form_alter( &$form, &$form_state,$form_id ){
 
 }
 
+/**
+ * @param $variables
+ * hook_preprocess_menu_link
+ */
 function oms_preprocess_menu_link(&$variables) {
-    $x=1;
     if(isset($variables['element']['#localized_options']['content']['image'])){
         $fid=$variables['element']['#localized_options']['content']['image'];
         $file = file_load($fid);
