@@ -5,9 +5,9 @@ define('PAYMENTS_PAYCARD_STATUS_PENDING', 1);
 define('PAYMENTS_PAYCARD_STATUS_DECLINED', 2);
 
 define('CARD_STATUS',array(
-    PAYMENTS_PAYCARD_STATUS_APPROVED=>t('Approved'),
-    PAYMENTS_PAYCARD_STATUS_PENDING=>t('Pending'),
-    PAYMENTS_PAYCARD_STATUS_DECLINED=>t('Declined'),
+  PAYMENTS_PAYCARD_STATUS_APPROVED=>t('Approved'),
+  PAYMENTS_PAYCARD_STATUS_PENDING=>t('Pending'),
+  PAYMENTS_PAYCARD_STATUS_DECLINED=>t('Declined'),
 ));
 
 define('CARD_TYPE', array(
@@ -47,30 +47,30 @@ function payments_menu() {
 
 
   $items['payments/course/%/buy']=array(
-      'title' => t('Buy product'), //page title
-      'description' => 'Buy product.',
-      'page callback' => 'drupal_get_form', //this is the function that will be called when the page is accessed.  for a form, use drupal_get_form
-      'page arguments' => array('payments_buy_course_form',1), //put the name of the form here
-      'access callback' => TRUE
+    'title' => t('Buy product'), //page title
+    'description' => 'Buy product.',
+    'page callback' => 'drupal_get_form', //this is the function that will be called when the page is accessed.  for a form, use drupal_get_form
+    'page arguments' => array('payments_buy_course_form',1), //put the name of the form here
+    'access callback' => TRUE
   );
 
   //admin configure
-    $items['admin/payments/paycard/%/edit'] = array(
-        'title' => 'Edit transaction',
-        'page callback' => 'drupal_get_form',
-        'page arguments' => array('payments_admin_txn',4,3),
-        'access arguments' => array('access adminstration page'),
-        'file' => 'payments.admin.inc',
-        'type' => MENU_LOCAL_TASK,
-    );
-    $items['admin/config/payments'] = array(
-        'title' => 'payments configuration',
-        'description' => 'This is the payments',
-        'weight' => -100,
-        'page callback' => 'drupal_get_form',
-        'page arguments' => array('payments_configure_form', 1),
-        'access arguments' => array('administer site configuration'),
-    );
+  $items['admin/payments-paycard/%/edit'] = array(
+    'title' => 'Edit transaction',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('payments_admin_txn',3,2),
+    'access arguments' => array('access adminstration page'),
+    'file' => 'payments.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/config/payments'] = array(
+    'title' => 'payments configuration',
+    'description' => 'This is the payments',
+    'weight' => -100,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('payments_configure_form', 1),
+    'access arguments' => array('administer site configuration'),
+  );
   return $items;
 }
 
@@ -256,13 +256,16 @@ function payments_views_data() {
   );
 
   $data['payments_paycard']['status'] = array(
-    'title' => t('Status'),
-    'help' => t('The status of the transaction.'),
+    'title' => t('Status paycard'),
+    'help' => t('The status of the transaction payments paycard.'),
     'field' => array(
       'handler' => 'views_handler_field',
     ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
     'sort' => array(
-      'handler' => 'views_handler_sort',
+      'handler' => 'views_handler_filter_numeric',
     ),
   );
 
@@ -359,7 +362,7 @@ function payments_pay_card_api($params) {
 
     if (!isset($params['status'])) {
       // If not passed then site default is used.
-        $params['status'] = PAYMENTS_PAYCARD_STATUS_PENDING;
+      $params['status'] = PAYMENTS_PAYCARD_STATUS_PENDING;
     }
 
     // Anonymous users do not get moneys, and there have to be moneys to process.
@@ -388,6 +391,9 @@ function payments_pay_card_api($params) {
 
   if (!empty($params['paycard_id']) && $params['paycard_id'] > 0) {
 
+    $ret = drupal_write_record('payments_paycard', $params, array('paycard_id'));
+
+    usermoneys_usermoneysapi($params);
   }
   else {
     // Create new transaction record.
@@ -411,58 +417,105 @@ function payments_pay_card_api($params) {
 
 function payments_views_pre_render(&$view) {
 
-    switch ($view->name) {
-        case 'payments_paycard':
-            //  override the global custom text field value
+  switch ($view->name) {
+    case 'payments_paycard':
+      //  override the global custom text field value
 
-            $count=count($view->result);
-            for($i=0;$i<$count;$i++){
-                $view->result[$i]->payments_paycard_card_type=CARD_TYPE[$view->result[$i]->payments_paycard_card_type];
-                $view->result[$i]->payments_paycard_status=CARD_STATUS[$view->result[$i]->payments_paycard_status];
-            }
-            //$x=1;
-            //$view->field['paycard_id']->options['alter']['html'] = 'My custom text';
-            break;
-    }
+      $count=count($view->result);
+      for($i=0;$i<$count;$i++){
+        $view->result[$i]->payments_paycard_card_type=CARD_TYPE[$view->result[$i]->payments_paycard_card_type];
+        $view->result[$i]->payments_paycard_status=CARD_STATUS[$view->result[$i]->payments_paycard_status];
+      }
+      //$x=1;
+      //$view->field['paycard_id']->options['alter']['html'] = 'My custom text';
+      break;
+  }
 }
 
 function payments_buy_course_form($form, &$form_state) {
-    global $user;
-    $nid=arg(2);
-    $node=node_load($nid);
+  global $user;
+  $nid=arg(2);
+  $node=node_load($nid);
 
-    if(!$node){
-      drupal_goto('/node/1');
-      drupal_exit();
-    }
 
+  //check node exit
+  if(!$node){
+    drupal_goto('/node/1');
+    drupal_exit();
+  }
+
+
+  //check course access
+  if(course_access_check($node->nid,$user->uid)){
+    drupal_goto(url('/node/'.$node->nid));
+    drupal_exit();
+  }
+
+  $field_price=field_get_items('node',$node,'field_price');
+
+  $form['node_title']=array(
+    '#type' => 'markup',
+    '#markup'=>'<div class="product-name">'.$node->title.'</div>',
+  );
+  $form['ownermoney']=array(
+    '#type' => 'markup',
+    '#markup'=>'<div class="product-money">'.number_format(usermoneys_get_current_moneys($user->uid)).'vnđ</div>',
+  );
+  $form['node_price']=array(
+    '#type' => 'markup',
+    '#markup'=>'<div class="product-price">'.number_format($field_price[0]['value']).'vnđ</div>',
+  );
+  $form['nid']=array(
+    '#type' => 'hidden',
+    '#value' => $nid,
+    '#default_value'=>$nid,
+  );
+
+  $form['actions'] = array('#type' => 'actions');
+
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Mua'),
+  );
+  return $form;
+}
+
+
+function payments_buy_course_validate($form, &$form_state) {
+  die('xxx');
+  $x=1;
+}
+
+function payments_buy_course_form_submit($form, &$form_state) {
+  payments_buy_course((int)($form_state['values']['nid']));
+
+}
+
+function payments_buy_course($nid){
+  global $user;
+  $node=node_load($nid);
+  if($node){
     $field_price=field_get_items('node',$node,'field_price');
-
-    $form['node_title']=array(
-      '#type' => 'markup',
-      '#markup'=>'<div class="product-name">'.$node->title.'</div>',
-    );
-    $form['ownermoney']=array(
-        '#type' => 'markup',
-        '#markup'=>'<div class="product-money">'.number_format(usermoneys_get_current_moneys($user->uid)).'vnđ</div>',
-    );
-    $form['node_price']=array(
-      '#type' => 'markup',
-      '#markup'=>'<div class="product-price">'.number_format($field_price[0]['value']).'vnđ</div>',
-    );
-    $form['nid']=array(
-      '#type' => 'hidden',
-      '#value' => $nid,
-      '#default_value'=>$nid,
-    );
-
-    $form['actions'] = array('#type' => 'actions');
-
-    $form['actions']['submit'] = array(
-      '#type' => 'submit',
-      '#value' => t('Mua'),
-    );
-    return $form;
+    $price=$field_price[0]['value'];
+    $current_money=usermoneys_get_current_moneys();
+    if($price<$current_money){
+      $params = array(
+        'moneys' => -$price,
+        'uid' => $user->uid,
+        'operation' => $user->name,
+        'description' => t('Mua khóa học/bài thi'),
+        'entity_type' => $node->type,
+        'entity_id' => $node->nid,
+        'time_stamp' => time(),
+        'moderate' => 0,
+        'approver_uid' => $user->uid,
+      );
+      //add course access
+      course_access_add($nid,$user->uid);
+      //minus money of user when buy a node
+      usermoneys_usermoneysapi($params);
+    }
+  }
 }
 
 
@@ -476,32 +529,32 @@ function payments_buy_course_form($form, &$form_state) {
  *   A loaded usermoneys transaction object.
  */
 function payments_transaction_load($txn_id) {
-    if (!empty($txn_id)) {
-        $transaction = db_query('SELECT * from {payments_paycard} WHERE paycard_id = :paycard', array(':paycard' => $txn_id))->fetchObject();
-    }
-    if (empty($transaction)) {
-        return FALSE;
-    }
+  if (!empty($txn_id)) {
+    $transaction = db_query('SELECT * from {payments_paycard} WHERE paycard_id = :paycard', array(':paycard' => $txn_id))->fetchObject();
+  }
+  if (empty($transaction)) {
+    return FALSE;
+  }
 
-    // Load corresponding user object.
-    $transaction->user = user_load($transaction->uid);
+  // Load corresponding user object.
+  $transaction->user = user_load($transaction->uid);
 
-    return $transaction;
+  return $transaction;
 }
 
 function payments_admin_access(){
-    return true;
+  return true;
 }
 
 function payments_txn_status() {
-    static $stati;
-    if (empty($stati)) {
-        $stati = array(
-            PAYMENTS_PAYCARD_STATUS_APPROVED=>t('Approved'),
-            PAYMENTS_PAYCARD_STATUS_PENDING=>t('Pending'),
-            PAYMENTS_PAYCARD_STATUS_DECLINED=>t('Declined'),
-        );
-    }
-    return $stati;
+  static $stati;
+  if (empty($stati)) {
+    $stati = array(
+      PAYMENTS_PAYCARD_STATUS_APPROVED=>t('Approved'),
+      PAYMENTS_PAYCARD_STATUS_PENDING=>t('Pending'),
+      PAYMENTS_PAYCARD_STATUS_DECLINED=>t('Declined'),
+    );
+  }
+  return $stati;
 }
 

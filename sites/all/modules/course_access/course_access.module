@@ -1,38 +1,43 @@
 <?php
 function course_access_add($nid,$uid){
     $course=node_load($nid);
-
+    $field_expired_day=field_get_items('node',$course,'field_expired_day');
     db_insert('course_access')
         ->fields($params=array(
             'nid'=>$nid,
             'ntype'=>$course->type,
             'uid'=>$uid,
-            'expiry_date'=>'12434343',
+            'expiry_date'=>time()+$field_expired_day[0]*24*60*60,
         ))->execute();
 
     //add sub nodes
-    foreach($course->field_lessons[LANGUAGE_NONE] as $item){
+    $field_lessons=field_get_items('node',$course,'field_lessons');
+    if($field_lessons){
+      foreach($field_lessons as $item){
         $obj=node_load($item['target_id']);
         db_insert('course_access')
-            ->fields($params=array(
-                'nid'=>$obj->nid,
-                'ntype'=>$obj->type,
-                'uid'=>$uid,
-                'expiry_date'=>'12434343',
-            ))->execute();
+          ->fields($params=array(
+            'nid'=>$obj->nid,
+            'ntype'=>$obj->type,
+            'uid'=>$uid,
+            'expiry_date'=>time()+$field_expired_day[0]*24*60*60,
+          ))->execute();
+      }
     }
 }
 
 function course_access_check($nid,$uid){
-    $query = db_select('course_access', 'b');
-    $query->fields('b', array('nid','uid','expiry_date'));
-    $query->condition('b.nid', $nid);
-    $query->condition('b.uid', $uid);
-    $result = $query->execute();
-    if($result->rowCount()>0) {
-        return true;
-    }
-    return false;
+  $query = db_select('course_access', 'b');
+  $query->fields('b', array('nid','uid','expiry_date'));
+  $query->condition('b.nid', $nid);
+  $query->condition('b.uid', $uid);
+  $query->condition('b.expiry_date',time(),'>=');
+
+  $result = $query->execute();
+  if($result->rowCount()>0) {
+    return true;
+  }
+  return false;
 }
 
 

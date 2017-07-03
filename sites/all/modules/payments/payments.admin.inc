@@ -252,14 +252,13 @@ function payments_admin_txn_submit($form, &$form_state) {
             'uid' => $form_state['values']['txn']->uid,
             'approver_uid' => $approver_uid,
             'moneys' => $form_state['values']['moneys'],
-            'tid' => $form_state['values']['tid'],
             'time_stamp' => strtotime($form_state['values']['time_stamp']),
             'operation' => $form_state['values']['operation'],
             'description' => $form_state['values']['description'],
             'reference' => $form_state['values']['reference'],
             'status' => $form_state['values']['status'],
             'expirydate' => $expirydate,
-            'txn_id' => $form_state['values']['txn']->txn_id,
+            'paycard_id' => $form_state['values']['txn']->paycard_id,
             'display' => FALSE,
         );
         if (!empty($form_state['values']['entity_id']) && !empty($form_state['values']['entity_type'])) {
@@ -268,7 +267,7 @@ function payments_admin_txn_submit($form, &$form_state) {
         }
         drupal_set_message(t('Changes to the !moneys transaction have been saved.'));
     }
-    payments_paymentsapi($params);
+    payments_pay_card_api($params);
 
-    $form_state['redirect'] = 'admin/payments-transaction';
+    $form_state['redirect'] = 'admin/payments/paycard';
 }

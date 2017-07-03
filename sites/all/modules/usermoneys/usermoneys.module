@@ -10,6 +10,12 @@ define('USERMONEYS_TXN_STATUS_APPROVED', 0);
 define('USERMONEYS_TXN_STATUS_PENDING', 1);
 define('USERMONEYS_TXN_STATUS_DECLINED', 2);
 
+define('USERMONEYS_TXN_STATUS',array(
+  USERMONEYS_TXN_STATUS_APPROVED=>t('Approved'),
+  USERMONEYS_TXN_STATUS_PENDING=>t('Pending'),
+  USERMONEYS_TXN_STATUS_DECLINED=>t('Declined'),
+));
+
 
 define('USERMONEYS_DISPLAY_MESSAGE', 'usermoneys_display_message');
 
@@ -213,17 +219,17 @@ function usermoneys_views_data() {
     );
 
     $data['usermoneys_txn']['status'] = array(
-        'title' => t('Status'),
-        'help' => t('The status of the transaction.'),
-        'field' => array(
-            'handler' => 'views_handler_field_numeric',
-        ),
-        'filter' => array(
-            'handler' => 'views_handler_filter_numeric',
-        ),
-        'sort' => array(
-            'handler' => 'views_handler_sort',
-        ),
+      'title' => t('Status'),
+      'help' => t('The status of the transaction.'),
+      'field' => array(
+        'handler' => 'views_handler_field',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_numeric',
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_filter_numeric',
+      ),
     );
 
     $data['usermoneys_txn']['description'] = array(
@@ -921,4 +927,24 @@ function usermoneys_translation() {
     );
   }
   return $trans;
+}
+
+/**
+ * hook_views_data()..
+ *
+ * alter card type from integer to text
+ * alter card status from integer to text
+ */
+
+function usermoneys_views_pre_render(&$view) {
+  switch ($view->name) {
+    case 'usermoneys_transaction':
+      //  override the global custom text field value
+
+      $count=count($view->result);
+      for($i=0;$i<$count;$i++){
+        $view->result[$i]->usermoneys_txn_status=USERMONEYS_TXN_STATUS[$view->result[$i]->usermoneys_txn_status];
+      }
+      break;
+  }
 }

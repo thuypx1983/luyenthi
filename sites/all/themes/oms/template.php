@@ -136,14 +136,16 @@ function oms_menu_local_tasks(&$variables) {
  * Override or insert variables into the node template.
  */
 function oms_preprocess_node(&$variables) {
-
+  global $user;
   $node = $variables['node'];
 
   $field_price= field_get_items('node',$node,'field_price');
   if($field_price){
     if($field_price[0]['value']>0){
-      drupal_goto('payments/course/'.$node->nid.'/buy');
-      drupal_exit();
+      if(!course_access_check($node->nid,$user->uid)){
+        drupal_goto('payments/course/'.$node->nid.'/buy');
+        drupal_exit();
+      }
     }
   }
 
