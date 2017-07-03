@@ -55,6 +55,9 @@ function oms_process_page(&$variables) {
  * Override or insert variables into the page template.
  */
 function oms_preprocess_page(&$vars) {
+
+  //Add videojs api to header
+  videojs_add();
   if (isset($vars['main_menu'])) {
     $vars['main_menu'] = theme('links__system_main_menu', array(
       'links' => $vars['main_menu'],
