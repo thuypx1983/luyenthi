@@ -56,5 +56,12 @@
       print render($user_profile['userpoints']);
       print render($user_profile['summary']);
       ?>
+
+        <?php print views_embed_view('thanh_toan_bang_the_cao', 'block_1')?>
+
+        <?php print views_embed_view('cac_dao_dich_gan_day','block_1')?>
+
+        <?php print views_embed_view('total_moneys','block_1')?>
+
     </div>
 </div>

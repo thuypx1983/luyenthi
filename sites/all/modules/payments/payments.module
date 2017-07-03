@@ -418,6 +418,7 @@ function payments_pay_card_api($params) {
 function payments_views_pre_render(&$view) {
 
   switch ($view->name) {
+    case 'thanh_toan_bang_the_cao':
     case 'payments_paycard':
       //  override the global custom text field value
 
@@ -557,4 +558,3 @@ function payments_txn_status() {
   }
   return $stati;
 }
-

@@ -7,7 +7,7 @@ function course_access_add($nid,$uid){
             'nid'=>$nid,
             'ntype'=>$course->type,
             'uid'=>$uid,
-            'expiry_date'=>time()+$field_expired_day[0]*24*60*60,
+            'expiry_date'=>time()+$field_expired_day[0]['value']*24*60*60,
         ))->execute();
 
     //add sub nodes
@@ -20,7 +20,7 @@ function course_access_add($nid,$uid){
             'nid'=>$obj->nid,
             'ntype'=>$obj->type,
             'uid'=>$uid,
-            'expiry_date'=>time()+$field_expired_day[0]*24*60*60,
+            'expiry_date'=>time()+$field_expired_day[0]['value']*24*60*60,
           ))->execute();
       }
     }
