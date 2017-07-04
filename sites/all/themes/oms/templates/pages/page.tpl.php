@@ -183,8 +183,18 @@
     </div>
     <div class="clear"></div>
   <?php endif; ?>
-
-  <!--END footer -->
+  <video id="vid1" class="video-js vjs-default-skin vjs-fluid" controls width="640" height="264"></video>
+  <script>
+    vgsPlayer = videojs('vid1', {
+      techOrder: ["html5", "flash", "youtube"],
+      autoplay: false,
+      youtube: { "iv_load_policy": 3 },
+      sources: [{
+        type: "video/mp4",
+        src: "https://drive.google.com/uc?export=download&id=0B4nHFYTMeXVaOF9jamc4eGM3TEZjSWpRVi1WdUVMTGlZUkFv"
+      }]
+    })
+  </script>
   <div id="footer-bottom">
     <div class="container">
       <div class="row">
