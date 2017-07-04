@@ -630,6 +630,45 @@ body {
   text-align: center;
 }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\000032}}
+.tab-thi-thu .block-title {
+  font-size: 16px;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin-bottom: 10px;
+  display: block;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\0000310}}
+.tab-thi-thu ul.quicktabs-tabs.quicktabs-style-nostyle {
+  border-bottom: 1px solid #e8e8e8;
+  display: table;
+  width: 100%;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\0000314}}
+.tab-thi-thu ul.quicktabs-tabs.quicktabs-style-nostyle li {
+  display: inline-block;
+  float: left;
+  margin-bottom: -1px;
+  margin-left: 0px;
+  padding-left: 0px;
+  padding-bottom: 0px;
+  padding-right: 5px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\0000321}}
+.tab-thi-thu ul.quicktabs-tabs.quicktabs-style-nostyle li a {
+  padding: 5px 10px 5px 10px;
+  border: 1px solid #e8e8e8;
+  display: block;
+  background-color: #79B43E;
+  color: #ffffff;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\0000330}}
+.tab-thi-thu ul.quicktabs-tabs.quicktabs-style-nostyle li.active a {
+  border-bottom: 1px solid #ffffff;
+  background-color: #ffffff;
+  color: #ff4747;
+}
+
 /*page*/
 @media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_news-list\.scss}line{font-family:\000032}}
 .page-taxonomy-term h1.page-title {

@@ -1,0 +1,141 @@
+<?php
+
+/**
+ * Implements hook_library().
+ */
+function videojs_youtube_library() {
+  $libraries['videojs_youtube'] = array(
+    'title' => 'VideoJS Youtube',
+    'website' => 'https://github.com/eXon/videojs-youtube',
+    'version' => '1.0',
+    'js' => array(
+      libraries_get_path('videojs-youtube') . '/vjs.youtube.js' => array('weight' => 10),
+    ),
+  );
+
+  return $libraries;
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function videojs_youtube_field_formatter_info() {
+  return array(
+    'videojs_youtube' => array(
+      'label' => 'VideoJS Youtube',
+      'field types' => array('link_field'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view(). This code just passes straight
+ */
+function videojs_youtube_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  if ($display['type'] !== 'videojs_youtube') {
+    return array();
+  }
+  if (empty($items)) {
+    return array();
+  }
+
+  drupal_add_library('videojs_youtube', 'videojs_youtube');
+  module_load_include('inc', 'videojs', 'includes/videojs.utility');
+  $options = videojs_utility::getDefaultDisplaySettings();
+
+  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+  return array(
+    array(
+      '#theme' => 'videojs_youtube',
+      '#items' => $items,
+      '#options' => $options,
+      '#ytcontrols' => 'true',
+      '#limit' => isset($display['settings']['field_multiple_limit'])? $display['settings']['field_multiple_limit']: NULL,
+      '#attached' => videojs_add(FALSE),
+    ),
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function videojs_youtube_theme() {
+  return array(
+    'videojs_youtube' => array(
+      'variables' => array(
+        'items' => NULL,
+        'player_id' => NULL,
+        'options' => array(),
+        'ytcontrols' => NULL,
+        'limit' => NULL,
+      ),
+    ),
+  );
+}
+
+/*
+ * Theme function for player
+ */
+function theme_videojs_youtube($vars) {
+  $output = '';
+  $options = $vars['options'];
+
+  /* Unset unnecessary options */
+  unset($options['loop'], $options['hidecontrols'], $options['autoplay'], $options['defaulttrack']);
+
+  $options += array(
+    'src' => '',
+    'class' => 'video-js vjs-default-skin',
+  );
+
+  if (isset($vars['options']['hidecontrols']) && $vars['options']['hidecontrols'] != TRUE) {
+    $options += array('controls' => 'true');
+  }
+
+  $attributes = drupal_attributes($options);
+
+  $data_setup = array('techOrder' => array('youtube'));
+  if (isset($options['controls']) && isset($vars['ytcontrols'])) {
+    $data_setup += array('ytcontrols' => 'true');
+  }
+
+  $items = $vars['items'];
+  if(isset($vars['limit'])) {
+    $items = array_slice($items, 0, $vars['limit']);
+  }
+
+  foreach ($items as $item) {
+    $parsed = drupal_parse_url($item['url']);
+    if(!empty($parsed['query']['v'])) {
+      $attr_id = 'videojs-' . $parsed['query']['v'];
+    }
+    else {
+      $remove = array(
+        'http://', 'www', 'youtube', 'watch', 'feature', 'player_embedded',
+        '.', 'com', 'be', 'youtu', '/', 'v=', '&', '?', '='
+      );
+      
+      $attr_id = 'videojs-' . str_replace($remove, array(''), $item['url']);
+
+      // Replace whitespace.      
+      $attr_id = str_replace(' ', '_', $attr_id);
+      
+      // Remove remaining unsafe characters.
+      $attr_id = preg_replace('![^0-9A-Za-z_.-]!', '', $attr_id);
+
+      // Remove multiple consecutive non-alphabetical characters.
+      $attr_id = preg_replace('/(_)_+|(\.)\.+|(-)-+/', '\\1\\2\\3', $attr_id);
+
+      // Force lowercase
+      $attr_id = drupal_strtolower($attr_id);
+    }
+
+    $data_setup['src'] = $item['url'];
+    $json_setup = drupal_json_encode($data_setup);
+    $json_setup = str_replace('\\/', '/', $json_setup);
+
+    $output = "<video id=\"$attr_id\" {$attributes} data-setup={$json_setup}></video>";
+  }
+
+  return $output;
+}

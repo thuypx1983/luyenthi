@@ -1,0 +1,42 @@
+.tab-thi-thu{
+  .block-title{
+    font-size: 16px;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: block;
+  }
+  ul.quicktabs-tabs{
+    &.quicktabs-style-nostyle{
+      border-bottom: 1px solid $color_gray;
+      display: table;
+      width: 100%;
+      li{
+        display: inline-block;
+        float: left;
+        margin-bottom: -1px;
+        margin-left: 0px;
+        padding-left: 0px;
+        padding-bottom: 0px;
+        a{
+          padding: 5px 10px 5px 10px;
+          border: 1px solid $color_gray;
+          display: block;
+          background-color: $color_main;
+          color:$color_white;
+        }
+        padding-right: 5px;
+        &.active{
+          a{
+            border-bottom: 1px solid $color_white;
+            background-color: $color_white;
+            color: $color_red;
+          }
+        }
+      }
+      li.first{
+
+      }
+    }
+  }
+}
