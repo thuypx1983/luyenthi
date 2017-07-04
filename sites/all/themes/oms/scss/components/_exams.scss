@@ -1,16 +1,21 @@
 .tab-thi-thu{
+  position: relative;
   .block-title{
     font-size: 16px;
     text-transform: uppercase;
     font-weight: bold;
     margin-bottom: 10px;
     display: block;
+    position: absolute;
+    left: 0px;
+    top: 5px;
   }
   ul.quicktabs-tabs{
     &.quicktabs-style-nostyle{
       border-bottom: 1px solid $color_gray;
       display: table;
       width: 100%;
+      padding-left: 220px;
       li{
         display: inline-block;
         float: left;

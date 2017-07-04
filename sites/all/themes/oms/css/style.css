@@ -630,21 +630,29 @@ body {
   text-align: center;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\000032}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\000031}}
+.tab-thi-thu {
+  position: relative;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\000033}}
 .tab-thi-thu .block-title {
   font-size: 16px;
   text-transform: uppercase;
   font-weight: bold;
   margin-bottom: 10px;
   display: block;
+  position: absolute;
+  left: 0px;
+  top: 5px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\0000310}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\0000314}}
 .tab-thi-thu ul.quicktabs-tabs.quicktabs-style-nostyle {
   border-bottom: 1px solid #e8e8e8;
   display: table;
   width: 100%;
+  padding-left: 220px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\0000314}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\0000319}}
 .tab-thi-thu ul.quicktabs-tabs.quicktabs-style-nostyle li {
   display: inline-block;
   float: left;
@@ -654,7 +662,7 @@ body {
   padding-bottom: 0px;
   padding-right: 5px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\0000321}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\0000326}}
 .tab-thi-thu ul.quicktabs-tabs.quicktabs-style-nostyle li a {
   padding: 5px 10px 5px 10px;
   border: 1px solid #e8e8e8;
@@ -662,7 +670,7 @@ body {
   background-color: #79B43E;
   color: #ffffff;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\0000330}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\0000335}}
 .tab-thi-thu ul.quicktabs-tabs.quicktabs-style-nostyle li.active a {
   border-bottom: 1px solid #ffffff;
   background-color: #ffffff;
