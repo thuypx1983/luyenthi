@@ -183,7 +183,6 @@
     </div>
     <div class="clear"></div>
   <?php endif; ?>
-  <video id="vid1" class="video-js vjs-default-skin vjs-fluid" controls width="640" height="264"></video>
   <div id="footer-bottom">
     <div class="container">
       <div class="row">
@@ -192,25 +191,3 @@
     </div>
   </div>
 </div>
-<script type="text/javascript">
-
-  (function($){
-    $(function () {
-      $.ajax({
-        url:'/demo.mp4',
-        success:function (response) {
-          alert();
-          vgsPlayer = videojs('vid1', {
-            techOrder: ["html5", "flash", "youtube"],
-            autoplay: false,
-            youtube: { "iv_load_policy": 3 },
-            sources: [{
-              type: "video/mp4",
-              src: response
-            }]
-          })
-        }
-      })
-    })
-  })(jQuery)
-</script>
