@@ -47,4 +47,23 @@
       }
     }
   }
+
+
+}
+
+.subject-btn{
+  background-color: $color_main;
+  color: $color_white;
+  text-align: center;
+  display: block;
+  padding-top: 10px;
+  .subject-name{
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-weight: bold;
+    font-size: 15px;
+    &:hover{
+      color: inherit;
+    }
+  }
 }

@@ -8,6 +8,7 @@ stylesheets[all][] = css/style.css
 stylesheets[all][] = color/colors.css
 scripts[] = css/bootstrap-3.3.7/js/bootstrap.js
 scripts[] = js/jquery.matchHeight-min.js
+scripts[] = js/videojs-youtube-2.4.0.js
 scripts[] = js/scripts.js
 
 regions[header_top]         = Header top

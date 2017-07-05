@@ -8,7 +8,10 @@
         });
 
 
-
+        $('.tab-thi-thu').each(function () {
+            var title=$(this).find('.views-field-title').text();
+            alert(title);
+        })
 
 
         var type=$('#views-exposed-form-search-tour-page #edit-field-type-value');
@@ -55,4 +58,6 @@
             }
         }
     })
+
+
 })(jQuery)
