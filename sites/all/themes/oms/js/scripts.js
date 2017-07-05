@@ -1,62 +1,35 @@
 (function ($) {
-    $(function () {
-        $('.region-header >div.block,.contact-us-info>div.col-md-4,#block-block-14 .col-md-6').matchHeight({
-            byRow: true,
-            property: 'height',
-            target: null,
-            remove: false
-        });
+    var oms={
 
+        /**
+         * Init match height
+         */
+        initMatchHeight: function (){
+            $('.region-header >div.block,.contact-us-info>div.col-md-4,#block-block-14 .col-md-6').matchHeight({
+                byRow: true,
+                property: 'height',
+                target: null,
+                remove: false
+            });
+        },
 
-        $('.tab-thi-thu').each(function () {
-            var title=$(this).find('.views-field-title').text();
-            alert(title);
-        })
-
-
-        var type=$('#views-exposed-form-search-tour-page #edit-field-type-value');
-        var destination=$('#views-exposed-form-search-tour-page #edit-term-node-tid-depth');
-        type.change(function(){
-            filterDiemDen(type.val());
-            destination.val('All');
-        })
-        $(function(){
-            filterDiemDen(type.val());
-        })
-        function filterDiemDen(type){
-
-            switch (type){
-                case "0":
-                    destination.find('option').each(function(){
-                        var value=parseInt($(this).attr('value'));
-                        if(diem_den_trong_nuoc.indexOf(value) > -1){
-                            $(this).show();
-                        }else{
-                            if($(this).val()!='All'){
-                                $(this).hide();
-                            }
-
-                        }
-                    })
-
-                    break;
-                case "1":
-                    destination.find('option').each(function(){
-                        var value=parseInt($(this).attr('value'));
-                        if(diem_den_nuoc_ngoai.indexOf(value) > -1){
-                            $(this).show();
-                        }else{
-                            if($(this).val()!='All'){
-                                $(this).hide();
-                            }
-                        }
-                    })
-                    break;
-                default:
-                    destination.find('option').show();
-                    break;
-            }
+        /**
+         * Init quicktab
+         */
+        initQuickTabExams: function(){
+            var title=$('#quicktabs-tabpage-thi_thu_ptth_quoc_gia-2').find('.views-field-title');
+            $('#quicktabs-tab-thi_thu_ptth_quoc_gia-2').text(title.text());
+            title.remove();
+            var title=$('#quicktabs-tabpage-thi_thu_thcs-2').find('.views-field-title');
+            $('#quicktabs-tab-thi_thu_thcs-2').text(title.text());
+            title.remove();
         }
+
+    }
+
+    $(function () {
+        oms.initMatchHeight();
+        oms.initQuickTabExams();
     })
 
 
