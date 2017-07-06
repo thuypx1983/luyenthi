@@ -142,15 +142,18 @@ function oms_preprocess_node(&$variables) {
   global $user;
   $node = $variables['node'];
 
-  $field_price= field_get_items('node',$node,'field_price');
-  if($field_price){
-    if($field_price[0]['value']>0){
-      if(!course_access_check($node->nid,$user->uid)){
-        drupal_goto('payments/course/'.$node->nid.'/buy');
-        drupal_exit();
+  if(!in_array('administrator',$user->roles)){
+    $field_price= field_get_items('node',$node,'field_price');
+    if($field_price){
+      if($field_price[0]['value']>0){
+        if(!course_access_check($node->nid,$user->uid)){
+          drupal_goto('payments/course/'.$node->nid.'/buy');
+          drupal_exit();
+        }
       }
     }
   }
+
 
   if ($variables['view_mode'] == 'full' && node_is_page($variables['node'])) {
     $variables['classes_array'][] = 'node-full';
