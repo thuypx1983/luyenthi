@@ -1,0 +1,21 @@
+.user-profile-block{
+  .content{
+
+    display: block;
+    width: 100%;
+    .view-user-profile{
+      .views-row{
+        .views-field-picture{
+          display: block;
+          float: left;width: 30%;
+          margin-right: 10px;
+        }
+        .views-field-nothing{
+          a{
+
+          }
+        }
+      }
+    }
+  }
+}

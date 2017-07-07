@@ -700,6 +700,19 @@ body {
   color: inherit;
 }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_block-user-profile\.scss}line{font-family:\000032}}
+.user-profile-block .content {
+  display: block;
+  width: 100%;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_block-user-profile\.scss}line{font-family:\000038}}
+.user-profile-block .content .view-user-profile .views-row .views-field-picture {
+  display: block;
+  float: left;
+  width: 30%;
+  margin-right: 10px;
+}
+
 /*page*/
 @media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_news-list\.scss}line{font-family:\000032}}
 .page-taxonomy-term h1.page-title {
@@ -1208,6 +1221,22 @@ body {
 @media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-take\.scss}line{font-family:\00003232}}
 .node-type-quiz .quiz-not-available a {
   color: #ffffff;
+}
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-take\.scss}line{font-family:\00003238}}
+.disallow-take-quiz {
+  display: block;
+  text-align: center;
+  padding-bottom: 15px;
+}
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-take\.scss}line{font-family:\00003245}}
+#quiz-question-answering-form .form-actions {
+  text-align: center;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-take\.scss}line{font-family:\00003247}}
+#quiz-question-answering-form .form-actions #edit-navigation-skip {
+  display: none;
 }
 
 @media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_teacher\.scss}line{font-family:\000032}}

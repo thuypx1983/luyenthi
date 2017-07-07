@@ -234,3 +234,18 @@
     }
   }
 }
+
+.disallow-take-quiz{
+  display: block;
+  text-align: center;
+  padding-bottom: 15px;
+}
+
+#quiz-question-answering-form{
+  .form-actions{
+    text-align: center;
+    #edit-navigation-skip{
+      display: none;
+    }
+  }
+}
