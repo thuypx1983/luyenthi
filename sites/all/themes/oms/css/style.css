@@ -712,6 +712,17 @@ body {
   width: 30%;
   margin-right: 10px;
 }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_block-user-profile\.scss}line{font-family:\0000313}}
+.user-profile-block .content .view-user-profile .views-row .views-field-nothing {
+  margin-top: 5px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_block-user-profile\.scss}line{font-family:\0000315}}
+.user-profile-block .content .view-user-profile .views-row .views-field-nothing a {
+  border-radius: 2px;
+  padding: 3px 18px 3px 18px;
+  color: #ffffff;
+  background: #8a8c8d;
+}
 
 /*page*/
 @media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_news-list\.scss}line{font-family:\000032}}
