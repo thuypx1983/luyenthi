@@ -64,6 +64,15 @@
             p{
               margin-bottom: 0px;
             }
+            .need-review{
+              cursor: pointer;
+              .fa{
+                margin-right: 5px;
+              }
+              &.checked{
+                color: $color_red;
+              }
+            }
           }
         }
       }
@@ -105,9 +114,16 @@
         cursor: pointer;
       }
     }
+
+    .need-review{
+      background-color: $color_red;
+    }
     .answered{
       background-color: $color_main;
       color: $color_white;
+      &.need-review{
+        background-color: $color_red;
+      }
     }
     .remember{
       background-color: yellow;
@@ -137,11 +153,18 @@
 
 .fa.answered{
   color: $color_main;
+  font-size: 15px;
 }
 .fa.remember{
+  color: $color_red;
+  font-size: 15px;
+}
+.fa.un-answer{
   color: $color_white;
   border: 1px solid $color_gray;
+  border-radius: 3px;
 }
+
 
 .group-container {
   display: table;

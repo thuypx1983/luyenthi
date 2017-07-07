@@ -25,6 +25,8 @@
             title.remove();
         }
 
+
+
     }
 
     $(function () {

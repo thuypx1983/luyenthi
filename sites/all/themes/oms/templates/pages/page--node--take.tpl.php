@@ -143,7 +143,7 @@
             </div>
             <div class="guide">
               <span><i class="fa fa-square answered"></i> Đã trả lời</span>
-              <span><i class="fa fa-square"></i> Chưa trả lời</span>
+              <span><i class="fa fa-square un-answer"></i> Chưa trả lời</span>
               <span><i class="fa fa-square remember"></i> Cần xem lại</span>
             </div>
             <div class="question-list">
@@ -168,6 +168,7 @@
                           i+'</a>' +
                           '</div>';
                       i++;
+                        $(this).find('table tbody').append('<tr><td colspan="2"><span data-nid='+nid+' class="need-review"><i class="fa fa-flag-o"></i>Cần xem lại</span></td></tr>')
                     })
                     $('.question-list').append(html);
 
@@ -176,8 +177,6 @@
                       var nid=input.attr('name').replace('question[','').replace('][answer][user_answer]','');
                       $('.question-list').find('a[data-quiz-page='+nid+']').addClass('answered');
                     })
-
-
 
                     $('.quiz-question-multichoice').each(function () {
                       var flag=false;
@@ -194,8 +193,46 @@
 
                     })
 
+                      $('.quiz-question-multichoice').on('click','.need-review',function(){
+                          var nid=$(this).attr('data-nid');
+                          var buttomStatus=$('.question-list').find('[data-quiz-page='+nid+']');
+                          if($(this).hasClass('checked')){
+                              $(this).removeClass('checked');
+                              buttomStatus.removeClass('need-review')
+                          }else{
+                              $(this).addClass('checked');
+                              buttomStatus.addClass('need-review');
+                          }
+                      })
 
 
+
+
+                      var offset = $("#sidebar").offset();
+                      var topPadding = 15;
+
+                      $(window).scroll(function() {
+
+                          if ($(window).scrollTop() > offset.top) {
+
+                              $("#sidebar").stop().animate({
+
+                                  marginTop: $(window).scrollTop() - offset.top + topPadding
+
+                              });
+
+                          } else {
+
+                              $("#sidebar").stop().animate({
+
+                                  marginTop: 0
+
+                              });
+
+                          }
+
+
+                      });
                   })
               })(jQuery)
           </script>
