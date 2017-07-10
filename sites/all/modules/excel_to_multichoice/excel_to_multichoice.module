@@ -1,0 +1,138 @@
+<?php
+/**
+ * Implements hook_menu().
+ */
+function excel_to_multichoice_menu() {
+    $items = array();
+    $items['excel-to-multichoice'] = array(
+        'title' => 'ADD point',
+        'page callback' => 'read_excel',
+        'access arguments' => array('access content'),
+        'type' => MENU_LOCAL_TASK,
+    );
+    return $items;
+}
+
+function test1(){
+    $settings=array();
+    $settings += array(
+        'title' => 'MCQ 1 Title',
+        'type' => 'multichoice',
+        'choice_multi' => 0,
+        'choice_random' => 0,
+        'choice_boolean' => 0,
+        'body' => array(LANGUAGE_NONE => array(array('value' => 'MCQ 1 body text'))),
+    );
+
+    // Set up some alternatives.
+    $settings['alternatives'][0]['answer']['value'] = 'A';
+    $settings['alternatives'][0]['answer']['format'] = 'filtered_html';
+    $settings['alternatives'][0]['feedback_if_chosen']['value'] = 'You chose A';
+    $settings['alternatives'][0]['feedback_if_chosen']['format'] = 'filtered_html';
+    $settings['alternatives'][0]['feedback_if_not_chosen']['value'] = 'You did not choose A';
+    $settings['alternatives'][0]['feedback_if_not_chosen']['format'] = 'filtered_html';
+    $settings['alternatives'][0]['score_if_chosen'] = 1;
+    $settings['alternatives'][0]['score_if_not_chosen'] = 0;
+
+    $settings['alternatives'][1]['answer']['value'] = 'B';
+    $settings['alternatives'][1]['answer']['format'] = 'filtered_html';
+    $settings['alternatives'][1]['feedback_if_chosen']['value'] = 'You chose B';
+    $settings['alternatives'][1]['feedback_if_chosen']['format'] = 'filtered_html';
+    $settings['alternatives'][1]['feedback_if_not_chosen']['value'] = 'You did not choose B';
+    $settings['alternatives'][1]['feedback_if_not_chosen']['format'] = 'filtered_html';
+    $settings['alternatives'][1]['score_if_chosen'] = 0;
+    $settings['alternatives'][1]['score_if_not_chosen'] = 0;
+
+    $settings['alternatives'][2]['answer']['value'] = 'C';
+    $settings['alternatives'][2]['answer']['format'] = 'filtered_html';
+    $settings['alternatives'][2]['feedback_if_chosen']['value'] = 'You chose C';
+    $settings['alternatives'][2]['feedback_if_chosen']['format'] = 'filtered_html';
+    $settings['alternatives'][2]['feedback_if_not_chosen']['value'] = 'You did not choose C';
+    $settings['alternatives'][2]['feedback_if_not_chosen']['format'] = 'filtered_html';
+    $settings['alternatives'][2]['score_if_chosen'] = 0;
+    $settings['alternatives'][2]['score_if_not_chosen'] = 0;
+
+    _excel_to_multichoise_addNode($settings);
+}
+function _excel_to_multichoise_addNode($settings=array()){
+    global $user;
+    // Populate defaults array.
+    $settings += array(
+        'comment'   => 2,
+        'changed'   => REQUEST_TIME,
+        'moderate'  => 0,
+        'promote'   => 0,
+        'revision'  => 1,
+        'log'       => '',
+        'status'    => 1,
+        'sticky'    => 0,
+        'type'      => 'page',
+        'revisions' => NULL,
+        'language'  => LANGUAGE_NONE,
+    );
+
+    // Add the body after the language is defined so that it may be set
+    // properly.
+    $settings += array(
+        'body' => array($settings['language'] => array(array())),
+    );
+
+    // Use the original node's created time for existing nodes.
+    if (isset($settings['created']) && !isset($settings['date'])) {
+        $settings['date'] = format_date($settings['created'], 'custom', 'Y-m-d H:i:s O');
+    }
+
+    // If the node's user uid is not specified manually, use the currently
+    // logged in user if available, or else the user running the test.
+    $settings['uid']=$user->uid;
+
+    // Merge body field value and format separately.
+    $body = array(
+        'value' => 'test',
+        'format' => filter_default_format(),
+    );
+    $settings['body'][$settings['language']][0] += $body;
+
+    $node = (object) $settings;
+    node_save($node);
+
+    // Small hack to link revisions to our test user.
+    db_update('node_revision')
+        ->fields(array('uid' => $node->uid))
+        ->condition('vid', $node->vid)
+        ->execute();
+    return $node;
+}
+
+function read_excel(){
+    //Had to change this path to point to IOFactory.php.
+    //Do not change the contents of the PHPExcel-1.8 folder at all.
+    include('libs/PHPExcel-1.8/Classes/PHPExcel/IOFactory.php');
+
+    //Use whatever path to an Excel file you need.
+    $inputFileName = 'F:\websites\luyenthi.localhost\sites\all\modules\excel_to_multichoice\TestLateX.xlsx';
+
+    try {
+        $inputFileType = PHPExcel_IOFactory::identify($inputFileName);
+        $objReader = PHPExcel_IOFactory::createReader($inputFileType);
+        $objPHPExcel = $objReader->load($inputFileName);
+    } catch (Exception $e) {
+        die('Error loading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) . '": ' .
+            $e->getMessage());
+    }
+
+    $sheet = $objPHPExcel->getSheet(0);
+    $highestRow = $sheet->getHighestRow();
+    $highestColumn = $sheet->getHighestColumn();
+
+    for ($row = 1; $row <= $highestRow; $row++) {
+        $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row,
+            null, true, false);
+
+        //Prints out data in each row.
+        //Replace this with whatever you want to do with the data.
+        echo '<pre>';
+        print_r($rowData);
+        echo '</pre>';
+    }
+}
