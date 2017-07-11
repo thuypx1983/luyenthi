@@ -51,103 +51,13 @@ function excel_to_multichoice_form_validate($form , &$form_state){
 function excel_to_multichoice_form_submit($form, &$form_state) {
  if($form_state['values']['file']){
    $file_path=drupal_realpath($form_state['values']['file']->uri);
-   read_excel($file_path);
+   _excel_to_multichoice_read_excel($file_path);
    file_delete($form_state['values']['file'],TRUE);
  }
 }
 
-function test1(){
-    $settings=array();
-    $settings += array(
-        'title' => 'MCQ 1 Title',
-        'type' => 'multichoice',
-        'choice_multi' => 0,
-        'choice_random' => 0,
-        'choice_boolean' => 0,
-        'body' => array(LANGUAGE_NONE => array(array('value' => 'MCQ 1 body text'))),
-    );
-
-    // Set up some alternatives.
-    $settings['alternatives'][0]['answer']['value'] = 'A';
-    $settings['alternatives'][0]['answer']['format'] = 'full_html';
-    $settings['alternatives'][0]['feedback_if_chosen']['value'] = 'You chose A';
-    $settings['alternatives'][0]['feedback_if_chosen']['format'] = 'full_html';
-    $settings['alternatives'][0]['feedback_if_not_chosen']['value'] = 'You did not choose A';
-    $settings['alternatives'][0]['feedback_if_not_chosen']['format'] = 'full_html';
-    $settings['alternatives'][0]['score_if_chosen'] = 1;
-    $settings['alternatives'][0]['score_if_not_chosen'] = 0;
-
-    $settings['alternatives'][1]['answer']['value'] = 'B';
-    $settings['alternatives'][1]['answer']['format'] = 'full_html';
-    $settings['alternatives'][1]['feedback_if_chosen']['value'] = 'You chose B';
-    $settings['alternatives'][1]['feedback_if_chosen']['format'] = 'full_html';
-    $settings['alternatives'][1]['feedback_if_not_chosen']['value'] = 'You did not choose B';
-    $settings['alternatives'][1]['feedback_if_not_chosen']['format'] = 'full_html';
-    $settings['alternatives'][1]['score_if_chosen'] = 0;
-    $settings['alternatives'][1]['score_if_not_chosen'] = 0;
-
-    $settings['alternatives'][2]['answer']['value'] = 'C';
-    $settings['alternatives'][2]['answer']['format'] = 'full_html';
-    $settings['alternatives'][2]['feedback_if_chosen']['value'] = 'You chose C';
-    $settings['alternatives'][2]['feedback_if_chosen']['format'] = 'full_html';
-    $settings['alternatives'][2]['feedback_if_not_chosen']['value'] = 'You did not choose C';
-    $settings['alternatives'][2]['feedback_if_not_chosen']['format'] = 'full_html';
-    $settings['alternatives'][2]['score_if_chosen'] = 0;
-    $settings['alternatives'][2]['score_if_not_chosen'] = 0;
-
-    _excel_to_multichoise_addNode($settings);
-}
-function _excel_to_multichoise_addNode($settings=array()){
+function _excel_to_multichoice_read_excel($inputFileName){
     global $user;
-    // Populate defaults array.
-    $settings += array(
-        'comment'   => 2,
-        'changed'   => REQUEST_TIME,
-        'moderate'  => 0,
-        'promote'   => 0,
-        'revision'  => 1,
-        'log'       => '',
-        'status'    => 1,
-        'sticky'    => 0,
-        'type'      => 'page',
-        'revisions' => NULL,
-        'language'  => LANGUAGE_NONE,
-    );
-
-    // Add the body after the language is defined so that it may be set
-    // properly.
-    $settings += array(
-        'body' => array($settings['language'] => array(array())),
-    );
-
-    // Use the original node's created time for existing nodes.
-    if (isset($settings['created']) && !isset($settings['date'])) {
-        $settings['date'] = format_date($settings['created'], 'custom', 'Y-m-d H:i:s O');
-    }
-
-    // If the node's user uid is not specified manually, use the currently
-    // logged in user if available, or else the user running the test.
-    $settings['uid']=$user->uid;
-
-    // Merge body field value and format separately.
-    $body = array(
-        'value' => 'test',
-        'format' => filter_default_format(),
-    );
-    $settings['body'][$settings['language']][0] += $body;
-
-    $node = (object) $settings;
-    node_save($node);
-
-    // Small hack to link revisions to our test user.
-    db_update('node_revision')
-        ->fields(array('uid' => $node->uid))
-        ->condition('vid', $node->vid)
-        ->execute();
-    return $node;
-}
-
-function read_excel($inputFileName){
     //Had to change this path to point to IOFactory.php.
     //Do not change the contents of the PHPExcel-1.8 folder at all.
     include('libs/PHPExcel-1.8/Classes/PHPExcel/IOFactory.php');
@@ -179,35 +89,27 @@ function read_excel($inputFileName){
       if(intval($first_row[0])==$first_row[0] and $first_row[0]> 0 and $first_row[0]<=12){
         if(isset($settings['alternatives']) and count($settings['alternatives'])==4){
           //insert node
-          print_r($settings);
+          if(!_excel_to_multichoice_exist_node_by_title($settings['title'])){
+            drupal_set_message('Đã tồn tại câu hỏi: <b>'.$settings['title'].'</b>','warning');
+          }else{
+            $node = (object) $settings;
+
+            node_save($node);
+
+            // Small hack to link revisions to our test user.
+            db_update('node_revision')
+              ->fields(array('uid' => $node->uid))
+              ->condition('vid', $node->vid)
+              ->execute();
+            drupal_set_message('Tạo câu hỏi thành công: <a href="'.url('node/'.$node->nid.'/edit').'">'.$node->title.'</a>');
+          }
+
           $settings=array();
         }
         $term_level1=taxonomy_get_term_by_name('Lớp '.trim($first_row[0]), 'topic');
-        if($term_level1){
-          $term_level1=array_shift($term_level1);
-          $tree=taxonomy_get_tree($term_level1->vid, $term_level1->tid, $max_depth = 1, $load_entities = true);
-          $term_level2=NULL;
-          foreach($tree as $item){
-           if(strtolower($item->name)==trim(strtolower($first_row[1]))){
-             $term_level2=$item;
-           }
-          }
-          if(!$term_level2){
-            $newterm = new stdClass();
-            $newterm->name = ucfirst(trim(strtolower($first_row[1]))); // The name of the term
-            $newterm->vid = 10; // The ID of the parent vocabulary
-            $newterm->parent = $term_level1->tid; // This tells taxonomy that this is a top-level term
-            taxonomy_term_save($newterm);
-            $x=1;
-          }
-
-
-
-        }else{
-
-        }
+        $term_level3=_excel_to_multichoice_create_term($term_level1,$first_row);
         $settings= array(
-          'title' => truncate_utf8(strip_tags($first_row[4]),120, true, true),
+          'title' => truncate_utf8(strip_tags($first_row[4]),254, true, true),
           'type' => 'multichoice',
           'choice_multi' => 0,
           'choice_random' => 0,
@@ -217,14 +119,16 @@ function read_excel($inputFileName){
           'moderate'  => 0,
           'promote'   => 0,
           'revision'  => 1,
+          'uid'=>$user->uid,
           'log'       => '',
           'status'    => 1,
           'sticky'    => 0,
           'revisions' => NULL,
           'language'  => LANGUAGE_NONE,
-          'body' => array(LANGUAGE_NONE => array(array('value' => $first_row[4]))),
+          'body' => array(LANGUAGE_NONE => array(array('value' => $first_row[4],'format'=>'full_html'))),
         );
         $settings['complexity'][LANGUAGE_NONE][0]['value']=intval($first_row[3]);
+        $settings['field_topic'][LANGUAGE_NONE][0]['tid']=$term_level3->tid;
         $alternatives=array();
         $alternatives['answer']['value'] = $first_row[5];
         $alternatives['answer']['format'] = 'full_html';
@@ -251,5 +155,75 @@ function read_excel($inputFileName){
         }
       }
     }
-    die();
 }
+
+function _excel_to_multichoice_create_term($term_level1,$first_row){
+  if($term_level1){
+    $term_level1=array_shift($term_level1);
+    $tree=taxonomy_get_tree($term_level1->vid, $term_level1->tid, $max_depth = 1, $load_entities = true);
+    $term_level2=NULL;
+    foreach($tree as $item){
+      if(strtolower($item->name)==trim(strtolower($first_row[1]))){
+        $term_level2=$item;
+      }
+    }
+    if(!$term_level2){
+      $term_level2_name=ucfirst(trim(strtolower($first_row[1])));
+      $term_level2 = new stdClass();
+      $term_level2->name = $term_level2_name; // The name of the term
+      $term_level2->vid = 10; // The ID of the parent vocabulary
+      $term_level2->parent = $term_level1->tid; // This tells taxonomy that this is a top-level term
+      taxonomy_term_save($term_level2);
+
+    }
+
+    $tree=taxonomy_get_tree($term_level2->vid, $term_level2->tid, $max_depth = 1, $load_entities = true);
+    $term_level3=NULL;
+    foreach($tree as $item){
+      if(strtolower($item->name)==trim(strtolower($first_row[2]))){
+        $term_level3=$item;
+      }
+    }
+    if(!$term_level3){
+      $term_level3_name=ucfirst(trim(strtolower($first_row[2])));
+      $term_level3 = new stdClass();
+      $term_level3->name = $term_level3_name; // The name of the term
+      $term_level3->vid = 10; // The ID of the parent vocabulary
+      $term_level3->parent = $term_level2->tid; // This tells taxonomy that this is a top-level term
+      taxonomy_term_save($term_level3);
+    }
+
+  }else{
+    $term_level1_name=ucfirst(trim(strtolower('Lớp '.trim($first_row[0]))));
+    $term_level1 = new stdClass();
+    $term_level1->name = $term_level1_name; // The name of the term
+    $term_level1->vid = 10; // The ID of the parent vocabulary
+    $term_level1->parent = 0; // This tells taxonomy that this is a top-level term
+    taxonomy_term_save($term_level1);
+
+    $term_level2_name=ucfirst(trim(strtolower('Lớp '.trim($first_row[1]))));
+    $term_level2 = new stdClass();
+    $term_level2->name = $term_level2_name; // The name of the term
+    $term_level2->vid = 10; // The ID of the parent vocabulary
+    $term_level2->parent = $term_level1->tid; // This tells taxonomy that this is a top-level term
+    taxonomy_term_save($term_level2);
+
+    $term_level3_name=ucfirst(trim(strtolower('Lớp '.trim($first_row[2]))));
+    $term_level3 = new stdClass();
+    $term_level3->name = $term_level3_name; // The name of the term
+    $term_level3->vid = 10; // The ID of the parent vocabulary
+    $term_level3->parent = $term_level2->tid; // This tells taxonomy that this is a top-level term
+    taxonomy_term_save($term_level3);
+  }
+
+  return $term_level3;
+}
+
+function _excel_to_multichoice_exist_node_by_title($title){
+  $row = db_query('SELECT nid FROM {node} WHERE BINARY title = :mytitle', array(':mytitle' =>   $title))->fetchField();
+  if(!isset($row['nid'])) {
+    return false;
+  }
+  return true;
+}
+
