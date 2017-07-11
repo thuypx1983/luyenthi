@@ -617,7 +617,10 @@ function quiz_categorized_term_ahah($start) {
  */
 function _quiz_search_terms($start, $all = FALSE) {
   $terms = array();
-  $sql_args = array_keys(_quiz_get_vocabularies());
+  //$sql_args = array_keys(_quiz_get_vocabularies());
+    //added by thuypx
+    $sql_args=array();
+    $sql_args[0]=10;
   if (empty($sql_args)) {
     return $terms;
   }
@@ -630,7 +633,15 @@ function _quiz_search_terms($start, $all = FALSE) {
   $res = $query->execute();
   // TODO Don't user db_fetch_object
   while ($res_o = $res->fetch()) {
-    $terms[$res_o->tid] = $res_o->name;
+      $parents=array_reverse(taxonomy_get_parents_all($res_o->tid));
+      $name="";
+      $comma="";
+      foreach($parents as $p){
+          $name.=$comma.$p->name;
+          $comma=" => ";
+      }
+
+    $terms[$res_o->tid] = $name;
   }
   return $terms;
 }
