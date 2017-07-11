@@ -89,7 +89,7 @@ function _excel_to_multichoice_read_excel($inputFileName){
       if(intval($first_row[0])==$first_row[0] and $first_row[0]> 0 and $first_row[0]<=12){
         if(isset($settings['alternatives']) and count($settings['alternatives'])==4){
           //insert node
-          if(!_excel_to_multichoice_exist_node_by_title($settings['title'])){
+          if(_excel_to_multichoice_exist_node_by_title($settings['title'])){
             drupal_set_message('Đã tồn tại câu hỏi: <b>'.$settings['title'].'</b>','warning');
           }else{
             $node = (object) $settings;
@@ -109,7 +109,7 @@ function _excel_to_multichoice_read_excel($inputFileName){
         $term_level1=taxonomy_get_term_by_name('Lớp '.trim($first_row[0]), 'topic');
         $term_level3=_excel_to_multichoice_create_term($term_level1,$first_row);
         $settings= array(
-          'title' => truncate_utf8(strip_tags($first_row[4]),254, true, true),
+          'title' => truncate_utf8(strip_tags($first_row[4]),168, true, true),
           'type' => 'multichoice',
           'choice_multi' => 0,
           'choice_random' => 0,
@@ -127,7 +127,7 @@ function _excel_to_multichoice_read_excel($inputFileName){
           'language'  => LANGUAGE_NONE,
           'body' => array(LANGUAGE_NONE => array(array('value' => $first_row[4],'format'=>'full_html'))),
         );
-        $settings['complexity'][LANGUAGE_NONE][0]['value']=intval($first_row[3]);
+        $settings['field_complexity'][LANGUAGE_NONE][0]['value']=intval($first_row[3]);
         $settings['field_topic'][LANGUAGE_NONE][0]['tid']=$term_level3->tid;
         $alternatives=array();
         $alternatives['answer']['value'] = $first_row[5];
@@ -220,8 +220,8 @@ function _excel_to_multichoice_create_term($term_level1,$first_row){
 }
 
 function _excel_to_multichoice_exist_node_by_title($title){
-  $row = db_query('SELECT nid FROM {node} WHERE BINARY title = :mytitle', array(':mytitle' =>   $title))->fetchField();
-  if(!isset($row['nid'])) {
+  $nid = db_query('SELECT nid FROM {node} WHERE BINARY title = :mytitle', array(':mytitle' =>   $title))->fetchField();
+  if(!$nid) {
     return false;
   }
   return true;
