@@ -1976,7 +1976,7 @@ function quiz_take_question($quiz, $question_number) {
   $content['progress']['#weight'] = -50;
 
   if (function_exists('jquery_countdown_add') && variable_get('quiz_has_timer', 0) && $quiz->time_limit) {
-    jquery_countdown_add('.countdown', array('until' => ($quiz_result->time_start + $quiz->time_limit - REQUEST_TIME), 'onExpiry' => 'finished', 'compact' => TRUE, 'layout' => t('Time left') . ' {hnn}{sep}{mnn}{sep}{snn}'));
+    jquery_countdown_add('.countdown', array('until' => ($quiz_result->time_start + $quiz->time_limit - REQUEST_TIME), 'onExpiry' => 'finished', 'compact' => TRUE, 'layout' => t('Time left') . ': {hnn}{sep}{mnn}{sep}{snn}'));
     // These are the two button op values that are accepted for answering
     // questions.
     $button_op1 = drupal_json_encode(t('Finish'));
@@ -2279,7 +2279,8 @@ function quiz_quiz_access($op = 'take', $quiz, $account) {
     );
   }
 
-  // Check permission and node access. modify by thuypx
+
+    // Check permission and node access. modify by thuypx
     if(user_is_logged_in()){
         if (!user_access('access quiz') || !node_access('view', $quiz)) {
             $hooks['node_perm_access'] = array(
@@ -2294,7 +2295,6 @@ function quiz_quiz_access($op = 'take', $quiz, $account) {
             'message' => t('<a href="'.url('user/login').'?destination='.urlencode($redirect).'">Đăng nhập để làm bài thi này</a>'),
         );
     }
-
 
   return $hooks;
 }
