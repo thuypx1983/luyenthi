@@ -4,11 +4,11 @@ define('PAYMENTS_PAYCARD_STATUS_APPROVED', 0);
 define('PAYMENTS_PAYCARD_STATUS_PENDING', 1);
 define('PAYMENTS_PAYCARD_STATUS_DECLINED', 2);
 
-define('CARD_STATUS',array(
+/*define('CARD_STATUS',array(
   PAYMENTS_PAYCARD_STATUS_APPROVED=>t('Approved'),
   PAYMENTS_PAYCARD_STATUS_PENDING=>t('Pending'),
   PAYMENTS_PAYCARD_STATUS_DECLINED=>t('Declined'),
-));
+));*/
 
 define('CARD_TYPE', array(
   1=>'Viettel',
