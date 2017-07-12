@@ -30,7 +30,6 @@
          */
         disablePageCategory: function(){
             var select=$('#views-exposed-form-quiz-filter-page').find('#edit-shs-term-node-tid-depth-select-1');
-            alert(select.length)
             select.find('option[value=0],option[value=27]').hide();
         }
 
