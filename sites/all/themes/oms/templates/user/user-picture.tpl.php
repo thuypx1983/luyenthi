@@ -20,8 +20,14 @@
   <div class="<?php print $classes; ?>">
     <?php print $user_picture; ?>
   </div>
-<?php else:?>
-    <div class="<?php print $classes; ?>">
-      <a href="<?php global $user; echo url('user/'.$user->name)?>"><img src="/sites/default/files/styles/thumbnail/public/pictures/picture-1-1498807340.jpg?itok=nmxkER_x"></a>
-    </div>
+<?php else:
+    global $user;
+    if($user->uid>0){
+    ?>
+        <div class="<?php print $classes; ?>">
+            <a href="<?php  echo url('user/'.$user->name)?>"><img src="/sites/default/files/styles/thumbnail/public/pictures/picture-1-1498807340.jpg?itok=nmxkER_x"></a>
+        </div>
+    <?php
+    }
+    ?>
 <?php endif; ?>
