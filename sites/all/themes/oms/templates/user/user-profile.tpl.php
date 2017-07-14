@@ -38,11 +38,21 @@
 
     <div class="col-md-3 profile-left">
        <div class="content">
-           <div class="profile-title">Thông tin tài khoản</div>
+           <div class="profile-left">
+               <div class="profile-title">Thông tin tài khoản</div>
              <?php
              print render($user_profile['user_picture']);
              ?>
-           <div class="name"><span><?php echo $field_name[0]['value']?></span></div>
+               <div class="name"><span><?php echo $field_name[0]['value']?></span></div>
+           </div>
+           <div class="user-tools">
+               <ul>
+                   <li><a href="<?php echo url('user/'.$user->uid)?>">Thông tin cá nhân</a></li>
+                   <li><a href="<?php echo url('myuserpoints')?>">Điểm của tôi</a></li>
+                   <li><a href="<?php echo url('user/paycard-history')?>">Lịch sử nạp thẻ</a></li>
+                   <li><a href="<?php echo url('user/payment-transaction')?>">Lịch sử giao dịch</a></li>
+               </ul>
+           </div>
        </div>
     </div>
     <div class="col-md-9 profile-left">
@@ -53,7 +63,6 @@
       print render($user_profile['field_phone']);
       print render($user_profile['field_province']);
       print render($user_profile['field_school']);
-      print render($user_profile['userpoints']);
       print render($user_profile['summary']);
       ?>
 
