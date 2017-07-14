@@ -10,11 +10,12 @@ define('USERMONEYS_TXN_STATUS_APPROVED', 0);
 define('USERMONEYS_TXN_STATUS_PENDING', 1);
 define('USERMONEYS_TXN_STATUS_DECLINED', 2);
 
-define('USERMONEYS_TXN_STATUS',array(
+global $USERMONEYS_TXN_STATUS;
+$USERMONEYS_TXN_STATUS=array(
   USERMONEYS_TXN_STATUS_APPROVED=>t('Approved'),
   USERMONEYS_TXN_STATUS_PENDING=>t('Pending'),
   USERMONEYS_TXN_STATUS_DECLINED=>t('Declined'),
-));
+);
 
 
 define('USERMONEYS_DISPLAY_MESSAGE', 'usermoneys_display_message');
@@ -937,13 +938,14 @@ function usermoneys_translation() {
  */
 
 function usermoneys_views_pre_render(&$view) {
+    global $USERMONEYS_TXN_STATUS;
   switch ($view->name) {
     case 'usermoneys_transaction':
       //  override the global custom text field value
 
       $count=count($view->result);
       for($i=0;$i<$count;$i++){
-        $view->result[$i]->usermoneys_txn_status=USERMONEYS_TXN_STATUS[$view->result[$i]->usermoneys_txn_status];
+        $view->result[$i]->usermoneys_txn_status=$USERMONEYS_TXN_STATUS[$view->result[$i]->usermoneys_txn_status];
       }
       break;
   }

@@ -4,17 +4,18 @@ define('PAYMENTS_PAYCARD_STATUS_APPROVED', 0);
 define('PAYMENTS_PAYCARD_STATUS_PENDING', 1);
 define('PAYMENTS_PAYCARD_STATUS_DECLINED', 2);
 
-define('CARD_STATUS',array(
-  PAYMENTS_PAYCARD_STATUS_APPROVED=>t('Approved'),
-  PAYMENTS_PAYCARD_STATUS_PENDING=>t('Pending'),
-  PAYMENTS_PAYCARD_STATUS_DECLINED=>t('Declined'),
-));
-
-define('CARD_TYPE', array(
+global $CARD_STATUS;
+$CARD_STATUS=array(
+        PAYMENTS_PAYCARD_STATUS_APPROVED=>t('Approved'),
+        PAYMENTS_PAYCARD_STATUS_PENDING=>t('Pending'),
+        PAYMENTS_PAYCARD_STATUS_DECLINED=>t('Declined'),
+    );
+global $CARD_TYPE;
+$CARD_TYPE=array(
   1=>'Viettel',
   2=>'Mobilephone',
   3=>'Vinaphone'
-));
+);
 
 /**
  * Implements hook_menu().
@@ -416,7 +417,7 @@ function payments_pay_card_api($params) {
  */
 
 function payments_views_pre_render(&$view) {
-
+    global $CARD_TYPE,$CARD_STATUS;
   switch ($view->name) {
     case 'thanh_toan_bang_the_cao':
     case 'payments_paycard':
@@ -424,8 +425,8 @@ function payments_views_pre_render(&$view) {
 
       $count=count($view->result);
       for($i=0;$i<$count;$i++){
-        $view->result[$i]->payments_paycard_card_type=CARD_TYPE[$view->result[$i]->payments_paycard_card_type];
-        $view->result[$i]->payments_paycard_status=CARD_STATUS[$view->result[$i]->payments_paycard_status];
+        $view->result[$i]->payments_paycard_card_type=$CARD_TYPE[$view->result[$i]->payments_paycard_card_type];
+        $view->result[$i]->payments_paycard_status=$CARD_STATUS[$view->result[$i]->payments_paycard_status];
       }
       //$x=1;
       //$view->field['paycard_id']->options['alter']['html'] = 'My custom text';
