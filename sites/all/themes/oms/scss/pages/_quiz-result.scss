@@ -2,6 +2,9 @@
   #block-system-main{
     .global-result{
       background-color: $bg_header;
+      border-top: 1px solid $color_main;
+      border-left: 1px solid $color_main;
+      border-right: 1px solid $color_main;
       padding: 10px;
       &>div{
         display: inline-block;
@@ -41,6 +44,9 @@
       }
     }
     .summary-result{
+      border-bottom: 1px solid $color_main;
+      border-left: 1px solid $color_main;
+      border-right: 1px solid $color_main;
       display: table;
       width: 100%;
       li{
@@ -125,5 +131,39 @@
         margin-right: auto;
       }
     }
+    .answered-correct{
+      color: $color_main;
+    }
+    .answered-wrong{
+      color: $color_red;
+    }
+  }
+  #block-block-15{
+    border: 1px solid $color_main;
+    padding: 10px;
+    #quiz-view-table{
+      tbody{
+        border: 0px;
+        tr{
+          border: none;
+          th{
+            border: none;
+          }
+          td{
+            border: none;
+            text-align: left;
+            vertical-align: middle;
+          }
+        }
+        tr.even{
+          background-color:transparent;
+          th:first-child{
+            width: 40%;
+          }
+        }
+      }
+
+    }
+
   }
 }

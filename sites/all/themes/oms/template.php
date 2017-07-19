@@ -237,12 +237,12 @@ function oms_quiz_answer_result($variables){
     case 'correct':
       $options['path'] = 'check_008000_64.png';
       $options['alt'] = t('Correct');
-      $options['markup']='<i class="fa fa-check"></i>';
+      $options['markup']='<i class="fa fa-check answered-correct"></i>';
       break;
     case 'incorrect':
       $options['path'] = 'times_ff0000_64.png';
       $options['alt'] = t('Incorrect');
-      $options['markup']='<i class="fa fa-close"></i>';
+      $options['markup']='<i class="fa fa-close answered-wrong"></i>';
       break;
     case 'unknown':
       $options['path'] = 'question_808080_64.png';

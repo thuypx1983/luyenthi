@@ -86,6 +86,7 @@ var NHAN_XE_VE_KET_QUA_PERFECT=Drupal.t('Result perfect');
 
             //add class to table
             content.find('table.sticky-enabled').addClass('table').addClass('table-striped').addClass('table-hover');
+            $(".page-node-quiz-results-view #quiz-view-table").addClass('table').addClass('table-striped');
         },
 
     }
