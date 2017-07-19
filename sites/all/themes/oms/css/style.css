@@ -1737,3 +1737,46 @@ body {
 .page-node-quiz-results-view #block-system-main .quiz-score-icon {
   padding-left: 15px;
 }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000389}}
+.page-node-quiz-results-view #block-system-main .sticky-enabled tr.odd {
+  background-color: transparent;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000393}}
+.page-node-quiz-results-view #block-system-main .sticky-enabled thead tr {
+  background-color: #8a8c8d;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000395}}
+.page-node-quiz-results-view #block-system-main .sticky-enabled thead tr th {
+  color: #ffffff;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\00003100}}
+.page-node-quiz-results-view #block-system-main .sticky-enabled .fa {
+  font-size: 20px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\00003104}}
+.page-node-quiz-results-view #block-system-main .result-detail {
+  font-size: 25px;
+  text-transform: uppercase;
+  color: #79B43E;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\00003109}}
+.page-node-quiz-results-view #block-system-main .admin-message {
+  text-align: center;
+  position: relative;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\00003115}}
+.page-node-quiz-results-view #block-system-main .admin-message:after {
+  position: absolute;
+  content: "";
+  height: 3px;
+  width: 30%;
+  background-color: #e8e8e8;
+  bottom: 0px;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+}

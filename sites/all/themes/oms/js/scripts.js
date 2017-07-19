@@ -1,3 +1,7 @@
+var NHAN_XE_VE_KET_QUA_BAD=Drupal.t('Result bad');
+var NHAN_XE_VE_KET_QUA_NORMAL=Drupal.t('Result normal');
+var NHAN_XE_VE_KET_QUA_GOOD=Drupal.t('Result good');
+var NHAN_XE_VE_KET_QUA_PERFECT=Drupal.t('Result perfect');
 (function ($) {
     var oms={
 
@@ -43,7 +47,7 @@
             var globalResult='<div class="global-result">';
             var summary="<ul class='summary-result'>";
             var i=1;
-            var content=$('.page-node-quiz-results-view #block-system-main');
+            var content=$('.page-node-quiz-results-view #block-system-main .content');
             content.find('fieldset.form-wrapper').each(function(){
                 total++;
                 var className="";
@@ -55,15 +59,33 @@
                 };
                 summary+='<li class="'+className+'">'+i+'</li>';
                 i++;
-            })
+            });
             correct=total-incorrect;
+            var rate=(correct/total)*100;
+            var message="";
+            //bad, normal, good, better, best, perfect
+            if(rate<50){
+                message='BAD';
+            }else if(rate<70){
+                message='NORMAL';
+            }else if(rate<80){
+                message='GOOD';
+            }else{
+                message='PERFECT';
+            }
             summary+="<ul>";
             globalResult+='<div class="total-correct"><span class="correct"></span>Bạn đã trả lời: <span class="count">'+correct+'</span></div>';
             globalResult+='<div class="total-incorrect"><span class="incorrect"></span>Cần xem xét lại: <span class="count">'+incorrect+'</span></div>';
             globalResult+='<div class="total-answer">Kết quả: <span class="count">'+correct+'/'+total+'</span></div>';
             globalResult+='</div>';
+
+            content.prepend('<h2 class="result-detail">'+Drupal.t('Đáp án chi tiết')+'</h2>');
+            content.prepend('<div class="admin-message">'+window['NHAN_XE_VE_KET_QUA_'+message]+'</div>');
             content.prepend(summary);
             content.prepend(globalResult);
+
+            //add class to table
+            content.find('table.sticky-enabled').addClass('table').addClass('table-striped').addClass('table-hover');
         },
 
     }
