@@ -47,7 +47,7 @@ var NHAN_XE_VE_KET_QUA_PERFECT=Drupal.t('Result perfect');
             var globalResult='<div class="global-result">';
             var summary="<ul class='summary-result'>";
             var i=1;
-            var content=$('.page-node-quiz-results-view #block-system-main .content');
+            var content=$('.page-node-quiz-results-view #block-system-main > .content');
             content.find('fieldset.form-wrapper').each(function(){
                 total++;
                 var className="";
