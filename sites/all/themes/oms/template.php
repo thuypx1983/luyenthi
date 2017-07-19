@@ -228,3 +228,65 @@ function oms_multichoice_answer_node_view($variables){
   }
   return theme('table', array('header' => $header, 'rows' => $rows));
 }
+
+function oms_quiz_answer_result($variables){
+  $options = array();
+  $type = $variables['type'];
+
+  switch($type) {
+    case 'correct':
+      $options['path'] = 'check_008000_64.png';
+      $options['alt'] = t('Correct');
+      $options['markup']='<i class="fa fa-check"></i>';
+      break;
+    case 'incorrect':
+      $options['path'] = 'times_ff0000_64.png';
+      $options['alt'] = t('Incorrect');
+      $options['markup']='<i class="fa fa-close"></i>';
+      break;
+    case 'unknown':
+      $options['path'] = 'question_808080_64.png';
+      $options['alt'] = t('Unknown');
+      $options['markup']='<i class="fa fa-question"></i>';
+      break;
+    case 'should':
+      $options['path'] = 'check_808080_64.png';
+      $options['alt'] = t('Should have chosen');
+      $options['markup']='<i class="fa fa-check"></i>';
+      break;
+    case 'should-not':
+      $options['path'] = 'times_808080_64.png';
+      $options['alt'] = t('Should not have chosen');
+      $options['markup']='<i class="fa fa-close"></i>';
+      break;
+    case 'almost':
+      $options['path'] = 'check_ffff00_64.png';
+      $options['alt'] = t('Almost');
+      break;
+    case 'selected':
+      $options['path'] = 'arrow-right_808080_64.png';
+      $options['alt'] = t('Selected');
+      $options['markup']='<i class="fa fa-check"></i>';
+      break;
+    case 'unselected':
+      $options['path'] = 'circle-o_808080_64.png';
+      $options['alt'] = t('Unselected');
+      $options['markup']='<i class="fa fa-circle-o"></i>';
+      break;
+    default:
+      $options['path'] = '';
+      $options['alt'] = '';
+      $options['markup']='<i class="fa fa-question"></i>';
+  }
+
+  /*if (!empty($options['path'])) {
+    $options['path'] = drupal_get_path('module', 'quiz') . '/images/' . $options['path'];
+  }
+  if (!empty($options['alt'])) {
+    $options['title'] = $options['alt'];
+  }
+
+  $image = theme('image', $options);*/
+  return '<div class="quiz-score-icon ' . $type . '">' . $options['markup'] . '</div>';
+
+}

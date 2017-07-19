@@ -1635,3 +1635,105 @@ body {
 .page-user .profile .profile-left .content {
   background-color: #F8F8F8;
 }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\000033}}
+.page-node-quiz-results-view #block-system-main .global-result {
+  background-color: #F8F8F8;
+  padding: 10px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\000036}}
+.page-node-quiz-results-view #block-system-main .global-result > div {
+  display: inline-block;
+  padding-right: 15px;
+  line-height: 20px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000311}}
+.page-node-quiz-results-view #block-system-main .global-result .correct {
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background-color: #79B43E;
+  margin-right: 5px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000319}}
+.page-node-quiz-results-view #block-system-main .global-result .incorrect {
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background-color: #ff4747;
+  margin-right: 5px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000327}}
+.page-node-quiz-results-view #block-system-main .global-result .count {
+  color: #ff6d00;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000330}}
+.page-node-quiz-results-view #block-system-main .global-result .total-answer {
+  padding: 10px 5px;
+  font-weight: normal;
+  font-size: 16px;
+  background-color: #ff6d00;
+  color: #ffffff;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000336}}
+.page-node-quiz-results-view #block-system-main .global-result .total-answer .count {
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 20px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000343}}
+.page-node-quiz-results-view #block-system-main .summary-result {
+  display: table;
+  width: 100%;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000346}}
+.page-node-quiz-results-view #block-system-main .summary-result li {
+  display: block;
+  float: left;
+  text-align: center;
+  margin: 10px;
+  font-weight: bold;
+  color: #ffffff;
+  width: 30px;
+  height: 30px;
+  padding-top: 5px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000356}}
+.page-node-quiz-results-view #block-system-main .summary-result li.incorrect {
+  background-color: #ff4747;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000359}}
+.page-node-quiz-results-view #block-system-main .summary-result li.correct {
+  background-color: #79B43E;
+  color: #ffffff;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000365}}
+.page-node-quiz-results-view #block-system-main #quiz_score_possible {
+  display: none;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000368}}
+.page-node-quiz-results-view #block-system-main #quiz_score_percent {
+  display: none;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000371}}
+.page-node-quiz-results-view #block-system-main .quiz-report-score-container {
+  display: none;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000374}}
+.page-node-quiz-results-view #block-system-main legend {
+  margin-bottom: 0px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000378}}
+.page-node-quiz-results-view #block-system-main .entity-quiz-result-answer > h2 {
+  display: none;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000382}}
+.page-node-quiz-results-view #block-system-main .tableheader-processed {
+  width: 100%;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-result\.scss}line{font-family:\0000385}}
+.page-node-quiz-results-view #block-system-main .quiz-score-icon {
+  padding-left: 15px;
+}

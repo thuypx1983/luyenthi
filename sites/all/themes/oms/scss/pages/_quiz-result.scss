@@ -1,0 +1,89 @@
+.page-node-quiz-results-view{
+  #block-system-main{
+    .global-result{
+      background-color: $bg_header;
+      padding: 10px;
+      &>div{
+        display: inline-block;
+        padding-right: 15px;
+        line-height: 20px;
+      }
+      .correct{
+        display: block;
+        float: left;
+        width: 20px;
+        height: 20px;
+        background-color: $color_main;
+        margin-right: 5px;
+      }
+      .incorrect{
+        display: block;
+        float: left;
+        width: 20px;
+        height: 20px;
+        background-color: $color_red;
+        margin-right: 5px;
+      }
+      .count{
+        color: $bg_button;
+      }
+      .total-answer{
+        padding: 10px 5px;
+        font-weight: normal;
+        font-size: 16px;
+        background-color: $bg_button;
+        color: $color_white;
+        .count{
+          color: $color_white;
+          font-weight: bold;
+          font-size: 20px;
+        }
+      }
+    }
+    .summary-result{
+      display: table;
+      width: 100%;
+      li{
+        display: block;
+        float: left;
+        text-align: center;
+        margin: 10px;
+        font-weight: bold;
+        color: $color_white;
+        width: 30px;
+        height: 30px;
+        padding-top: 5px;
+        &.incorrect{
+          background-color: $color_red;
+        }
+        &.correct{
+          background-color: $color_main;
+          color: $color_white;
+        }
+      }
+    }
+    #quiz_score_possible{
+      display: none;
+    }
+    #quiz_score_percent{
+      display: none;
+    }
+    .quiz-report-score-container{
+      display: none;
+    }
+    legend{
+      margin-bottom: 0px;
+    }
+    .entity-quiz-result-answer{
+      &>h2{
+        display: none;
+      }
+    }
+    .tableheader-processed{
+      width: 100%;
+    }
+    .quiz-score-icon{
+      padding-left: 15px;
+    }
+  }
+}
