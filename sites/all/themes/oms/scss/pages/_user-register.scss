@@ -8,10 +8,14 @@
       margin-left: 155px;
     }
     .confirm-parent{
-      width: auto;
+      width: 100%;
     }
     .password-parent{
-      width: auto;
+      display: table;
+      width: 100%;
+      input.password-field{
+        margin-left: 5px;
+      }
     }
     .captcha{
       legend{
