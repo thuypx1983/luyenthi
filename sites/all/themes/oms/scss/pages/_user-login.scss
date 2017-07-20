@@ -4,6 +4,76 @@
     text-align: left;
   }
   .description{
-    margin-left: 155px;
   }
+}
+.user-login-container{
+  display: block;
+  padding: 15px;
+  .user-login-container-content{
+    border: 1px solid $color_main;
+    display: table;
+    width: 100%;
+  }
+  .more-information{
+    a{
+      font-weight: bold;
+      color: $color_red;
+    }
+  }
+}
+.other-login{
+  .title{
+    padding-top: 15px;
+    font-weight: bold;
+  }
+  .btn-facebook {
+    background-color: #3b5998;
+    border-bottom-color: rgba(0, 0, 0, 0.2);
+    border-left-color: rgba(0, 0, 0, 0.2);
+    border-right-color: rgba(0, 0, 0, 0.2);
+    border-top-color: rgba(0, 0, 0, 0.2);
+    color: #fff;
+  }
+  .btn-google {
+    background-color: $bg_button;
+    border-bottom-color: rgba(0, 0, 0, 0.2);
+    border-left-color: rgba(0, 0, 0, 0.2);
+    border-right-color: rgba(0, 0, 0, 0.2);
+    border-top-color: rgba(0, 0, 0, 0.2);
+    color: #fff;
+  }
+  .btn-social {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding-left: 44px;
+    position: relative;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fa{
+    border-right-color: rgba(0, 0, 0, 0.2);
+    border-right-style: solid;
+    border-right-width: 1px;
+    bottom: 0;
+    font-size: 1.6em;
+    left: 0;
+    line-height: 34px;
+    position: absolute;
+    text-align: center;
+    top: 0;
+    width: 32px;
+  }
+}
+#block-block-16{
+  padding-top: 15px;
+}
+.form-item-persistent-login{
+  #edit-persistent-login{
+    margin-top: 0px;
+  }
+  .option{
+    margin-bottom: 0px;
+  }
+
 }

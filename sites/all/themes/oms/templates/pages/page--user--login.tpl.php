@@ -132,16 +132,39 @@
           <?php if ($action_links): ?><ul class="action-links"><?php print render($action_links); ?></ul><?php endif; ?>
           <h1 class="page-title"><?php echo $title?></h1>
           <div class="row">
-            <div class="col-md-6">
-              <?php print render($page['content']); ?>
-            </div>
-            <div class="col-md-6">
-              <?php
-              $block = block_load('block', '16');
-              $block=_block_get_renderable_array(_block_render_blocks(array($block)));
-              $output = drupal_render($block);
-              print $output;
-              ?>
+            <div class="user-login-container">
+                <div class="user-login-container-content">
+                    <div class="col-md-6">
+                      <?php print render($page['content']); ?>
+                        <div class="more-information">
+                            <p>Nếu bạn chưa có tài khoản, hãy <a href="<?php echo url('user/register')?>">đăng ký</a> ngay bây giờ</p>
+                            <p>Trong trường hợp bạn quên mật khẩu hãy <a href="<?php echo url('/user/password')?>">Kích vào đây</a></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="other-login">
+                            <p class="title">Đăng nhập bằng:</p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <a href="<?php echo url('user/simple-fb-connect')?>" class="btn btn-block btn-social btn-facebook">
+                                        <span class="fa fa-facebook"></span>Facebook
+                                    </a>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="#" class="btn btn-block btn-social btn-google">
+                                        <span class="fa fa-google-plus"></span>Google
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                      <?php
+                      $block = block_load('block', '16');
+                      $block=_block_get_renderable_array(_block_render_blocks(array($block)));
+                      $output = drupal_render($block);
+                      print $output;
+                      ?>
+                    </div>
+                </div>
             </div>
           </div>
         </section> <!-- /#main -->
