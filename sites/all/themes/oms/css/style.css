@@ -1173,34 +1173,13 @@ body {
 .group-container .group-image {
   width: 20%;
 }
-/* line 181, ../scss/pages/_quiz-take.scss */
-.group-container .group-infomation {
-  padding-left: 15px;
-}
-/* line 184, ../scss/pages/_quiz-take.scss */
-.group-container .group-infomation table tbody {
-  border: none;
-}
-/* line 187, ../scss/pages/_quiz-take.scss */
-.group-container .group-infomation table tr {
-  background-color: transparent;
-  border: none;
-}
-/* line 190, ../scss/pages/_quiz-take.scss */
-.group-container .group-infomation table tr th {
-  border: none;
-}
-/* line 193, ../scss/pages/_quiz-take.scss */
-.group-container .group-infomation table tr td {
-  border: none;
-}
-/* line 199, ../scss/pages/_quiz-take.scss */
+/* line 182, ../scss/pages/_quiz-take.scss */
 .group-container .field {
   font-size: 14px;
   font-weight: bold;
 }
 
-/* line 207, ../scss/pages/_quiz-take.scss */
+/* line 190, ../scss/pages/_quiz-take.scss */
 .node-type-quiz .group-take {
   margin-top: 30px;
   padding-top: 30px;
@@ -1209,7 +1188,7 @@ body {
   display: table;
   border-top: 1px solid #e8e8e8;
 }
-/* line 215, ../scss/pages/_quiz-take.scss */
+/* line 198, ../scss/pages/_quiz-take.scss */
 .node-type-quiz .group-take .quiz-start-link {
   background-color: #ff6d00;
   padding: 10px;
@@ -1217,11 +1196,11 @@ body {
   color: #ffffff;
   display: inline-block;
 }
-/* line 223, ../scss/pages/_quiz-take.scss */
+/* line 206, ../scss/pages/_quiz-take.scss */
 .node-type-quiz .tabs-wrapper {
   display: none;
 }
-/* line 226, ../scss/pages/_quiz-take.scss */
+/* line 209, ../scss/pages/_quiz-take.scss */
 .node-type-quiz .quiz-not-available {
   display: inline-block;
   padding: 5px 10px;
@@ -1229,25 +1208,47 @@ body {
   font-weight: bold;
   background-color: #ff6d00;
 }
-/* line 232, ../scss/pages/_quiz-take.scss */
+/* line 215, ../scss/pages/_quiz-take.scss */
 .node-type-quiz .quiz-not-available a {
   color: #ffffff;
 }
 
-/* line 238, ../scss/pages/_quiz-take.scss */
+/* line 221, ../scss/pages/_quiz-take.scss */
 .disallow-take-quiz {
   display: block;
   text-align: center;
   padding-bottom: 15px;
 }
 
-/* line 245, ../scss/pages/_quiz-take.scss */
+/* line 228, ../scss/pages/_quiz-take.scss */
 #quiz-question-answering-form .form-actions {
   text-align: center;
 }
-/* line 247, ../scss/pages/_quiz-take.scss */
+/* line 230, ../scss/pages/_quiz-take.scss */
 #quiz-question-answering-form .form-actions #edit-navigation-skip {
   display: none;
+}
+
+/* line 237, ../scss/pages/_quiz-take.scss */
+#quiz-view-table tbody {
+  border: none;
+}
+/* line 239, ../scss/pages/_quiz-take.scss */
+#quiz-view-table tbody tr.even {
+  background-color: transparent;
+}
+/* line 242, ../scss/pages/_quiz-take.scss */
+#quiz-view-table tbody tr {
+  border: none;
+}
+/* line 244, ../scss/pages/_quiz-take.scss */
+#quiz-view-table tbody tr th {
+  border: none;
+}
+/* line 247, ../scss/pages/_quiz-take.scss */
+#quiz-view-table tbody tr td {
+  border: none;
+  vertical-align: middle;
 }
 
 /* line 2, ../scss/pages/_teacher.scss */
@@ -1824,4 +1825,19 @@ body {
 /* line 160, ../scss/pages/_quiz-result.scss */
 .page-node-quiz-results-view #block-block-15 #quiz-view-table tbody tr.even th:first-child {
   width: 40%;
+}
+
+/* line 171, ../scss/pages/_quiz-result.scss */
+.authenticated-user .tabs-wrapper {
+  display: none;
+}
+
+/* line 176, ../scss/pages/_quiz-result.scss */
+.anonymous-user .tabs-wrapper {
+  display: none;
+}
+
+/* line 182, ../scss/pages/_quiz-result.scss */
+.administrator.authenticated-user .tabs-wrapper {
+  display: block;
 }

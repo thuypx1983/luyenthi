@@ -167,3 +167,20 @@
 
   }
 }
+.authenticated-user{
+  .tabs-wrapper{
+    display: none;
+  }
+}
+.anonymous-user{
+  .tabs-wrapper{
+    display: none;
+  }
+}
+.administrator{
+  &.authenticated-user{
+    .tabs-wrapper{
+      display: block;
+    }
+  }
+}

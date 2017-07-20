@@ -178,24 +178,7 @@
     width: 20%;
 
   }
-  .group-infomation{
-    padding-left: 15px;
-    table{
-      tbody{
-        border: none;
-      }
-      tr{
-        background-color: transparent;
-        border: none;
-        th{
-          border: none;
-        }
-        td{
-          border: none;
-        }
-      }
-    }
-  }
+
   .field{
     font-size: 14px;
     font-weight: bold;
@@ -248,4 +231,24 @@
       display: none;
     }
   }
+}
+
+#quiz-view-table{
+  tbody{
+    border: none;
+    tr.even{
+      background-color: transparent;
+    }
+    tr{
+      border: none;
+      th{
+        border: none;
+      }
+      td{
+        border: none;
+        vertical-align: middle;
+      }
+    }
+  }
+
 }

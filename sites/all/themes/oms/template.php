@@ -24,6 +24,13 @@ function oms_breadcrumb($variables) {
   }
 }
 
+function oms_preprocess_html(&$vars) {
+    global $user;
+    foreach ($user->roles as $role){
+        $vars['classes_array'][]=strtolower(str_replace(' ','-',$role));
+    }
+}
+
 /**
  * Override or insert variables into the html template.
  */
@@ -32,6 +39,7 @@ function oms_process_html(&$vars) {
   if (module_exists('color')) {
     _color_html_alter($vars);
   }
+
 }
 
 /**
