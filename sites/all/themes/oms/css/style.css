@@ -1921,3 +1921,27 @@ body {
 .administrator.authenticated-user .tabs-wrapper {
   display: block;
 }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_search-page\.scss}line{font-family:\000032}}
+.page-search-node .search-results {
+  display: block;
+  padding-left: 0px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_search-page\.scss}line{font-family:\000035}}
+.page-search-node .search-results li {
+  display: inline-table;
+  width: 100%;
+  margin-left: 0px;
+  border-bottom: 1px solid #e8e8e8;
+  padding-bottom: 10px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_search-page\.scss}line{font-family:\0000311}}
+.page-search-node .search-results li .field-name-field-image {
+  float: left;
+  width: 30%;
+  margin-right: 10px;
+}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_search-page\.scss}line{font-family:\0000316}}
+.page-search-node .search-results li h3.title {
+  margin-top: 0px;
+}
