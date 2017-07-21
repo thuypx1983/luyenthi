@@ -57,7 +57,7 @@ INSTALLATION
    Note that version 1.6 is tested and will only work with google-api-php-client 2.0.0 or later,
    version 1.3 of this module required google-api-php-client 0.6.0 and
    1.4 is tested with 1.0.5-beta release of google-api-php-client.
-
+e
 3. Enable the module and manage accounts at
    admin/config/services/gauth_account.
 

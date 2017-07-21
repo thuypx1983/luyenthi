@@ -1050,6 +1050,11 @@ body {
   margin-bottom: 0px;
 }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_user-login\.scss}line{font-family:\0000380}}
+#edit-submit-google {
+  display: none;
+}
+
 @media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-take\.scss}line{font-family:\000032}}
 .page-node-take .tabs-wrapper {
   display: none;
