@@ -1,5 +1,8 @@
 #block-search-form{
   margin-top: -6px;
+  #search-block-form{
+    margin-bottom:5px;
+  }
   .container-inline{
     display: block;
     position: relative;
@@ -19,5 +22,8 @@
 
       }
     }
+  }
+  .form-item-custom-search-types{
+    display: none;
   }
 }

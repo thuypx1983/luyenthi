@@ -1,0 +1,13 @@
+#payments-pay-card-form{
+  .form-item{
+    label{
+      width: 100px;
+    }
+  }
+}
+.payment-cart-notice{
+  display: block;
+  padding-top: 20px;
+  color: $color_red;
+  font-weight: bold;
+}

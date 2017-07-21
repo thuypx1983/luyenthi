@@ -24,8 +24,8 @@ function payments_menu() {
   $items = array();
 
   $items['payments/pay-card'] = array( //this creates a URL that will call this form at "examples/form-example"
-    'title' => 'Pay card', //page title
-    'description' => 'Pay card.',
+    'title' => 'Nạp tiền qua thẻ điện thoại', //page title
+    'description' => 'Nạp tiền qua thẻ điện thoại.',
     'page callback' => 'drupal_get_form', //this is the function that will be called when the page is accessed.  for a form, use drupal_get_form
     'page arguments' => array('payments_pay_card_form'), //put the name of the form here
     'access callback' => TRUE
@@ -127,11 +127,12 @@ function _pay_card_content(){
 }
 
 function payments_pay_card_form($form, &$form_state) {
+  global $CARD_TYPE;
 
   $form['card_type']=array(
     '#title'=>t('Loại thẻ'),
     '#type' => 'select',
-    '#options' => CARD_TYPE,
+    '#options' => $CARD_TYPE,
     '#required' => TRUE,
   );
   $form['card_number']=array(
