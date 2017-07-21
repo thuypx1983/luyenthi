@@ -94,6 +94,15 @@ var NHAN_XE_VE_KET_QUA_PERFECT=Drupal.t('Result perfect');
          */
         addStyleToQuizTable:function () {
             $('#quiz-view-table').addClass('table').addClass('table-striped');
+        },
+
+        //google login
+        triggerGoogleLoginButton: function(){
+            $('.btn-social.btn-google').click(function (e) {
+                $('#edit-submit-google').trigger('click');
+                e.preventDefault();
+            })
+
         }
 
     }
@@ -104,6 +113,7 @@ var NHAN_XE_VE_KET_QUA_PERFECT=Drupal.t('Result perfect');
         oms.disablePageCategory();
         oms.generateQuizResult();
         oms.addStyleToQuizTable();
+        oms.triggerGoogleLoginButton();
     })
 
 
