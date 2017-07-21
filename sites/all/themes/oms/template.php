@@ -298,3 +298,7 @@ function oms_quiz_answer_result($variables){
   return '<div class="quiz-score-icon ' . $type . '">' . $options['markup'] . '</div>';
 
 }
+
+function oms_field_views_data($field) {
+  $x=1;
+}
