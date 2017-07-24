@@ -299,6 +299,10 @@ function oms_quiz_answer_result($variables){
 
 }
 
-function oms_field_views_data($field) {
-  $x=1;
+function oms_views_pre_render(&$view) {
+    if ($view->name == 'tu_luyen') {
+        foreach ($view->result as $key => &$result) {
+            $result->quiz_node_properties_time_limit=(int)($result->quiz_node_properties_time_limit/60);
+        }
+    }
 }

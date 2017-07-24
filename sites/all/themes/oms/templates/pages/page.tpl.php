@@ -142,7 +142,7 @@
       <?php endif; ?>
 
      <div class="row">
-       <section class="<?php if($page['sidebar_first']) echo 'col-md-8'; else echo 'col-md-12';?>" id="post-content" role="main">
+       <section class="<?php if($page['sidebar_first']) echo 'col-md-9'; else echo 'col-md-12';?>" id="post-content" role="main">
          <?php if ($page['content_top']): ?><div id="content_top"><?php print render($page['content_top']); ?></div><?php endif; ?>
 
          <?php if (!empty($tabs['#primary'])): ?><div class="tabs-wrapper clearfix"><?php print render($tabs); ?></div><?php endif; ?>
@@ -153,7 +153,7 @@
        </section> <!-- /#main -->
 
        <?php if ($page['sidebar_first']): ?>
-         <aside id="sidebar" role="complementary" class="sidebar col-md-4">
+         <aside id="sidebar" role="complementary" class="sidebar col-md-3">
            <?php print render($page['sidebar_first']); ?>
          </aside>  <!-- /#sidebar-first -->
        <?php endif; ?>

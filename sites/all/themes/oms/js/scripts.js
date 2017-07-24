@@ -103,7 +103,12 @@ var NHAN_XE_VE_KET_QUA_PERFECT=Drupal.t('Result perfect');
                 e.preventDefault();
             })
 
-        }
+        },
+
+        //Add title to tuluyen page
+        addTitleToTuluyen:function () {
+          $('#views-exposed-form-tu-luyen-page .views-exposed-form .views-exposed-widgets').prepend('<div class="views-exposed-widget"><h1 class="title">Thi tự luyện</h1></div>')
+        },
 
     }
 
@@ -114,6 +119,7 @@ var NHAN_XE_VE_KET_QUA_PERFECT=Drupal.t('Result perfect');
         oms.generateQuizResult();
         oms.addStyleToQuizTable();
         oms.triggerGoogleLoginButton();
+        oms.addTitleToTuluyen();
     })
 
 

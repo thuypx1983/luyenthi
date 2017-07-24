@@ -1,0 +1,78 @@
+.page-thi-tu-luyen{
+  .page-title{
+    display: none;
+  }
+}
+.view-tu-luyen{
+  #views-exposed-form-tu-luyen-page{
+    .views-exposed-form{
+      .views-exposed-widgets{
+        position: relative;
+        padding-bottom: 50px;
+        h1.title{
+          text-transform: uppercase;
+          color: $bg_button;
+          padding-right: 30px;
+        }
+        #edit-field-category-exam-tid-wrapper{
+          position: absolute;
+          left: 0;
+          right: 0;
+          margin-left: auto;
+          margin-right: auto;
+          padding-top: 33px;
+          bottom: 0px;
+          border-top: 2px solid $color_gray;
+          text-align: center;
+          .form-type-bef-link{
+            display: inline-block;
+
+            a{
+              padding: 10px;
+              background-color: $color_main;
+              color: $color_white;
+              &.active{
+                background-color: $bg_button;
+              }
+            }
+            margin-right: 5px;
+
+          }
+        }
+      }
+      .form-submit{
+        background-color: $color_gray_bold;
+      }
+    }
+  }
+  .view-content{
+     margin-top: 30px;
+     display: table;
+     width: 100%;
+    .views-row{
+      margin-bottom: 30px;
+      .row-content{
+        background-color: $bg_header;
+        padding: 5px 10px;
+        .views-field-title{
+          a{
+            font-weight: bold;
+            line-height: 15px;
+            color: $color_main2;
+          }
+        }
+        .time-limite{
+          display: inline-block;
+          background-color: $color_gray_bold;
+          margin-top: 5px;
+          margin-bottom: 3px;
+          padding: 3px 5px;
+          .views-field{
+            display: inline-block;
+            color: $color_white;
+          }
+        }
+      }
+    }
+  }
+}
