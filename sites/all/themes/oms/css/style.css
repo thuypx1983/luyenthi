@@ -2119,3 +2119,31 @@ body {
   max-width: 33%;
   margin-right: 10px;
 }
+
+/* line 4, ../scss/pages/_quiz.scss */
+.node-type-quiz .group-infomation .field {
+  display: table;
+  width: 100%;
+}
+/* line 7, ../scss/pages/_quiz.scss */
+.node-type-quiz .group-infomation .field.field-name-field-subject {
+  background-color: #f9f9f9;
+}
+/* line 10, ../scss/pages/_quiz.scss */
+.node-type-quiz .group-infomation .field > div {
+  display: table-cell;
+  padding: 8px;
+  font-size: 13px;
+}
+/* line 15, ../scss/pages/_quiz.scss */
+.node-type-quiz .group-infomation .field .field-label {
+  width: 25%;
+}
+/* line 20, ../scss/pages/_quiz.scss */
+.node-type-quiz .group-infomation .field .field-items {
+  padding-left: 3px;
+}
+/* line 22, ../scss/pages/_quiz.scss */
+.node-type-quiz .group-infomation .field .field-items .field-item {
+  font-weight: normal;
+}

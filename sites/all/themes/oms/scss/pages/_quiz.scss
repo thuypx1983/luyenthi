@@ -1,0 +1,28 @@
+
+.node-type-quiz{
+  .group-infomation{
+    .field{
+      display: table;
+      width: 100%;
+      &.field-name-field-subject{
+        background-color: #f9f9f9;
+      }
+      &>div{
+        display: table-cell;
+        padding: 8px;
+        font-size: 13px;
+      }
+      .field-label{
+        width: 25%;
+
+
+      }
+      .field-items{
+        padding-left: 3px;
+        .field-item{
+          font-weight: normal;
+        }
+      }
+    }
+  }
+}
