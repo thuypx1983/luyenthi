@@ -1,0 +1,21 @@
+.payment-container{
+  border: 1px solid $color_gray;
+  padding: 10px;
+  display: inline-table;
+  width: 100%;
+  h2{
+    margin-top: 0px;
+    color: $color_main2;
+  }
+  .payment-card{
+    border-bottom: 1px solid $color_gray;
+    padding-bottom: 25px;
+    margin-bottom: 25px;
+  }
+  .logos{
+    img{
+      max-width: 33%;
+      margin-right: 10px;
+    }
+  }
+}

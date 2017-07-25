@@ -2058,3 +2058,27 @@ body {
   display: inline-block;
   color: #ffffff;
 }
+
+/* line 1, ../scss/pages/_paymens.scss */
+.payment-container {
+  border: 1px solid #e8e8e8;
+  padding: 10px;
+  display: inline-table;
+  width: 100%;
+}
+/* line 6, ../scss/pages/_paymens.scss */
+.payment-container h2 {
+  margin-top: 0px;
+  color: #f25a29;
+}
+/* line 10, ../scss/pages/_paymens.scss */
+.payment-container .payment-card {
+  border-bottom: 1px solid #e8e8e8;
+  padding-bottom: 25px;
+  margin-bottom: 25px;
+}
+/* line 16, ../scss/pages/_paymens.scss */
+.payment-container .logos img {
+  max-width: 33%;
+  margin-right: 10px;
+}

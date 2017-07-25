@@ -39,7 +39,7 @@ function payments_menu() {
   );
 
   $items['payments'] = array(
-    'title' => 'Thanh toán',
+    'title' => 'Phương thức thanh toán',
     'page callback' => '_payments_content',
     'access arguments' => array('access content'),
     'type' => MENU_LOCAL_TASK,
