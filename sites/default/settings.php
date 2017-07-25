@@ -252,9 +252,9 @@ $databases = array (
   array (
     'default' => 
     array (
-      'database' => 'luyenthi',
-      'username' => 'root',
-      'password' => 'root',
+      'database' => 'densach_vn',
+      'username' => 'densach_vn',
+      'password' => '3rgsdsqKR5Hf8QhX',
       'host' => '127.0.0.1',
       'port' => '',
       'driver' => 'mysql',
