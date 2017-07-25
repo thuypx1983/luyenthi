@@ -175,8 +175,12 @@
     text-align: left;
   }
   .group-image{
-    width: 20%;
-
+    width: 40%;
+    vertical-align: middle;
+    text-align: center;
+    image{
+      max-width: 100%;
+    }
   }
 
   .field{

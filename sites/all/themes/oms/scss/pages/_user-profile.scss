@@ -12,10 +12,42 @@
       padding: 5px;
       margin-bottom: 15px;
     }
+    .field{
+      display: table;
+      width: 100%;
+      &>div{
+        display: table-cell;
+        text-align: left;
+        padding: 8px;
+      }
+      .field-label{
+        width: 25%;
+      }
+      &:nth-child(even){
+        background-color: #f9f9f9;
+      }
+    }
     .profile-left{
       text-align: center;
       .content{
         background-color: $bg_header;
+      }
+      .user-tools{
+        ul{
+          li{
+            padding-top: 10px;
+            padding-bottom: 10px;
+            background-color: $color_main;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 1px solid $color_white;
+            text-align: left;
+            padding-left: 10px;
+            a{
+              color: $color_white;
+            }
+          }
+        }
       }
     }
   }
