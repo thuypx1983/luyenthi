@@ -5,10 +5,17 @@
 }
 .view-tu-luyen{
   #views-exposed-form-tu-luyen-page{
+    margin-right: 15px;
+    margin-left:15px;
     .views-exposed-form{
+       label{
+         display: block;
+         text-align: left;
+       }
       .views-exposed-widgets{
         position: relative;
         padding-bottom: 50px;
+        text-align: right;
         h1.title{
           text-transform: uppercase;
           color: $bg_button;
@@ -42,6 +49,27 @@
       }
       .form-submit{
         background-color: $color_gray_bold;
+      }
+      #edit-field-subject-tid-wrapper{
+        display: inline-block;
+        float: inherit;
+        padding: 0px 0px 0px 10px;
+      }
+      .views-exposed-widget{
+        padding: 0px;
+      }
+      .views-submit-button{
+        display: inline-block;
+        float: inherit;
+        padding: 0px 0px 0px 10px;
+      }
+      #edit-field-class-tid-wrapper{
+        display: inline-block;
+        float: inherit;
+        padding: 0px 0px 0px 10px;
+      }
+      .form-select{
+        width: 150px;
       }
     }
   }

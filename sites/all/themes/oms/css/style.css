@@ -1982,18 +1982,29 @@ body {
   display: none;
 }
 
-/* line 9, ../scss/pages/_page-tu-luyen.scss */
+/* line 7, ../scss/pages/_page-tu-luyen.scss */
+.view-tu-luyen #views-exposed-form-tu-luyen-page {
+  margin-right: 15px;
+  margin-left: 15px;
+}
+/* line 11, ../scss/pages/_page-tu-luyen.scss */
+.view-tu-luyen #views-exposed-form-tu-luyen-page .views-exposed-form label {
+  display: block;
+  text-align: left;
+}
+/* line 15, ../scss/pages/_page-tu-luyen.scss */
 .view-tu-luyen #views-exposed-form-tu-luyen-page .views-exposed-form .views-exposed-widgets {
   position: relative;
   padding-bottom: 50px;
+  text-align: right;
 }
-/* line 12, ../scss/pages/_page-tu-luyen.scss */
+/* line 19, ../scss/pages/_page-tu-luyen.scss */
 .view-tu-luyen #views-exposed-form-tu-luyen-page .views-exposed-form .views-exposed-widgets h1.title {
   text-transform: uppercase;
   color: #ff6d00;
   padding-right: 30px;
 }
-/* line 17, ../scss/pages/_page-tu-luyen.scss */
+/* line 24, ../scss/pages/_page-tu-luyen.scss */
 .view-tu-luyen #views-exposed-form-tu-luyen-page .views-exposed-form .views-exposed-widgets #edit-field-category-exam-tid-wrapper {
   position: absolute;
   left: 0;
@@ -2005,47 +2016,73 @@ body {
   border-top: 2px solid #e8e8e8;
   text-align: center;
 }
-/* line 27, ../scss/pages/_page-tu-luyen.scss */
+/* line 34, ../scss/pages/_page-tu-luyen.scss */
 .view-tu-luyen #views-exposed-form-tu-luyen-page .views-exposed-form .views-exposed-widgets #edit-field-category-exam-tid-wrapper .form-type-bef-link {
   display: inline-block;
   margin-right: 5px;
 }
-/* line 30, ../scss/pages/_page-tu-luyen.scss */
+/* line 37, ../scss/pages/_page-tu-luyen.scss */
 .view-tu-luyen #views-exposed-form-tu-luyen-page .views-exposed-form .views-exposed-widgets #edit-field-category-exam-tid-wrapper .form-type-bef-link a {
   padding: 10px;
   background-color: #79B43E;
   color: #ffffff;
 }
-/* line 34, ../scss/pages/_page-tu-luyen.scss */
+/* line 41, ../scss/pages/_page-tu-luyen.scss */
 .view-tu-luyen #views-exposed-form-tu-luyen-page .views-exposed-form .views-exposed-widgets #edit-field-category-exam-tid-wrapper .form-type-bef-link a.active {
   background-color: #ff6d00;
 }
-/* line 43, ../scss/pages/_page-tu-luyen.scss */
+/* line 50, ../scss/pages/_page-tu-luyen.scss */
 .view-tu-luyen #views-exposed-form-tu-luyen-page .views-exposed-form .form-submit {
   background-color: #8a8c8d;
 }
-/* line 48, ../scss/pages/_page-tu-luyen.scss */
+/* line 53, ../scss/pages/_page-tu-luyen.scss */
+.view-tu-luyen #views-exposed-form-tu-luyen-page .views-exposed-form #edit-field-subject-tid-wrapper {
+  display: inline-block;
+  float: inherit;
+  padding: 0px 0px 0px 10px;
+}
+/* line 58, ../scss/pages/_page-tu-luyen.scss */
+.view-tu-luyen #views-exposed-form-tu-luyen-page .views-exposed-form .views-exposed-widget {
+  padding: 0px;
+}
+/* line 61, ../scss/pages/_page-tu-luyen.scss */
+.view-tu-luyen #views-exposed-form-tu-luyen-page .views-exposed-form .views-submit-button {
+  display: inline-block;
+  float: inherit;
+  padding: 0px 0px 0px 10px;
+}
+/* line 66, ../scss/pages/_page-tu-luyen.scss */
+.view-tu-luyen #views-exposed-form-tu-luyen-page .views-exposed-form #edit-field-class-tid-wrapper {
+  display: inline-block;
+  float: inherit;
+  padding: 0px 0px 0px 10px;
+}
+/* line 71, ../scss/pages/_page-tu-luyen.scss */
+.view-tu-luyen #views-exposed-form-tu-luyen-page .views-exposed-form .form-select {
+  width: 150px;
+}
+/* line 76, ../scss/pages/_page-tu-luyen.scss */
 .view-tu-luyen .view-content {
   margin-top: 30px;
   display: table;
   width: 100%;
 }
-/* line 52, ../scss/pages/_page-tu-luyen.scss */
+/* line 80, ../scss/pages/_page-tu-luyen.scss */
 .view-tu-luyen .view-content .views-row {
   margin-bottom: 30px;
 }
-/* line 54, ../scss/pages/_page-tu-luyen.scss */
+/* line 82, ../scss/pages/_page-tu-luyen.scss */
 .view-tu-luyen .view-content .views-row .row-content {
   background-color: #F8F8F8;
   padding: 5px 10px;
 }
-/* line 58, ../scss/pages/_page-tu-luyen.scss */
+/* line 86, ../scss/pages/_page-tu-luyen.scss */
 .view-tu-luyen .view-content .views-row .row-content .views-field-title a {
   font-weight: bold;
   line-height: 15px;
   color: #f25a29;
 }
-/* line 64, ../scss/pages/_page-tu-luyen.scss */
+/* line 92, ../scss/pages/_page-tu-luyen.scss */
 .view-tu-luyen .view-content .views-row .row-content .time-limite {
   display: inline-block;
   background-color: #8a8c8d;
@@ -2053,7 +2090,7 @@ body {
   margin-bottom: 3px;
   padding: 3px 5px;
 }
-/* line 70, ../scss/pages/_page-tu-luyen.scss */
+/* line 98, ../scss/pages/_page-tu-luyen.scss */
 .view-tu-luyen .view-content .views-row .row-content .time-limite .views-field {
   display: inline-block;
   color: #ffffff;
