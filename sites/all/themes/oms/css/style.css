@@ -1718,12 +1718,12 @@ body {
   top: 50%;
 }
 
-/* line 3, ../scss/pages/_user-profile.scss */
-.page-user .profile .user-picture {
+/* line 2, ../scss/pages/_user-profile.scss */
+.profile .user-picture {
   float: none;
 }
-/* line 6, ../scss/pages/_user-profile.scss */
-.page-user .profile .profile-title {
+/* line 5, ../scss/pages/_user-profile.scss */
+.profile .profile-title {
   background-color: #79B43E;
   text-align: left;
   text-transform: uppercase;
@@ -1732,35 +1732,35 @@ body {
   padding: 5px;
   margin-bottom: 15px;
 }
-/* line 15, ../scss/pages/_user-profile.scss */
-.page-user .profile .field {
+/* line 14, ../scss/pages/_user-profile.scss */
+.profile .field {
   display: table;
   width: 100%;
 }
-/* line 18, ../scss/pages/_user-profile.scss */
-.page-user .profile .field > div {
+/* line 17, ../scss/pages/_user-profile.scss */
+.profile .field > div {
   display: table-cell;
   text-align: left;
   padding: 8px;
 }
-/* line 23, ../scss/pages/_user-profile.scss */
-.page-user .profile .field .field-label {
+/* line 22, ../scss/pages/_user-profile.scss */
+.profile .field .field-label {
   width: 25%;
 }
-/* line 26, ../scss/pages/_user-profile.scss */
-.page-user .profile .field:nth-child(even) {
+/* line 25, ../scss/pages/_user-profile.scss */
+.profile .field:nth-child(even) {
   background-color: #f9f9f9;
 }
-/* line 30, ../scss/pages/_user-profile.scss */
-.page-user .profile .profile-left {
+/* line 29, ../scss/pages/_user-profile.scss */
+.profile .profile-left {
   text-align: center;
 }
-/* line 32, ../scss/pages/_user-profile.scss */
-.page-user .profile .profile-left .content {
+/* line 31, ../scss/pages/_user-profile.scss */
+.profile .profile-left .content {
   background-color: #F8F8F8;
 }
-/* line 37, ../scss/pages/_user-profile.scss */
-.page-user .profile .profile-left .user-tools ul li {
+/* line 36, ../scss/pages/_user-profile.scss */
+.profile .profile-left .user-tools ul li {
   padding-top: 10px;
   padding-bottom: 10px;
   background-color: #79B43E;
@@ -1770,8 +1770,8 @@ body {
   text-align: left;
   padding-left: 10px;
 }
-/* line 46, ../scss/pages/_user-profile.scss */
-.page-user .profile .profile-left .user-tools ul li a {
+/* line 45, ../scss/pages/_user-profile.scss */
+.profile .profile-left .user-tools ul li a {
   color: #ffffff;
 }
 
