@@ -65,6 +65,9 @@
  */
 ?>
 
+<?php
+global $user;
+?>
 <div id="wrap">
 
     <?php include(drupal_get_path('theme', 'oms').'/templates/pages/header.tpl.php'); ?>
@@ -78,31 +81,22 @@
             <div class="col-md-3 profile-left">
                 <div class="content">
                     <div class="profile-left">
-                        <div class="profile-title">Thông tin tài khoản</div>
-
-
-                        <!-- THEME DEBUG -->
-                        <!-- CALL: theme('user_picture') -->
-                        <!-- BEGIN OUTPUT from 'sites/all/themes/oms/templates/user/user-picture.tpl.php' -->
-                        <div class="user-picture">
-                            <a href="/user/1" title="Xem hồ sơ người dùng." class="active"><img typeof="foaf:Image" src="http://luyenthi.localhost/sites/default/files/styles/thumbnail/public/pictures/picture-1-1498807340.jpg?itok=nmxkER_x" alt="Ảnh của admin" title="Ảnh của admin"></a>  </div>
-
-                        <!-- END OUTPUT from 'sites/all/themes/oms/templates/user/user-picture.tpl.php' -->
-
-                        <div class="name"><span>Admin</span></div>
+                        <div class="profile-title"><?php echo t('Thông tin tài khoản')?></div>
+                        <?php print theme('user_picture', array('account' =>$user,'style_name' => 'content_highlighter'));?>
+                        <div class="name"><span><?php echo $user->name?></span></div>
                     </div>
                     <div class="user-tools">
                         <ul>
-                            <li><a href="/user/1">Thông tin cá nhân</a></li>
-                            <li><a href="/myuserpoints">Điểm của tôi</a></li>
-                            <li><a href="/user/paycard-history">Lịch sử nạp thẻ</a></li>
-                            <li><a href="/user/payment-transaction">Lịch sử giao dịch</a></li>
+                            <li><a href="<?php echo url('user/1')?>"><?php echo t('Thông tin cá nhân')?></a></li>
+                            <li class="active"><a href="<?php echo url('myuserpoints')?>"><?php echo t('Điểm của tôi')?></a></li>
+                            <li><a href="<?php echo url('user/paycard-history')?>"><?php echo t('Lịch sử nạp thẻ')?></a></li>
+                            <li><a href="<?php echo url('user/payment-transaction')?>"><?php echo t('Lịch sử giao dịch')?></a></li>
                         </ul>
                     </div>
                 </div>
             </div>
             <section class="col-md-9" role="main">
-                <div class="profile-title">Điểm của tôi</div>
+                <div class="profile-title"><?php echo t('Điểm của tôi')?></div>
                 <?php print render($page['content']); ?>
             </section>
         </div>

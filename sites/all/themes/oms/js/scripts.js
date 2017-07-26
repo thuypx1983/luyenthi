@@ -94,6 +94,8 @@ var NHAN_XE_VE_KET_QUA_PERFECT=Drupal.t('Result perfect');
          */
         addStyleToQuizTable:function () {
             $('#quiz-view-table').addClass('table').addClass('table-striped');
+            $('.userpoints-myuserpoints-list').addClass('table').addClass('table-striped');
+            $('.userpoints-myuserpoints-total').addClass('table').addClass('table-striped');
         },
 
         //google login

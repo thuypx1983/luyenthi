@@ -47,10 +47,10 @@
            </div>
            <div class="user-tools">
                <ul>
-                   <li><a href="<?php echo url('user/'.$user->uid)?>">Thông tin cá nhân</a></li>
-                   <li><a href="<?php echo url('myuserpoints')?>">Điểm của tôi</a></li>
-                   <li><a href="<?php echo url('user/paycard-history')?>">Lịch sử nạp thẻ</a></li>
-                   <li><a href="<?php echo url('user/payment-transaction')?>">Lịch sử giao dịch</a></li>
+                   <li class="active"><a href="<?php echo url('user/1')?>"><?php echo t('Thông tin cá nhân')?></a></li>
+                   <li><a href="<?php echo url('myuserpoints')?>"><?php echo t('Điểm của tôi')?></a></li>
+                   <li><a href="<?php echo url('user/paycard-history')?>"><?php echo t('Lịch sử nạp thẻ')?></a></li>
+                   <li><a href="<?php echo url('user/payment-transaction')?>"><?php echo t('Lịch sử giao dịch')?></a></li>
                </ul>
            </div>
        </div>
@@ -65,12 +65,5 @@
       print render($user_profile['field_school']);
       print render($user_profile['summary']);
       ?>
-
-        <?php print views_embed_view('thanh_toan_bang_the_cao', 'block_1')?>
-
-        <?php print views_embed_view('cac_dao_dich_gan_day','block_1')?>
-
-        <?php print views_embed_view('total_moneys','block_1')?>
-
-    </div>
+  </div>
 </div>

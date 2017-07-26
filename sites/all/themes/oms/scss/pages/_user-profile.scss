@@ -45,6 +45,18 @@
           a{
             color: $color_white;
           }
+          &.active{
+            position: relative;
+            background-color: $bg_button;
+            &:after{
+              @include fontAwesome();
+              right: 5px;
+              top: 10px;
+              content: "\f054";
+              font-size: 16px;
+              color: $color_white;
+            }
+          }
         }
       }
     }
