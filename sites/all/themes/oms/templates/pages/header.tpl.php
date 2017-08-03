@@ -9,6 +9,9 @@
   <div class="header">
     <div class="container">
       <div class="row">
+        <div class="hidden-md hidden-lg hidden-print">
+            <a href="#" id="menu-icon"><i class="fa fa-list"></i></a>
+        </div>
         <?php print render($page['header']); ?>
       </div>
 
@@ -19,7 +22,7 @@
     <div class="container">
       <div class="main-menu">
         <!-- start main-menu -->
-        <nav id="navigation" class="clearfix" role="navigation">
+        <div id="navigation" class="clearfix" role="navigation">
           <div id="main-menu">
             <?php
             if (module_exists('i18n_menu')) {
@@ -30,7 +33,7 @@
             print drupal_render($main_menu_tree);
             ?>
           </div>
-        </nav><!-- end main-menu -->
+        </div><!-- end main-menu -->
       </div>
     </div>
   </div>

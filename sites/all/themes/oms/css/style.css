@@ -216,6 +216,52 @@ a.i-button:hover {
   margin-bottom: 18px;
 }
 
+@media only screen and (max-width: 991px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/global\/_header\.scss}line{font-family:\00003116}}
+  #navigation {
+    background-attachment: scroll;
+    background-clip: border-box;
+    background-color: #363636;
+    background-image: none;
+    background-origin: padding-box;
+    background-position-x: 0;
+    background-position-y: 0;
+    background-repeat: repeat;
+    background-size: auto auto;
+    height: 100vh;
+    left: 0;
+    opacity: 0;
+    overflow-y: scroll;
+    padding-bottom: 0;
+    padding-left: 35px;
+    padding-right: 35px;
+    padding-top: 40px;
+    position: absolute;
+    top: 47px;
+    transform: translate(-350px, 0px);
+    transition-delay: 0s;
+    transition-duration: 0.3s;
+    transition-property: all;
+    transition-timing-function: linear;
+  }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/global\/_header\.scss}line{font-family:\00003142}}
+  #navigation.open {
+    opacity: 1;
+    transform: translate(0px, 0px);
+  }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/global\/_header\.scss}line{font-family:\00003146}}
+  #navigation .menu {
+    width: 280px;
+  }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/global\/_header\.scss}line{font-family:\00003149}}
+  #navigation .menu li {
+    margin-right: 0;
+    width: 100%;
+  }
+}
 @media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/global\/_body\.scss}line{font-family:\000031}}
 body {
   color: #666666;
