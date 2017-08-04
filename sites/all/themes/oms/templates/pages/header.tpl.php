@@ -6,13 +6,15 @@
       </div>
     </div>
   </div>
-  <div class="header">
+  <div class="header" id="header-mobile">
     <div class="container">
       <div class="row">
-        <div class="hidden-md hidden-lg hidden-print">
-            <a href="#" id="menu-icon"><i class="fa fa-list"></i></a>
+        <div class="hidden-md hidden-lg hidden-print menu-button">
+            <a href="#" id="menu-icon"><i class="fa fa-bars"></i></a>
         </div>
-        <?php print render($page['header']); ?>
+        <div class="header-left">
+          <?php print render($page['header']); ?>
+        </div>
       </div>
 
     </div>
