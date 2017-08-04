@@ -62,3 +62,24 @@ h1.page-title{
 #main{
   padding-bottom: 30px;
 }
+@include bp(max-width,$bp-tablet){
+  .banner-top-1{
+    .slick-prev::before, .slick-next::before{
+      color: $color_main;
+    }
+    .slick-prev{
+      left: 15px;
+      z-index: 1;
+    }
+    .slick-next{
+      right: 15px;
+      z-index: 1;
+    }
+    .slick-dots{
+      bottom: 0px;
+    }
+  }
+  .banner-top-2{
+    display: none;
+  }
+}

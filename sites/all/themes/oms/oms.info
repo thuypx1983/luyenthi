@@ -6,8 +6,11 @@ stylesheets[all][] = css/bootstrap-3.3.7/css/bootstrap.min.css
 stylesheets[all][] = fronts/font-awesome-4.7.0/css/font-awesome.min.css
 stylesheets[all][] = css/style.css
 stylesheets[all][] = color/colors.css
+stylesheets[all][] = js/slick/slick.css
+stylesheets[all][] = js/slick/slick-theme.css
 scripts[] = css/bootstrap-3.3.7/js/bootstrap.js
 scripts[] = js/jquery.matchHeight-min.js
+scripts[] = js/slick/slick.js
 scripts[] = js/scripts.js
 
 regions[header_top]         = Header top

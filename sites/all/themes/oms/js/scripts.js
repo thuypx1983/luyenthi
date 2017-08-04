@@ -128,6 +128,29 @@ var NHAN_XE_VE_KET_QUA_PERFECT=Drupal.t('Result perfect');
 
         },
 
+        slider:function(){
+            $('.banner-top-1 .row').slick({
+                dots: true,
+                infinite: true,
+                speed: 300,
+                responsive: [
+                    {
+                        breakpoint: 2024,
+                        settings: "unslick"
+                    },
+                    {
+                        breakpoint: 767,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1
+                        }
+                    }
+                    // You can unslick at a given breakpoint now by adding:
+                    // settings: "unslick"
+                    // instead of a settings object
+                ]
+            });
+        }
     }
 
     $(function () {
@@ -139,6 +162,7 @@ var NHAN_XE_VE_KET_QUA_PERFECT=Drupal.t('Result perfect');
         oms.addStyleToQuizTable();
         oms.triggerGoogleLoginButton();
         oms.addTitleToTuluyen();
+        oms.slider();
     })
 
 
