@@ -138,3 +138,17 @@
     }
   }
 }
+
+@include bp(max-width,$bp-tablet) {
+  #block-menu-menu-exams{
+    ul.menu{
+      li{
+
+        list-style: none;
+        width: 50%;
+        float: left;
+        padding: 15px;
+      }
+    }
+  }
+}
