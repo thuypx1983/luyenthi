@@ -150,6 +150,27 @@ var NHAN_XE_VE_KET_QUA_PERFECT=Drupal.t('Result perfect');
                     // instead of a settings object
                 ]
             });
+            $('#block-views-couses-block-1 .view-content').slick({
+                dots: true,
+                infinite: true,
+                speed: 300,
+                responsive: [
+                    {
+                        breakpoint: 2024,
+                        settings: "unslick"
+                    },
+                    {
+                        breakpoint: 767,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1
+                        }
+                    }
+                    // You can unslick at a given breakpoint now by adding:
+                    // settings: "unslick"
+                    // instead of a settings object
+                ]
+            });
         }
     }
 

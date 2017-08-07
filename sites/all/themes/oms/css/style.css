@@ -1858,6 +1858,16 @@ body {
   display: block;
 }
 
+@media only screen and (max-width: 991px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_front\.scss}line{font-family:\00003228}}
+  .home-highlight-right .news-slider-bar {
+    display: none;
+  }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_front\.scss}line{font-family:\00003231}}
+  .home-highlight-right #block-block-6 {
+    display: none;
+  }
+}
 @media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_course\.scss}line{font-family:\000032}}
 .view-couses .views-field {
   padding-left: 10px;
