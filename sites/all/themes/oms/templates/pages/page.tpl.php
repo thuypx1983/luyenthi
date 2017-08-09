@@ -64,76 +64,9 @@
  * @see template_process()
  */
 ?>
-
 <div id="wrap">
 
-  <header id="header" class="clearfix" role="banner">
-    <div class="header-top container-out">
-      <div class="container">
-        <div class="row">
-          <?php print render($page['header_top']); ?>
-        </div>
-      </div>
-    </div>
-    <div class="header">
-      <div class="container">
-        <div class="row">
-          <?php print render($page['header']); ?>
-        </div>
-
-      </div>
-
-    </div>
-    <div class="container-out main-menu-container">
-      <div class="container">
-        <div class="main-menu">
-          <!-- start main-menu -->
-          <nav id="navigation" class="clearfix" role="navigation">
-            <div id="main-menu">
-              <?php
-              if (module_exists('i18n_menu')) {
-                $main_menu_tree = i18n_menu_translated_tree(variable_get('menu_main_links_source', 'main-menu'));
-              } else {
-                $main_menu_tree = menu_tree(variable_get('menu_main_links_source', 'main-menu'));
-              }
-              print drupal_render($main_menu_tree);
-              ?>
-            </div>
-          </nav><!-- end main-menu -->
-        </div>
-      </div>
-    </div>
-    <div class="container-out header-bottom">
-      <div class="container">
-        <div class="row">
-          <?php print render($page['header_bottom']); ?>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <div class="container">
-    <?php print $messages; ?>
-  </div>
-
-  <?php if ($page['homequotes']): ?>
-    <div id="home-quote"> <?php print render($page['homequotes']); ?></div>
-  <?php endif; ?>
-
-  <?php if ($page['home_highlight_left'] || $page['home_highlight_right']): ?>
-    <div id="home-highlights" class="clearfix">
-      <div class="container">
-        <div class="row">
-          <?php if ($page['home_highlight_left']): ?>
-            <div class="home-highlight-left col-md-9"><?php print render($page['home_highlight_left']); ?></div>
-          <?php endif; ?>
-          <?php if ($page['home_highlight_right']): ?>
-            <div class="home-highlight-right col-md-3"><?php print render($page['home_highlight_right']); ?></div>
-          <?php endif; ?>
-        </div>
-      </div>
-    </div>
-  <?php endif; ?>
+  <?php include(drupal_get_path('theme', 'oms').'/templates/pages/header.tpl.php'); ?>
 
   <?php if (theme_get_setting('show_front_content') == 1): ?>
     <div id="main" class="container">
@@ -183,11 +116,8 @@
     </div>
     <div class="clear"></div>
   <?php endif; ?>
-  <div id="footer-bottom">
-    <div class="container">
-      <div class="row">
-        <?php print render($page['footer']) ?>
-      </div>
-    </div>
-  </div>
+
+    <!--footer -->
+  <?php include(drupal_get_path('theme', 'oms').'/templates/pages/footer.tpl.php'); ?>
+    <!--!footer -->
 </div>

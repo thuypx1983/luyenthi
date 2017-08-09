@@ -87,6 +87,7 @@
           </div>
       </div>
   <?php endif; ?>
+
   <?php if ($page['home_top']): ?>
       <div id="home-top" class="clearfix">
           <div class="container">
@@ -99,8 +100,6 @@
           </div>
       </div>
   <?php endif; ?>
-
-
 
   <?php if ($page['home_middle_left'] || $page['home_middle_right']): ?>
       <div id="home-middle" class="clearfix">
@@ -150,6 +149,7 @@
       <div class="clear"></div>
   <?php endif; ?>
 
-    <!--END footer -->
+    <!--footer -->
   <?php include(drupal_get_path('theme', 'oms').'/templates/pages/footer.tpl.php'); ?>
+    <!--!footer -->
 </div>
