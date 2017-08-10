@@ -223,13 +223,97 @@
   }
 }
 
-@include bp(max-width,$bp-tablet){
-  .home-highlight-right{
-    .news-slider-bar{
-      display: none;
+#block-views-couses-block-1,
+.banner-top-1 {
+  .slick-prev{
+    &:before{
+      @include fontAwesome();
+      content: "\f104";
+      font-size: 40px;
+      left:5px;
+      color: $color_link;
     }
-    #block-block-6{
-      display: none;
+  }
+  .slick-next {
+    &:before{
+      @include fontAwesome();
+      content: "\f105";
+      font-size: 40px;
+      right:5px;
+      color: $color_link;
     }
   }
 }
+
+
+
+  @include bp(max-width,$bp-tablet){
+    .home-highlight-right{
+      .news-slider-bar{
+        display: none;
+      }
+      #block-block-6{
+        display: none;
+      }
+    }
+    #block-views-couses-block-1{
+      .slick-prev::before, .slick-next::before{
+        color: $color_main;
+      }
+      .slick-prev{
+        left: 15px;
+        z-index: 1;
+      }
+      .slick-next{
+        right: 15px;
+        z-index: 1;
+      }
+      .slick-dots{
+        bottom: 0px;
+      }
+    }
+
+    #block-block-14{
+      display: block;
+      margin-top: 10px;
+      .col-md-6{
+        .content{
+          display: block;
+          color: $color_white;
+          height: 100%;
+          &>div{
+            display: block;
+            vertical-align: middle;
+            &.level-left{
+              width: auto;
+              text-align: center;
+              background-color: transparent !important;
+              img{
+                max-width: 35%;
+              }
+            }
+            &.level-right{
+              text-align: center;
+              &>span{
+                display: none;
+              }
+              h3{
+                font-size: 20px;
+                padding-left: 10px;
+                padding-right: 10px;
+              }
+            }
+          }
+          padding-top: 15px;
+          padding-bottom: 15px;
+
+        }
+        &:first-child .content{
+          background-color: $color_main;
+        }
+        &:last-child .content{
+          background-color: $color_main2;
+        }
+      }
+    }
+  }

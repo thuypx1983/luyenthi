@@ -28,9 +28,21 @@
         color: $color_white;
       }
     }
+    .views-field-field-price{
+
+    }
     .views-field-field-image{
       padding-left: 0px;
       padding-right: 0px;
+    }
+  }
+}
+@include bp(max-width,$bp-tablet){
+  .view-couses{
+    .row-content{
+      .views-field{
+        text-align: center;
+      }
     }
   }
 }
