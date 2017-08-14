@@ -953,6 +953,22 @@ body {
   color: inherit;
 }
 
+@media only screen and (max-width: 991px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\0000373}}
+  .tab-thi-thu .block-title {
+    display: block;
+    position: relative;
+  }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\0000377}}
+  .tab-thi-thu ul.quicktabs-tabs.quicktabs-style-nostyle {
+    padding-left: 0px;
+  }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_exams\.scss}line{font-family:\0000383}}
+  .view-display-id-block_1 .item {
+    margin-top: 30px;
+  }
+}
 @media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/components\/_block-user-profile\.scss}line{font-family:\000032}}
 .user-profile-block .content {
   display: block;
@@ -1595,6 +1611,31 @@ body {
   vertical-align: middle;
 }
 
+@media only screen and (max-width: 991px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-take\.scss}line{font-family:\00003262}}
+  .group-container {
+    display: block;
+  }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-take\.scss}line{font-family:\00003264}}
+  .group-container > div {
+    display: block;
+  }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-take\.scss}line{font-family:\00003267}}
+  .group-container .group-image {
+    display: block;
+    text-align: center;
+    width: 100%;
+  }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-take\.scss}line{font-family:\00003271}}
+  .group-container .group-image img {
+    max-width: 50%;
+  }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_quiz-take\.scss}line{font-family:\00003277}}
+  .node-type-quiz .node-quiz {
+    margin-bottom: 30px;
+  }
+}
 @media -sass-debug-info{filename{font-family:file\:\/\/\/media\/datas\/websites\/dev\.sutunam\.com\/luyenthi\/sites\/all\/themes\/oms\/scss\/pages\/_teacher\.scss}line{font-family:\000032}}
 .node-type-teacher #block-system-main {
   display: table;

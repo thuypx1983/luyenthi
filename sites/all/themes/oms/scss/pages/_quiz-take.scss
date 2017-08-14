@@ -256,3 +256,26 @@
   }
 
 }
+
+@include bp(max-width,$bp-tablet){
+
+  .group-container {
+    display: block;
+    &>div{
+      display: block;
+    }
+    .group-image{
+      display: block;
+      text-align: center;
+      width: 100%;
+      img{
+        max-width: 50%;
+      }
+    }
+  }
+  .node-type-quiz{
+    .node-quiz{
+      margin-bottom: 30px;
+    }
+  }
+}

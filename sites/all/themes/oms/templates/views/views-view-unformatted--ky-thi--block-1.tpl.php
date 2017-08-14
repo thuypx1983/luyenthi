@@ -21,7 +21,7 @@
             $nid=$item['raw']['target_id'];
             $quiz=node_load($nid);
             ?>
-            <div class="item col-md-3">
+            <div class="item col-md-3 col-xs-6 col-sm-6">
                 <?php
                 $field_subject=field_get_items('node',$quiz,'field_subject');
                 if($field_subject){

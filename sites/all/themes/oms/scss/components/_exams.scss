@@ -67,3 +67,21 @@
     }
   }
 }
+
+@include bp(max-width,$bp-tablet){
+  .tab-thi-thu {
+    .block-title{
+      display: block;
+      position: relative;
+    }
+    ul.quicktabs-tabs.quicktabs-style-nostyle{
+      padding-left: 0px;
+    }
+  }
+  .view-display-id-block_1{
+
+    .item{
+      margin-top: 30px;
+    }
+  }
+}
