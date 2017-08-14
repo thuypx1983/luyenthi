@@ -88,3 +88,11 @@ h1.page-title{
     }
   }
 }
+
+@include bp(max-width,$bp-tablet) {
+  #block-system-main{
+    &>.content{
+      margin-bottom: 30px;
+    }
+  }
+}

@@ -104,3 +104,50 @@
     }
   }
 }
+
+@include bp(max-width,$bp-tablet) {
+  .view-tu-luyen{
+    #views-exposed-form-tu-luyen-page{
+      .views-exposed-form {
+        .views-exposed-widgets{
+          padding-bottom: 70px;
+        }
+        .views-exposed-widget{
+          &:first-child{
+            display: block;
+            width: 100%;
+            text-align: left;
+          }
+        }
+        #edit-field-class-tid-wrapper{
+          padding-left: 0px;
+          float: left;
+          width: 33%;
+        }
+        #edit-field-subject-tid-wrapper{
+          float: left;
+          width: 33%;
+        }
+
+      }
+    }
+  }
+}
+
+@include bp(max-width,$bp-small) {
+  .view-tu-luyen{
+      #views-exposed-form-tu-luyen-page {
+        .views-exposed-form {
+          .views-exposed-widgets {
+            #edit-field-category-exam-tid-wrapper{
+              padding-top: 22px;
+              bottom: -38px;
+              .form-type-bef-link{
+                margin-bottom: 25px;
+              }
+            }
+          }
+        }
+      }
+  }
+}

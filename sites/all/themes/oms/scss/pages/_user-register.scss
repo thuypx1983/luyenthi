@@ -30,3 +30,18 @@
     }
   }
 }
+@include bp(max-width,$bp-tablet){
+
+  .page-user-register {
+    #user-register-form {
+      .description {
+        margin-left: 0px;
+      }
+      .captcha{
+        img{
+          margin-left: 0px;
+        }
+      }
+    }
+  }
+}
