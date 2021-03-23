@@ -4,9 +4,8 @@ core = 7.x
 configure = admin/config/system/persistent_login
 
 
-; Information added by Drupal.org packaging script on 2017-03-03
-version = "7.x-1.0"
+; Information added by Drupal.org packaging script on 2018-08-31
+version = "7.x-1.1"
 core = "7.x"
 project = "persistent_login"
-datestamp = "1488563586"
-
+datestamp = "1535750884"

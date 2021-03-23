@@ -248,13 +248,13 @@ ini_set('display_startup_errors', TRUE);
  * @endcode
  */
 $databases = array (
-  'default' => 
+  'default' =>
   array (
-    'default' => 
+    'default' =>
     array (
-      'database' => 'densach_vn',
-      'username' => 'densach_vn',
-      'password' => '3rgsdsqKR5Hf8QhX',
+      'database' => 'luyenthi',
+      'username' => 'root',
+      'password' => 'root',
       'host' => '127.0.0.1',
       'port' => '',
       'driver' => 'mysql',

@@ -56,7 +56,7 @@ function webform_ajax_form_webform_configure_form_alter(&$form, &$form_state) {
   $form['webform_ajax_fieldset']['webform_ajax_confirmation'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show confirmation screen'),
-    '#description' => t('Choose wether to retrieve in AJAX, after webform submit, the confirmation screen, or the webform itself. Available only when redirection is set to "No redirect".'),
+    '#description' => t('Choose whether to retrieve in AJAX, after webform submit, the confirmation screen, or the webform itself. Available only when redirection is set to "No redirect".'),
     '#default_value' => $node->webform['webform_ajax'] == WEBFORM_AJAX_NO_CONFIRM ? FALSE : TRUE,
     '#states' => array(
       'visible' => array(
@@ -124,25 +124,29 @@ function webform_ajax_form_webform_client_form_alter(&$form, $form_state, $form_
         if (in_array($button, array('next', 'submit'))) {
           $form['actions'][$button]['#ajax']['event'] = 'click';
         }
-        // Workaround for Drupal core bug http://drupal.org/node/1548976.
-        // As long as buttons HTML id are causing problems, and it has bad
-        // consequences on pages where Webform AJAX is active, we'll force
-        // custom ids on AJAXed Webform's buttons.
-        $form['actions'][$button]['#id'] = drupal_html_id('edit-webform-ajax-' . $button . '-' .$form['#node']->nid);
       }
     }
   }
+  // Suppress webform’s confirmation message. We want to control its rendering.
+  // @see https://www.drupal.org/project/webform_ajax/issues/2516730
+  $form['#webform_confirmation'] = $webform['confirmation'];
+  $form['#node']->webform['confirmation'] = FALSE;
 }
 
 /**
  * AJAX callback for Webform Prev/Next page and Submit buttons.
  *
- * Returns the new computed webform, unless it has been completed.
+ * Returns the newly computed webform, unless the submission is complete or the
+ * user is being redirected for some other reason.
  */
 function webform_ajax_callback($form, &$form_state) {
   $output = array();
   // If user completed his submission, determine what to do.
   if (!empty($form_state['webform_completed']) && empty($form_state['save_draft'])) {
+    $output = _webform_ajax_callback_completed($form, $form_state);
+  }
+  // The user is being redirected for some other reason.
+  elseif (!empty($form_state['redirect'])) {
     $output = _webform_ajax_callback_completed($form, $form_state);
   }
   // Else, we're just switching page, or saving draft.
@@ -176,6 +180,10 @@ function _webform_ajax_callback_completed($form, $form_state) {
     );
   }
   elseif ($form['#node']->webform['webform_ajax'] == WEBFORM_AJAX_CONFIRM) {
+    // Reinstate the confirmation message that was removed in
+    // webform_client_form_alter().
+    $form["#node"]->webform["confirmation"] = $form['#webform_confirmation'];
+
     // Display webform confirmation.
     $output = array(
       '#type' => 'markup',
@@ -183,26 +191,6 @@ function _webform_ajax_callback_completed($form, $form_state) {
       '#prefix' => '<div id="' . $form_state['values']['webform_ajax_wrapper_id'] . '">',
       '#suffix' => '</div>',
     );
-
-    // Unset confirmation message previously set with drupal_set_message()
-    // by Webform module, as we displayed it themed.
-    // Get messages without clearing queue.
-    $status_messages = drupal_get_messages('status', FALSE);
-    // If there are status messages, we may want to clear one.
-    if (isset($status_messages['status'])) {
-      // This is the message we want to erase.
-      $confirmation = check_markup($form['#node']->webform['confirmation'], $form['#node']->webform['confirmation_format'], '', TRUE);
-      $index = array_search($confirmation, $status_messages['status']);
-      // If message found, then remove it from the list, clear the messages queue,
-      // then reset all messages (except the one we removed).
-      if ($index !== FALSE) {
-        unset($status_messages['status'][$index]);
-        drupal_get_messages('status');
-        foreach ($status_messages['status'] as $message) {
-          drupal_set_message($message);
-        }
-      }
-    }
 
     // Add Javascript which will AJAXify "Return to form" link in webform_confirmation.
     $ajax_setting = array('webform_ajax' => array('wrappers' => array(
@@ -233,6 +221,7 @@ function _webform_ajax_callback_completed($form, $form_state) {
     // This output does not alter the page, and ensures Drupal messages are kept for the next request.
     $output = array(
       '#type' => 'ajax',
+      '#commands' => array(),
     );
   }
   return $output;
